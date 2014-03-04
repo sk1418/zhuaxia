@@ -17,10 +17,11 @@ STYLE={
     'uline'   : u'\x1b[4m', # Underline Texth
     'error'   : u'\x1b[31;5m', #blink, bold, red
     'red'     : u'\x1b[31;1m', # bold, red
-    'warning' : u'\x1b[33m', #blink, bold, yellow
-    'cyan'    : u'\x1b[36m', #bold, cyan
-    'green'   : u'\x1b[32m', #bold, cyan
-    'purple'  : u'\x1b[35m', #bold, cyan
+    'warning' : u'\x1b[33m', # bold, yellow
+    'cyan'    : u'\x1b[36m',
+    'green'   : u'\x1b[32m',
+    'blue'    : u'\x1b[34m', 
+    'purple'  : u'\x1b[35m',
 }
 
 def test_hl():
