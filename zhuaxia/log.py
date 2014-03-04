@@ -12,14 +12,20 @@ LVL_DICT={
 
 #style dict
 STYLE={
-    'bold'    : '\033[1m',
-    'clear'   : '\033[0m',
-    'uline'   : '\033[4m', # Underline Texth
-    'error'   : '\033[31;5m', #blink, bold, red
-    'red'     : '\033[31;1m', # bold, red
-    'warning' : '\033[33;1m', #blink, bold, yellow
-    'cyan'    : '\033[36;1m', #bold, cyan
+    'bold'    : u'\x1b[1m',
+    'clear'   : u'\x1b[0m',
+    'uline'   : u'\x1b[4m', # Underline Texth
+    'error'   : u'\x1b[31;5m', #blink, bold, red
+    'red'     : u'\x1b[31;1m', # bold, red
+    'warning' : u'\x1b[33m', #blink, bold, yellow
+    'cyan'    : u'\x1b[36m', #bold, cyan
+    'green'   : u'\x1b[32m', #bold, cyan
+    'purple'  : u'\x1b[35m', #bold, cyan
 }
+
+def test_hl():
+    for x in STYLE:
+        print hl("["+x+"]: this is test", x)
 
 def hl(text,style_key):
     """highlight the give text"""
@@ -28,11 +34,11 @@ def hl(text,style_key):
         return text
     return ('%('+k+')s'+ text + '%(clear)s') % STYLE
 
-def print_err(msg):
+def err(msg):
     """this is for normal error output before the logger was setup"""
     print hl('Error: ','error') + msg
 
-def print_warn(msg):
+def warn(msg):
     """this is for normal warning output before the logger was setup"""
     print hl('Warning: ','warning') + msg
 
@@ -56,13 +62,13 @@ class LogFormatter(logging.Formatter):
 
         # Replace the original format with one customized by logging level
         if record.levelno == logging.DEBUG:
-            self._fmt = TmuxbackFormatter.dbg_fmt
+            self._fmt = LogFormatter.dbg_fmt
         elif record.levelno == logging.INFO:
-            self._fmt = TmuxbackFormatter.info_fmt
+            self._fmt = LogFormatter.info_fmt
         elif record.levelno == logging.ERROR:
-            self._fmt = TmuxbackFormatter.err_fmt
+            self._fmt = LogFormatter.err_fmt
         elif record.levelno == logging.WARNING:
-            self._fmt = TmuxbackFormatter.warning_fmt
+            self._fmt = LogFormatter.warning_fmt
 
         # Call the original formatter class to do the grunt work
         result = logging.Formatter.format(self, record)
@@ -92,7 +98,7 @@ def setup_log(c_lvl_str, f_lvl_str):
 
     # create formatter and add it to the handlers
     fhFormatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    chFormatter = TmuxbackFormatter()
+    chFormatter = LogFormatter()
 
     fh.setFormatter(fhFormatter)
     ch.setFormatter(chFormatter)

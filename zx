@@ -1,0 +1,22 @@
+#!/usr/bin/python
+# -*- coding:utf-8 -*-
+import sys
+import zhuaxia.config as config
+import zhuaxia.util as util
+import logging
+import zhuaxia.log as log
+
+if __name__ == '__main__':
+
+    #load config
+    if not config.load_config():
+        print
+    
+    log.setup_log(config.LOG_LVL_CONSOLE, config.LOG_LVL_FILE)
+    LOG = log.get_logger()
+    LOG.error(u"test error")
+    LOG.info("test info")
+    LOG.warn("test warn")
+    print "============"
+    log.test_hl()
+

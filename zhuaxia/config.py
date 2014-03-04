@@ -78,4 +78,5 @@ def init_config():
     create config under home
     """
     #mkdir and copy files
+    os.makedirs(USER_PATH)
     shutil.copy(SAMPLE_CONF,CONF_FILE)

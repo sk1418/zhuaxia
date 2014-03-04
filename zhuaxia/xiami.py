@@ -5,6 +5,9 @@ import httplib
 from contextlib import closing
 from Cookie import SimpleCookie
 from os import path
+import log
+
+LOG = log.get_logger()
 
 #xiami android/iphone api urls
 url_xiami="http://www.xiami.com"
