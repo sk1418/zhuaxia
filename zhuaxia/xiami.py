@@ -52,33 +52,30 @@ class Xiami(object):
     def __init__(self, email, password, cookie_file):
         self.email = email
         self.password = password
-        self._auth = None
         self.cookie_file = cookie_file
         self.member_auth = ""
 
     def login_with_cookie(self):
         ts = str(int(time.time()))
-        cookie_member_auth = None
         if path.exists(self.cookie_file):
             print 'read member_auth from cookie file ...'
             with open(self.cookie_file) as f:
                 cif = f.read().split(' ')
-                tm_valid = (int(ts) - int(cif[0])) > 18000 
-                self._auth = cif[1]
-                cookie_member_auth = self._auth
+                ts_expired = (int(ts) - int(cif[0])) > 18000 
+                self.member_auth = cif[1]
                 auth = self.checkin()
-                if auth != '0' or tm_valid:
-                    cookie_member_auth = self.write_cookie(ts)
+                if auth == '0' or ts_expired:
+                    self.write_cookie(ts)
         else:
-           cookie_member_auth = self.write_cookie(ts)
-        self.member_auth = cookie_member_auth
+           self.write_cookie(ts)
+        
 
     def write_cookie(self, ts):
-        cookie_auth = self.login()
+        if not self.login():
+            exit(1)
         print 'Writing cookie file ...'
         with open(self.cookie_file, 'w') as f:
-            f.write(ts + ' ' + cookie_auth)
-        return cookie_auth
+            f.write(ts + ' ' + self.member_auth)
 
 
     def login(self):
@@ -96,15 +93,20 @@ class Xiami(object):
             conn.request('POST', '/web/login', data, headers)
             res = conn.getresponse()
             cookie = res.getheader('Set-Cookie')
-            self._auth = SimpleCookie(cookie)['member_auth'].value
-            print 'login success'
-            return self._auth
+            try:
+                self.member_auth = SimpleCookie(cookie)['member_auth'].value
+                print 'login success'
+                return True
+            except:
+                print "login failed"
+            return False
 
     def checkin(self):
-        if not self._auth:
-            self.login()
+        if not self.member_auth:
+            if not self.login():
+                exit(1)
         headers = checkin_headers
-        headers['Cookie'] = 'member_auth=%s; t_sign_auth=1' % self._auth
+        headers['Cookie'] = 'member_auth=%s; t_sign_auth=1' % self.member_auth
         with closing(httplib.HTTPConnection('www.xiami.com')) as conn:
             conn.request('POST', '/task/signin', None, headers)
             res = conn.getresponse()
@@ -112,4 +114,4 @@ class Xiami(object):
 
 if __name__ == '__main__':
     xm = Xiami('kent.yuan@gmail.com', '######','/tmp/test/xm.cookie')
-    xm.login_with_cookie();
+    xm.login()
