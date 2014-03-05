@@ -46,10 +46,10 @@ def warn(msg):
 class LogFormatter(logging.Formatter):
     """define different format for different log levels"""
 
-    err_fmt  = hl('ERROR: ','error') +"%(msg)s"
+    err_fmt  = hl('ERROR: _(msg)s', 'error').replace('_','%')
     dbg_fmt  = "DEBUG: %(module)s: %(lineno)d: %(msg)s"
-    info_fmt = "%(msg)s"
-    warning_fmt = hl('WARNING: ','warning') + "%(msg)s"
+    info_fmt = hl('_(msg)s', 'blue').replace('_','%')
+    warning_fmt = hl('WARNING: _(msg)s','warning').replace('_','%')
 
     def __init__(self, fmt="%(levelno)s: %(msg)s"):
         logging.Formatter.__init__(self, fmt)
@@ -79,12 +79,12 @@ class LogFormatter(logging.Formatter):
 
         return result
 
-def setup_log(c_lvl_str, f_lvl_str):
+def setup_log(logger_name,c_lvl_str, f_lvl_str):
     """setup_log, this function should be called only once at the beginning of application starts"""
     file_lvl = LVL_DICT[f_lvl_str.lower()]
     console_lvl = LVL_DICT[c_lvl_str.lower()]
 
-    logger = logging.getLogger('zhuaxiaLogger')
+    logger = logging.getLogger(logger_name)
     logger.setLevel(file_lvl)
 
     # create file handler which logs even debug messages
@@ -110,5 +110,5 @@ def setup_log(c_lvl_str, f_lvl_str):
 
     logger.debug("Log system setup successfully")
 
-def get_logger():
-    return logging.getLogger('zhuaxiaLogger')
+def get_logger(logger_name):
+    return logging.getLogger(logger_name)

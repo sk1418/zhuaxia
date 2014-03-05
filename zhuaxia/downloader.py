@@ -5,7 +5,7 @@ import config
 import log
 import datetime,time
 
-LOG = log.get_logger()
+LOG = log.get_logger('zxLogger')
 
 MULTITASKS_VALUES = ('THREAD', 'PROCESS')
 

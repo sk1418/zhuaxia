@@ -7,13 +7,16 @@ import logging
 import zhuaxia.log as log
 
 if __name__ == '__main__':
+    logger_name = 'zxLogger'
 
     #load config
     if not config.load_config():
-        print
+        print 'xx'
     
-    log.setup_log(config.LOG_LVL_CONSOLE, config.LOG_LVL_FILE)
-    LOG = log.get_logger()
+    log.setup_log(logger_name, config.LOG_LVL_CONSOLE, config.LOG_LVL_FILE)
+
+    LOG = log.get_logger(logger_name)
+
     LOG.error(u"test error")
     LOG.info("test info")
     LOG.warn("test warn")
