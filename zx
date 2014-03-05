@@ -5,6 +5,7 @@ import zhuaxia.config as config
 import zhuaxia.util as util
 import logging
 import zhuaxia.log as log
+import zhuaxia.xiami as xm
 
 if __name__ == '__main__':
     logger_name = 'zxLogger'
@@ -17,9 +18,12 @@ if __name__ == '__main__':
 
     LOG = log.get_logger(logger_name)
 
-    LOG.error(u"test error")
-    LOG.info("test info")
-    LOG.warn("test warn")
-    print "============"
-    log.test_hl()
+    xia = xm.Xiami('kent.yuan@gmail.com', '######','/tmp/test/xm.cookie')
+    xia.login()
+
+    #LOG.error(u"test error")
+    #LOG.info("test info")
+    #LOG.warn("test warn")
+    #print "============"
+    #log.test_hl()
 

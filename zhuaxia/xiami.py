@@ -5,9 +5,9 @@ import httplib
 from contextlib import closing
 from Cookie import SimpleCookie
 from os import path
-import log
+import log,config
 
-LOG = log.get_logger()
+LOG = log.get_logger("zxLogger")
 
 #xiami android/iphone api urls
 url_xiami="http://www.xiami.com"
@@ -22,6 +22,7 @@ url_lib_songs = "http://www.xiami.com/app/android/lib-songs?uid=%s&page=%s"
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
 
 
+
 class Song(object):
     """xiami Song class"""
     def init(self,url):
@@ -31,8 +32,10 @@ class Song(object):
 class Album(object):
     """The xiami album object"""
     def __init__(self, url):
+        
         self.url = url 
         self.album_id = album_id
+        self.songs = [] # list of Song
 
 class Favorite(object):
     def __init__(self,url):
@@ -61,7 +64,7 @@ class Xiami(object):
     def login_with_cookie(self):
         ts = str(int(time.time()))
         if path.exists(self.cookie_file):
-            print 'read member_auth from cookie file ...'
+            LOG.info('read member_auth from cookie file ...')
             with open(self.cookie_file) as f:
                 cif = f.read().split(' ')
                 ts_expired = (int(ts) - int(cif[0])) > 18000 
@@ -76,13 +79,13 @@ class Xiami(object):
     def write_cookie(self, ts):
         if not self.login():
             exit(1)
-        print 'Writing cookie file ...'
+        LOG.info( 'Writing cookie file ...')
         with open(self.cookie_file, 'w') as f:
             f.write(ts + ' ' + self.member_auth)
 
 
     def login(self):
-        print 'login with email and password....'
+        LOG.info( 'login with email and password....')
         _form = {
             'email': self.email,
             'password': self.password,
@@ -93,15 +96,18 @@ class Xiami(object):
         headers['Referer'] = 'http://www.xiami.com/web/login'
         headers['Content-Type'] = 'application/x-www-form-urlencoded'
         with closing(httplib.HTTPConnection('www.xiami.com')) as conn:
+            #proxy setting
+            if config.PROXY_HAS :
+                conn = httplib.HTTPConnection(config.PROXY_HOST, config.PROXY_PORT)
             conn.request('POST', '/web/login', data, headers)
             res = conn.getresponse()
             cookie = res.getheader('Set-Cookie')
             try:
                 self.member_auth = SimpleCookie(cookie)['member_auth'].value
-                print 'login success'
+                LOG.info( 'login success')
                 return True
             except:
-                print "login failed"
+                LOG.error( "login failed")
             return False
 
     def checkin(self):
@@ -115,6 +121,3 @@ class Xiami(object):
             res = conn.getresponse()
             return res.read()
 
-if __name__ == '__main__':
-    xm = Xiami('kent.yuan@gmail.com', '######','/tmp/test/xm.cookie')
-    xm.login()

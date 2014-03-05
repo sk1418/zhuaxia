@@ -22,12 +22,16 @@ LOG_LVL_CONSOLE = 'INFO'
 MULTITASKS_MODE = 'Thread'
 MULTITASKS_POOL_SIZE = 5
 DOWNLOAD_DIR='/tmp'
+PROXY_HAS=False
+PROXY_HOST=''
+PROXY_PORT=''
 
 def load_config():
 
     config_warn_msg = "Cannot load %s config, use default: %s"
 
-    global LOG_LVL_FILE, LOG_LVL_CONSOLE, MULTITASKS_MODE, MULTITASKS_POOL_SIZE
+    global LOG_LVL_FILE, LOG_LVL_CONSOLE, MULTITASKS_MODE, MULTITASKS_POOL_SIZE, \
+            PROXY_HAS, PROXY_HOST, PROXY_PORT
     """
         load config from config file 
         return True if sucessful, otherwise False
@@ -49,6 +53,9 @@ def load_config():
         multi_mode = cf.get('settings', 'multitasks.mode')
         XIAMI_LOGIN_EMAIL = cf.get('settings','xiami.auth.email')
         XIAMI_LOGIN_PASSWORD = cf.get('settings','xiami.auth.password')
+        PROXY_HAS = cf.getboolean('settings', 'proxy.active')
+        PROXY_HOST= cf.get('settings', 'proxy.host')
+        PROXY_PORT= cf.get('settings', 'proxy.port')
 
         #TODO
         #read download dir, if not exists, create the dir
@@ -69,7 +76,7 @@ def load_config():
             LOG_LVL_CONSOLE = lvl_console
     except:
 
-        log.print_warn('Error occured when loading config, using all default values')
+        log.warn('Error occured when loading config, using all default values')
         return False
     return True;
 
