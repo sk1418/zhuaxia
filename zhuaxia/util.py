@@ -9,6 +9,7 @@ import random, string
 
 
 
+
 def random_str(length):
     return ''.join(random.choice(string.lowercase) for i in range(length))
 
@@ -16,3 +17,4 @@ def random_str(length):
 def get_line(s):
     """get a gui line with given char"""
     return str(s)*72
+

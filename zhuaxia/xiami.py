@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import time
-import urllib
+import urllib,urllib2
 import httplib
 from contextlib import closing
 from Cookie import SimpleCookie
@@ -21,12 +21,37 @@ url_lib_songs = "http://www.xiami.com/app/android/lib-songs?uid=%s&page=%s"
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
 
-
-
 class Song(object):
     """xiami Song class"""
-    def init(self,url):
+    def init(self,xm,url):
+        self.xm = xm
         self.url = url
+        self.song_id = re.search(r'(?=/song/)\d+', self.url).group(1)
+        self.dl_link = ''
+        self.mp3_meta = {}
+        self.filename = ''
+
+    def load_dl_link(self):
+        if not self.dl_link:
+            api_json = xm.read_link(song_url % song_id)
+            j = json.loads(api_json)
+            link = j['song']['song_location']
+            self.dl_link = link
+        return self.dl_link
+    
+    def write_mp3_meta_info(self, mp3_meta, filename):
+        id3 = ID3()
+        id3.add(TRCK(encoding=3, text=mp3_meta['track']))
+        id3.add(TDRC(encoding=3, text=mp3_meta['year']))
+        id3.add(TIT2(encoding=3, text=mp3_meta['song_name']))
+        id3.add(TALB(encoding=3, text=mp3_meta['album_name']))
+        id3.add(TPE1(encoding=3, text=mp3_meta['artist_name']))
+        id3.add(TPOS(encoding=3, text=mp3_meta['cd_serial']))
+        id3.add(COMM(encoding=3, desc=u'Comment', text=u'\n\n'.join([mp3_meta['song_url'], mp3_meta['album_description']])))
+        id3.save(self.filename)
+
+
+    
 
         
 class Album(object):
@@ -55,11 +80,19 @@ checkin_headers = {
 }
 
 class Xiami(object):
+
     def __init__(self, email, password, cookie_file):
         self.email = email
         self.password = password
         self.cookie_file = cookie_file
         self.member_auth = ""
+        
+        #do login
+        self.login_with_cookie()
+        #init opener
+        self.init_opener()
+        
+
 
     def login_with_cookie(self):
         ts = str(int(time.time()))
@@ -120,4 +153,13 @@ class Xiami(object):
             conn.request('POST', '/task/signin', None, headers)
             res = conn.getresponse()
             return res.read()
+
+    
+    def init_opener(self):
+        self.opener = urllib2.build_opener()
+        self.opener.addheaders = [('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'), ('User-Agent', AGENT), ('Cookie', 'member_auth=%s' % self.member_auth)]
+
+    def read_link(self, link):
+        return self.opener.open(linke).read()
+
 
