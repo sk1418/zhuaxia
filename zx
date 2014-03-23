@@ -18,8 +18,11 @@ if __name__ == '__main__':
 
     LOG = log.get_logger(logger_name)
 
-    xia = xm.Xiami('kent.yuan@gmail.com', '######','/tmp/test/xm.cookie')
-    xia.login()
+    xiami_obj = xm.Xiami('kent.yuan@gmail.com', '######','/tmp/test/xm.cookie')
+    song = xm.Song(xiami_obj,'http://www.xiami.com/song/1769901638')
+    print song.filename
+    print song.dl_link
+    #xia.login()
 
     #LOG.error(u"test error")
     #LOG.info("test info")

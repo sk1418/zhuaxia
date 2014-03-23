@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
 import time
+import re
+import json
 import urllib,urllib2
 import httplib
 from contextlib import closing
@@ -23,31 +25,54 @@ AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chr
 
 class Song(object):
     """xiami Song class"""
-    def init(self,xm,url):
-        self.xm = xm
+    def __init__(self,xiami_obj,url):
+        self.xm = xiami_obj
         self.url = url
-        self.song_id = re.search(r'(?=/song/)\d+', self.url).group(1)
+        self.album_id = ''
+        self.song_id = re.search(r'(?<=/song/)\d+', self.url).group(0)
+        self.album_id = ''
         self.dl_link = ''
-        self.mp3_meta = {}
+        self.lyrics_link = ''
+        self.artist_name = ''
+        self.song_name = self.song_id
+        self.album_name = ''
         self.filename = ''
 
-    def load_dl_link(self):
-        if not self.dl_link:
-            api_json = xm.read_link(song_url % song_id)
-            j = json.loads(api_json)
-            link = j['song']['song_location']
-            self.dl_link = link
-        return self.dl_link
-    
+        self.year = None
+        self.track=None
+
+        self.init_song()
+
+
+    def init_song(self):
+        api_json = self.xm.read_link(url_song % self.song_id)
+        j = json.loads(api_json)
+
+        #name
+        self.song_name = j['song']['song_name']
+        # download link
+        self.dl_link = j['song']['song_location']
+        # lyrics link
+        self.lyrics_link = j['song']['song_lrc']
+        # artist_name
+        self.artist_name = j['song']['artist_name']
+        # album id, name
+        self.album_name = j['song']['album_name']
+        self.album_id = j['song']['album_id']
+
+        #filename  artistName_songName.mp3
+        self.filename = (self.artist_name + "_" if self.artist_name  else "" ) + self.song_name + u'.mp3'
+
+
     def write_mp3_meta_info(self, mp3_meta, filename):
         id3 = ID3()
-        id3.add(TRCK(encoding=3, text=mp3_meta['track']))
-        id3.add(TDRC(encoding=3, text=mp3_meta['year']))
-        id3.add(TIT2(encoding=3, text=mp3_meta['song_name']))
-        id3.add(TALB(encoding=3, text=mp3_meta['album_name']))
-        id3.add(TPE1(encoding=3, text=mp3_meta['artist_name']))
-        id3.add(TPOS(encoding=3, text=mp3_meta['cd_serial']))
-        id3.add(COMM(encoding=3, desc=u'Comment', text=u'\n\n'.join([mp3_meta['song_url'], mp3_meta['album_description']])))
+        id3.add(TRCK(encoding=3, text=self.track if self.track else ""))
+        id3.add(TDRC(encoding=3, text=self.year if self.year else ""))
+        id3.add(TIT2(encoding=3, text=self.song_name))
+        id3.add(TALB(encoding=3, text=self.album_name))
+        id3.add(TPE1(encoding=3, text=self.artist_name))
+        #id3.add(TPOS(encoding=3, text=mp3_meta['cd_serial']))
+        #id3.add(COMM(encoding=3, desc=u'Comment', text=u'\n\n'.join([mp3_meta['url_song'], mp3_meta['album_description']])))
         id3.save(self.filename)
 
 
@@ -86,7 +111,7 @@ class Xiami(object):
         self.password = password
         self.cookie_file = cookie_file
         self.member_auth = ""
-        
+        self.opener = None 
         #do login
         self.login_with_cookie()
         #init opener
@@ -160,6 +185,6 @@ class Xiami(object):
         self.opener.addheaders = [('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'), ('User-Agent', AGENT), ('Cookie', 'member_auth=%s' % self.member_auth)]
 
     def read_link(self, link):
-        return self.opener.open(linke).read()
+        return self.opener.open(link).read()
 
 
