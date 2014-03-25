@@ -59,7 +59,8 @@ class Song(object):
         self.filename = (self.artist_name + "_" if self.artist_name  else "" ) + self.song_name + u'.mp3'
 
 
-    def write_mp3_meta_info(self, mp3_meta, filename):
+
+    def write_mp3_meta_info(self, filename):
         id3 = ID3()
         id3.add(TRCK(encoding=3, text=self.track if self.track else ""))
         id3.add(TDRC(encoding=3, text=self.year if self.year else ""))
