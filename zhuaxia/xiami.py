@@ -1,12 +1,7 @@
 # -*- coding:utf-8 -*-
 import time
 import re
-import json
-import urllib2
-import httplib
 import requests
-from contextlib import closing
-from Cookie import SimpleCookie
 from os import path
 import log,config
 
@@ -47,9 +42,7 @@ class Song(object):
 
 
     def init_song(self):
-        api_json = self.xm.read_link(url_song % self.song_id)
-        j = json.loads(api_json)
-
+        j = self.xm.read_link(url_song % self.song_id).json()
         #name
         self.song_name = j['song']['song_name']
         # download link
@@ -171,6 +164,8 @@ class Xiami(object):
         self.opener.addheaders = [('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'), ('User-Agent', AGENT), ('Cookie', 'member_auth=%s' % self.member_auth)]
 
     def read_link(self, link):
-        return self.opener.open(link).read()
+        headers = {'User-Agent':AGENT}
+        headers['Cookie'] = 'member_auth=%s' % self.member_auth
+        return requests.get(link,headers=headers)
 
 
