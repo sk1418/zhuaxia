@@ -2,8 +2,9 @@
 import time
 import re
 import json
-import urllib,urllib2
+import urllib2
 import httplib
+import requests
 from contextlib import closing
 from Cookie import SimpleCookie
 from os import path
@@ -13,6 +14,7 @@ LOG = log.get_logger("zxLogger")
 
 #xiami android/iphone api urls
 url_xiami="http://www.xiami.com"
+url_login="https://login.xiami.com/member/login"
 url_song = "http://www.xiami.com/app/android/song?id=%s"
 url_album = "http://www.xiami.com/app/android/album?id=%s"
 url_collect = "http://www.xiami.com/app/android/collect?id=%s"
@@ -127,8 +129,7 @@ class Xiami(object):
                 cif = f.read().split(' ')
                 ts_expired = (int(ts) - int(cif[0])) > 18000 
                 self.member_auth = cif[1]
-                auth = self.checkin()
-                if auth == '0' or ts_expired:
+                if ts_expired:
                     self.write_cookie(ts)
         else:
            self.write_cookie(ts)
@@ -147,39 +148,24 @@ class Xiami(object):
         _form = {
             'email': self.email,
             'password': self.password,
-            'LoginButton': '登录',
+            'submit': '登录',
         }
-        data = urllib.urlencode(_form)
         headers = {'User-Agent': AGENT}
-        headers['Referer'] = 'http://www.xiami.com/web/login'
-        headers['Content-Type'] = 'application/x-www-form-urlencoded'
-        with closing(httplib.HTTPConnection('www.xiami.com')) as conn:
-            #proxy setting
-            if config.PROXY_HAS :
-                conn = httplib.HTTPConnection(config.PROXY_HOST, config.PROXY_PORT)
-            conn.request('POST', '/web/login', data, headers)
-            res = conn.getresponse()
-            cookie = res.getheader('Set-Cookie')
-            try:
-                self.member_auth = SimpleCookie(cookie)['member_auth'].value
-                LOG.info( 'login success')
-                return True
-            except:
-                LOG.error( "login failed")
+        headers['Referer'] = url_login
+        # do http post login
+        try:
+            sess = requests.Session()
+            sess.headers['User-Agent'] = AGENT
+            sess.verify = False
+            sess.mount('https://', requests.adapters.HTTPAdapter())
+            res = sess.post(url_login, data=_form)
+            self.memeber_auth = sess.cookies['member_auth']
+            LOG.info( 'login success')
+            return True
+        except:
+            LOG.error( "login failed")
             return False
 
-    def checkin(self):
-        if not self.member_auth:
-            if not self.login():
-                exit(1)
-        headers = checkin_headers
-        headers['Cookie'] = 'member_auth=%s; t_sign_auth=1' % self.member_auth
-        with closing(httplib.HTTPConnection('www.xiami.com')) as conn:
-            conn.request('POST', '/task/signin', None, headers)
-            res = conn.getresponse()
-            return res.read()
-
-    
     def init_opener(self):
         self.opener = urllib2.build_opener()
         self.opener.addheaders = [('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'), ('User-Agent', AGENT), ('Cookie', 'member_auth=%s' % self.member_auth)]

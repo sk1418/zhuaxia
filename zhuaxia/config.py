@@ -31,7 +31,7 @@ def load_config():
     config_warn_msg = "Cannot load %s config, use default: %s"
 
     global LOG_LVL_FILE, LOG_LVL_CONSOLE, MULTITASKS_MODE, MULTITASKS_POOL_SIZE, \
-            PROXY_HAS, PROXY_HOST, PROXY_PORT
+            PROXY_HAS, PROXY_HOST, PROXY_PORT, XIAMI_LOGIN_EMAIL, XIAMI_LOGIN_PASSWORD
     """
         load config from config file 
         return True if sucessful, otherwise False
