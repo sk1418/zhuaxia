@@ -25,18 +25,13 @@ class Song(object):
     def __init__(self,xiami_obj,url):
         self.xm = xiami_obj
         self.url = url
-        self.album_id = ''
         self.song_id = re.search(r'(?<=/song/)\d+', self.url).group(0)
-        self.album_id = ''
-        self.dl_link = ''
-        self.lyrics_link = ''
-        self.artist_name = ''
-        self.song_name = self.song_id
-        self.album_name = ''
-        self.filename = ''
 
         self.year = None
         self.track=None
+        
+        #used only for album/collection etc. create a dir to group all songs
+        self.group_dir = None
 
         self.init_song()
 
@@ -107,11 +102,8 @@ class Xiami(object):
         self.password = password
         self.cookie_file = cookie_file
         self.member_auth = ""
-        self.opener = None 
         #do login
         self.login_with_cookie()
-        #init opener
-        self.init_opener()
         
 
 
@@ -159,10 +151,6 @@ class Xiami(object):
         except:
             LOG.error( "login failed")
             return False
-
-    def init_opener(self):
-        self.opener = urllib2.build_opener()
-        self.opener.addheaders = [('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'), ('User-Agent', AGENT), ('Cookie', 'member_auth=%s' % self.member_auth)]
 
     def read_link(self, link):
         headers = {'User-Agent':AGENT}

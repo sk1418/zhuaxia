@@ -6,6 +6,7 @@ import zhuaxia.util as util
 import logging
 import zhuaxia.log as log
 import zhuaxia.xiami as xm
+import zhuaxia.downloader as downloader
 
 if __name__ == '__main__':
     logger_name = 'zxLogger'
@@ -25,6 +26,8 @@ if __name__ == '__main__':
     song = xm.Song(xiami_obj,'http://www.xiami.com/song/1769901638')
     print song.filename
     print song.dl_link
+    downloader.download(song)
+
 
     #LOG.error(u"test error")
     #LOG.info("test info")

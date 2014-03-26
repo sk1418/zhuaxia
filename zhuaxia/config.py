@@ -50,6 +50,7 @@ def load_config():
         multi_mode = cf.get('settings', 'multitasks.mode')
         XIAMI_LOGIN_EMAIL = cf.get('settings','xiami.auth.email')
         XIAMI_LOGIN_PASSWORD = cf.get('settings','xiami.auth.password')
+        PROX
 
         #TODO
         #read download dir, if not exists, create the dir
