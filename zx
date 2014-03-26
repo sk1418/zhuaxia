@@ -1,5 +1,5 @@
-#!/usr/bin/python
 # -*- coding:utf-8 -*-
+#!/usr/bin/python
 import sys
 import zhuaxia.config as config
 import zhuaxia.util as util
