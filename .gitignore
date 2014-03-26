@@ -8,3 +8,4 @@ dist/*.*
 *.bak
 *.egg-info/*.*
 thought/*.*
+.idea/

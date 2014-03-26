@@ -1,5 +1,5 @@
+#!/bin/python
 # -*- coding:utf-8 -*-
-#!/usr/bin/python
 import sys
 import zhuaxia.config as config
 import zhuaxia.util as util
@@ -23,10 +23,15 @@ if __name__ == '__main__':
     print 'pwd:' +config.XIAMI_LOGIN_PASSWORD
 
     xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,config.XIAMI_LOGIN_PASSWORD,'/tmp/test/xm.cookie')
-    song = xm.Song(xiami_obj,'http://www.xiami.com/song/1769901638')
-    print song.filename
-    print song.dl_link
-    downloader.download(song)
+    # song = xm.Song(xiami_obj,'http://www.xiami.com/song/1769901638')
+    # print song.filename
+    # print song.dl_link
+    # downloader.download(song)
+
+    album = xm.Album(xiami_obj, 'http://www.xiami.com/album/253320')
+
+    for s in album.songs:
+        print s.song_name
 
 
     #LOG.error(u"test error")

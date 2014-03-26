@@ -2,8 +2,8 @@
 import time
 import re
 import requests
+import log, config
 from os import path
-import log,config
 
 LOG = log.get_logger("zxLogger")
 
@@ -22,21 +22,32 @@ AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chr
 
 class Song(object):
     """xiami Song class"""
-    def __init__(self,xiami_obj,url):
+    def __init__(self,xiami_obj,url=None,song_json=None):
         self.xm = xiami_obj
-        self.url = url
-        self.song_id = re.search(r'(?<=/song/)\d+', self.url).group(0)
-
-        self.year = None
-        self.track=None
-        
-        #used only for album/collection etc. create a dir to group all songs
-        self.group_dir = None
-
-        self.init_song()
+        if url:
+            self.url = url
+            self.init_by_url(url)
+        elif song_json:
+            self.init_by_json(song_json)
 
 
-    def init_song(self):
+    def init_by_json(self, song_json):
+        self.song_id = song_json['song_id']
+        self.album_id = song_json['album_id']
+        self.song_name = song_json['name']
+        self.dl_link = song_json['location']
+        # lyrics link
+        self.lyrics_link = song_json['lyric']
+        # artist_name
+        self.artist_name = song_json['artist_name']
+        # album id, name
+        self.album_name = song_json['title']
+
+        self.filename = self.song_name + u'.mp3'
+        self.group_dir = self.artist_name + u'_' + self.album_name
+
+    def init_by_url(self,url):
+        self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
         j = self.xm.read_link(url_song % self.song_id).json()
         #name
         self.song_name = j['song']['song_name']
@@ -50,9 +61,10 @@ class Song(object):
         self.album_name = j['song']['album_name']
         self.album_id = j['song']['album_id']
 
+        #used only for album/collection etc. create a dir to group all songs
+        self.group_dir = None
         #filename  artistName_songName.mp3
         self.filename = (self.artist_name + "_" if self.artist_name  else "" ) + self.song_name + u'.mp3'
-
 
 
     def write_mp3_meta_info(self, filename):
@@ -72,11 +84,40 @@ class Song(object):
         
 class Album(object):
     """The xiami album object"""
-    def __init__(self, url):
-        
+    def __init__(self, xm_obj, url):
+
+        self.xm = xm_obj
         self.url = url 
-        self.album_id = album_id
+        self.album_id = re.search(r'(?<=/album/)\d+', self.url).group(0)
+
+        self.year = None
+        self.track=None
         self.songs = [] # list of Song
+        self.init_album()
+
+    def init_album(self):
+        j = self.xm.read_link(url_album % self.album_id).json()
+        #name
+        self.album_name = j['album']['title']
+        #album logo
+        self.logo = j['album']['album_logo']
+        # artist_name
+        self.artist_name = j['album']['artist_name']
+
+        #description
+        self.album_desc = j['album']['description']
+
+        #handle songs
+        for jsong in j['album']['songs']:
+            song = Song(self.xm, song_json=jsong)
+            self.songs.append(song)
+
+
+
+
+
+
+
 
 class Favorite(object):
     def __init__(self,url):
