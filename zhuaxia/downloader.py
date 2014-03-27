@@ -30,13 +30,16 @@ def download(song):
     #TODO modify the mp3 file
 
 def start_download(songs):
-    if 'PROCESS' == upper(config.MULTITASKS_MODE):
-        pool = multiprocessing.Pool(processes=config.MULTITASKS_POOL_SIZE)
-    else:
-        from multiprocessing.pool import ThreadPool
-        pool = ThreadPool(processes=config.MULTITASKS_POOL_SIZE)
-    for song in Songs:
-        pool.apply_async(download,song)
+    LOG.info(config.MULTITASKS_MODE)
+    pool = multiprocessing.Pool(processes=config.MULTITASKS_POOL_SIZE)
+    #if 'PROCESS' == config.MULTITASKS_MODE.upper():
+        #pool = multiprocessing.Pool(processes=config.MULTITASKS_POOL_SIZE)
+    #else:
+        #from multiprocessing.pool import ThreadPool
+        #pool = ThreadPool(processes=config.MULTITASKS_POOL_SIZE)
+    #for song in songs:
+        #pool.apply_async(download,song)
+    pool.map_async(download, songs)
     pool.close()
     pool.join()
 
