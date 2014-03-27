@@ -6,6 +6,7 @@ import config
 import log
 import datetime,time
 import multiprocessing
+from mutagen.id3 import ID3,TRCK,TIT2,TALB,TPE1,APIC,TDRC,COMM,TPOS,USLT
 
 LOG = log.get_logger('zxLogger')
 
@@ -15,16 +16,17 @@ def download(song):
     if ( not song.filename ) or (not song.dl_link):
         LOG.err( 'Song [id:%s] cannot downloaded' % song.song_id)
         return
-    mp3_file = path.join(config.DOWNLOAD_DIR,song.group_dir, song.filename) if song.group_dir \
-            else path.join(config.DOWNLOAD_DIR, song.filename)
-    print log.hl('[starting] %s' % song.filename ,'cyan')
-    #urllib.urlretrieve(url,filename)   
+    mp3_file = song.abs_path
+
+    LOG.info('[starting] %s' % song.filename )
     r = requests.get(song.dl_link, stream=True)
     if r.status_code == 200:
         with open(mp3_file,'wb') as mp3:
             for chunk in r.iter_content():
                 mp3.write(chunk)
-    print log.hl('[finished] %s' % song.filename ,'cyan')
+    LOG.info('[finished] %s' % song.filename )
+    write_mp3_meta_info(song)
+    
     #TODO modify the mp3 file
 
 def start_download(songs):
@@ -37,3 +39,15 @@ def start_download(songs):
         pool.apply_async(download,song)
     pool.close()
     pool.join()
+
+
+def write_mp3_meta_info(song):
+    id3 = ID3()
+    #id3.add(TRCK(encoding=3, text=song.track if song.track else ""))
+    #id3.add(TDRC(encoding=3, text=song.year if song.year else ""))
+    id3.add(TIT2(encoding=3, text=song.song_name))
+    id3.add(TALB(encoding=3, text=song.album_name))
+    id3.add(TPE1(encoding=3, text=song.artist_name))
+    #id3.add(TPOS(encoding=3, text=mp3_meta['cd_serial']))
+    #id3.add(COMM(encoding=3, desc=u'Comment', text=u'\n\n'.join([mp3_meta['url_song'], mp3_meta['album_description']])))
+    id3.save(song.abs_path)

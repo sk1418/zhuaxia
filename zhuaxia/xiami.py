@@ -45,6 +45,7 @@ class Song(object):
 
         self.filename = self.song_name + u'.mp3'
         self.group_dir = self.artist_name + u'_' + self.album_name
+        self.abs_path = path.join(config.DOWNLOAD_DIR, self.group_dir, self.filename)
 
     def init_by_url(self,url):
         self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
@@ -65,23 +66,9 @@ class Song(object):
         self.group_dir = None
         #filename  artistName_songName.mp3
         self.filename = (self.artist_name + "_" if self.artist_name  else "" ) + self.song_name + u'.mp3'
+        self.abs_path = path.join(config.DOWNLOAD_DIR,self.filename)
 
 
-    def write_mp3_meta_info(self, filename):
-        id3 = ID3()
-        id3.add(TRCK(encoding=3, text=self.track if self.track else ""))
-        id3.add(TDRC(encoding=3, text=self.year if self.year else ""))
-        id3.add(TIT2(encoding=3, text=self.song_name))
-        id3.add(TALB(encoding=3, text=self.album_name))
-        id3.add(TPE1(encoding=3, text=self.artist_name))
-        #id3.add(TPOS(encoding=3, text=mp3_meta['cd_serial']))
-        #id3.add(COMM(encoding=3, desc=u'Comment', text=u'\n\n'.join([mp3_meta['url_song'], mp3_meta['album_description']])))
-        id3.save(self.filename)
-
-
-    
-
-        
 class Album(object):
     """The xiami album object"""
     def __init__(self, xm_obj, url):

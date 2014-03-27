@@ -23,15 +23,16 @@ if __name__ == '__main__':
     print 'pwd:' +config.XIAMI_LOGIN_PASSWORD
 
     xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,config.XIAMI_LOGIN_PASSWORD,'/tmp/test/xm.cookie')
-    # song = xm.Song(xiami_obj,'http://www.xiami.com/song/1769901638')
-    # print song.filename
-    # print song.dl_link
-    # downloader.download(song)
+    song = xm.Song(xiami_obj,url='http://www.xiami.com/song/1769901638')
+    LOG.info( song.filename)
+    LOG.info(song.dl_link)
+    LOG.info(song.abs_path)
+    downloader.download(song)
 
-    album = xm.Album(xiami_obj, 'http://www.xiami.com/album/253320')
+    #album = xm.Album(xiami_obj, 'http://www.xiami.com/album/253320')
 
-    for s in album.songs:
-        print s.song_name
+    #for s in album.songs:
+        #print s.song_name
 
 
     #LOG.error(u"test error")
