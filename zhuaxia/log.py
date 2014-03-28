@@ -33,7 +33,7 @@ def hl(text,style_key):
     k = style_key.lower()
     if k not in STYLE.keys():
         return text
-    return ('%('+k+')s'+ text + '%(clear)s') % STYLE
+    return ('%('+k+')s'+ text.replace('%','%%') + '%(clear)s') % STYLE
 
 def err(msg):
     """this is for normal error output before the logger was setup"""

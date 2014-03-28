@@ -12,15 +12,12 @@ if __name__ == '__main__':
     logger_name = 'zxLogger'
 
     #load config
-    if not config.load_config():
-        print 'xx'
+    config.load_config()
+
     
     log.setup_log(logger_name, config.LOG_LVL_CONSOLE, config.LOG_LVL_FILE)
 
     LOG = log.get_logger(logger_name)
-
-    print 'user:' + config.XIAMI_LOGIN_EMAIL
-    print 'pwd:' +config.XIAMI_LOGIN_PASSWORD
 
     xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,config.XIAMI_LOGIN_PASSWORD,'/tmp/test/xm.cookie')
     slist = ['http://www.xiami.com/song/1769901638',
@@ -30,8 +27,9 @@ if __name__ == '__main__':
             ]
     song_list=[]
     for s in slist:
+        LOG.info('parsing %s...'% s)
         song = xm.Song(xiami_obj,url=s)
-        LOG.info( song.filename)
+        LOG.info('\b\b.. -> %s'% song.filename)
         song_list.append(song)
     downloader.start_download(song_list)
 
