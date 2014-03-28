@@ -3,7 +3,6 @@ import os
 import shutil, sys
 import ConfigParser
 import log
-import downloader
 
 
 VERSION     = '1.0.0'                #software version
@@ -19,15 +18,14 @@ XIAMI_LOGIN_EMAIL=''
 XIAMI_LOGIN_PASSWORD=''
 LOG_LVL_FILE = 'INFO'
 LOG_LVL_CONSOLE = 'INFO'
-MULTITASKS_MODE = 'Thread'
-MULTITASKS_POOL_SIZE = 5
+THREAD_POOL_SIZE = 3
 DOWNLOAD_DIR='/tmp'
 
 def load_config():
 
     config_warn_msg = "Cannot load %s config, use default: %s"
 
-    global LOG_LVL_FILE, LOG_LVL_CONSOLE, MULTITASKS_MODE, MULTITASKS_POOL_SIZE, \
+    global LOG_LVL_FILE, LOG_LVL_CONSOLE, THREAD_POOL_SIZE, \
             XIAMI_LOGIN_EMAIL, XIAMI_LOGIN_PASSWORD
     """
         load config from config file 
@@ -46,19 +44,17 @@ def load_config():
         download_dir = cf.get('settings','download.dir')
         lvl_file = cf.get('settings','log.level.file')
         lvl_console = cf.get('settings','log.level.console')
-        pool_size = cf.getint('settings', 'multitasks.pool.size')
-        multi_mode = cf.get('settings', 'multitasks.mode')
+        pool_size = cf.getint('settings', 'thread.pool.size')
         XIAMI_LOGIN_EMAIL = cf.get('settings','xiami.auth.email')
         XIAMI_LOGIN_PASSWORD = cf.get('settings','xiami.auth.password')
-        PROX
 
         #TODO
         #read download dir, if not exists, create the dir
 
-        if multi_mode.upper() not in downloader.MULTITASKS_VALUES:
-            log.print_warn(config_warn_msg % 'multitasks.mode', MULTITASKS_MODE)
+        if not pool_size: 
+            log.print_warn(config_warn_msg % 'thread.pool.size',THREAD_POOL_SIZE)
         else:
-            MULTITASKS_MODE = multi_mode.upper()
+            THREAD_POOL_SIZE = pool_size
 
         if lvl_file.lower() not in log.LVL_DICT.keys():
             log.print_warn(config_warn_msg % 'log.level.file',LOG_LVL_FILE)
