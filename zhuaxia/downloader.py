@@ -11,24 +11,39 @@ from mutagen.id3 import ID3,TRCK,TIT2,TALB,TPE1,APIC,TDRC,COMM,TPOS,USLT
 
 LOG = log.get_logger('zxLogger')
 
+#total number of jobs
 total=0
+#the number of finished jobs
 done=0
+#progress dictionary, for progress display
 progress = {}
+#finsished job to be shown in progress
+done2show=[]
 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 # print progress 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 def print_progress():
+    line = log.hl(u' %s\n'% ('-'*90), 'cyan')
     sys.stdout.write(u'\x1b[2J\x1b[H') #clear screen
-    header = u'<已完成的任务只显示最近3个> | 线程池:[%d] | 已完成:[%d/%d]\n'%(config.THREAD_POOL_SIZE,done,total)
+    sys.stdout.write(line)
+    header = u' 线程池:[%d] | 总进度:[%d/%d]\n'% (config.THREAD_POOL_SIZE,done,total)
     sys.stdout.write(log.hl(u' %70s'%header,'warning'))
-    sys.stdout.write(log.hl(u' %s\n'% ('v'*90), 'cyan'))
+    sys.stdout.write(line)
     for filename, percent in progress.items():
         bar = ('=' * int(percent * 40)).ljust(40)
         percent = percent * 100
-        line =  "%40s [%s] %.1f%%\n" % (filename, bar, percent) 
-        sys.stdout.write(log.hl(line,'green'))
+        single_p =  "%40s [%s] %.1f%%\n" % (filename, bar, percent) 
+        sys.stdout.write(log.hl(single_p,'green'))
+    sys.stdout.write(line)
+    sys.stdout.write(log.hl(u' %70s'%header,'warning'))
+    header = u'最近完成(只显示%d个):\n'% config.SHOW_DONE_NUMBER
+    sys.stdout.write(line)
+    #display finished jobs
+    for d in done2show:
+        sys.stdout.write(' - %-40s\n' % d)
+
     sys.stdout.flush()
 
 def download(song):
@@ -49,10 +64,14 @@ def download(song):
                 percent = float(done_length) / float(total_length)
                 progress[song.filename] = percent
     write_mp3_meta(song)
-
-    #TODO only keep last 3 finished job in progress
     done += 1
+    fill_done2show(song.filename)
 
+def fill_done2show(filename):
+    global done2show
+    if len(done2show) == config.SHOW_DONE_NUMBER:
+        done2show.pop()
+    done2show.append(filename)
 
 def start_download(songs):
     global total, progress

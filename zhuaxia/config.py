@@ -13,6 +13,7 @@ USER_PATH   = path.join(os.getenv("HOME") , ".zhuaxia")
 SAMPLE_CONF = path.join(PKG_PATH, 'conf','default.conf')
 CONF_FILE   = path.join(USER_PATH, "zhuaxia.conf")
 
+
 ######user config####
 XIAMI_LOGIN_EMAIL=''
 XIAMI_LOGIN_PASSWORD=''
@@ -20,13 +21,14 @@ LOG_LVL_FILE = 'INFO'
 LOG_LVL_CONSOLE = 'INFO'
 THREAD_POOL_SIZE = 3
 DOWNLOAD_DIR='/tmp'
+SHOW_DONE_NUMBER=5
 
 def load_config():
 
     config_warn_msg = "Cannot load %s config, use default: %s"
 
     global LOG_LVL_FILE, LOG_LVL_CONSOLE, THREAD_POOL_SIZE, \
-            XIAMI_LOGIN_EMAIL, XIAMI_LOGIN_PASSWORD
+            SHOW_DONE_NUMBER, XIAMI_LOGIN_EMAIL, XIAMI_LOGIN_PASSWORD
     """
         load config from config file 
         return True if sucessful, otherwise False
@@ -41,13 +43,13 @@ def load_config():
 
     #load options here
     try:
+        XIAMI_LOGIN_EMAIL = cf.get('settings','xiami.auth.email')
+        XIAMI_LOGIN_PASSWORD = cf.get('settings','xiami.auth.password')
         download_dir = cf.get('settings','download.dir')
         lvl_file = cf.get('settings','log.level.file')
         lvl_console = cf.get('settings','log.level.console')
         pool_size = cf.getint('settings', 'thread.pool.size')
-        XIAMI_LOGIN_EMAIL = cf.get('settings','xiami.auth.email')
-        XIAMI_LOGIN_PASSWORD = cf.get('settings','xiami.auth.password')
-
+        done_number = cf.get('settings','show.done.number')
         #TODO
         #read download dir, if not exists, create the dir
 
@@ -61,6 +63,10 @@ def load_config():
         else:
             LOG_LVL_FILE = lvl_file
 
+        if not done_number:
+            log.print_warn( config_warn_msg % 'show.done.number',SHOW_DONE_NUMBER)
+        else:
+            SHOW_DONE_NUMBER = done_number
         if lvl_console.lower() not in log.LVL_DICT.keys():
             log.print_warn( config_warn_msg % 'log.level.console',LOG_LVL_CONSOLE)
         else:
