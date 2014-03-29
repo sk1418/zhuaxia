@@ -66,7 +66,7 @@ def load_config():
         if not done_number:
             log.print_warn( config_warn_msg % 'show.done.number',SHOW_DONE_NUMBER)
         else:
-            SHOW_DONE_NUMBER = done_number
+            SHOW_DONE_NUMBER = int(done_number)
         if lvl_console.lower() not in log.LVL_DICT.keys():
             log.print_warn( config_warn_msg % 'log.level.console',LOG_LVL_CONSOLE)
         else:

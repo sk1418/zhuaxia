@@ -5,6 +5,7 @@ import requests
 import config
 import log
 import datetime,time
+from threadpool import ThreadPool
 from Queue import Queue
 from threading import Thread
 from mutagen.id3 import ID3,TRCK,TIT2,TALB,TPE1,APIC,TDRC,COMM,TPOS,USLT
@@ -29,20 +30,22 @@ def print_progress():
     sys.stdout.write(u'\x1b[2J\x1b[H') #clear screen
     sys.stdout.write(line)
     header = u' 线程池:[%d] | 总进度:[%d/%d]\n'% (config.THREAD_POOL_SIZE,done,total)
-    sys.stdout.write(log.hl(u' %70s'%header,'warning'))
+    header = header.rjust(80)
+    sys.stdout.write(log.hl(u' %s'%header,'warning'))
     sys.stdout.write(line)
     for filename, percent in progress.items():
         bar = ('=' * int(percent * 40)).ljust(40)
         percent = percent * 100
         single_p =  "%40s [%s] %.1f%%\n" % (filename, bar, percent) 
         sys.stdout.write(log.hl(single_p,'green'))
-    sys.stdout.write(line)
-    sys.stdout.write(log.hl(u' %70s'%header,'warning'))
-    header = u'最近完成(只显示%d个):\n'% config.SHOW_DONE_NUMBER
-    sys.stdout.write(line)
-    #display finished jobs
-    for d in done2show:
-        sys.stdout.write(' - %-40s\n' % d)
+
+    if len(done2show):
+        sys.stdout.write(line)
+        sys.stdout.write(log.hl((u'最近完成(只显示%d个):\n'% config.SHOW_DONE_NUMBER).rjust(80),'warning'))
+        sys.stdout.write(line)
+        #display finished jobs
+        for d in done2show:
+            sys.stdout.write(log.hl((u' - %s\n'% d).rjust(80),'cyan'))
 
     sys.stdout.flush()
 
@@ -90,39 +93,6 @@ def start_download(songs):
 
     pool.wait_completion()
 
-
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
-# ThreadPool implementation
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
-class ThreadPool(object):
-    def __init__(self, size):
-        self.size = size
-        self.tasks = Queue(size)
-        for i in range(size):
-            Worker(self.tasks)
-
-    def add_task(self, func, *args, **kargs):
-        self.tasks.put((func,args,kargs))
-
-    def wait_completion(self):
-        self.tasks.join()
-
-class Worker(Thread):
-    def __init__(self, taskQueue):
-        Thread.__init__(self)
-        self.tasks = taskQueue
-        self.daemon = True
-        self.start()
-
-    def run(self):
-        while True:
-            func ,args, kargs = self.tasks.get()
-            try:
-                func(*args, **kargs)
-            except Exception, e: 
-                LOG.error(str(e))
-            finally:
-                self.tasks.task_done()
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 # write mp3 meta data to downloaded mp3 files
