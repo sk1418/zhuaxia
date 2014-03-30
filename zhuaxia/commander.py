@@ -31,5 +31,17 @@ def parse_and_prepare(xm_obj, url, verbose=False):
             msg.append('%d Songs.' % len(album.songs))
             LOG.info( ' | '.join(msg))
         dl_songs.append(album.songs)
+    if '/lib-song/u/' in url:
+        fav = xm.Favorite(xm_obj.url)
+        msg = ['Parsing: "%s" ..... [Favorite] %s'% (url,album.album_name)]
+        if verbose:
+            for s in fav.songs:
+                msg.append('[Song] %s'%s.song_name)
+            LOG.info('\n    |-> '.join(msg))
+        else:
+            msg.append('%d Songs.' % len(fav.songs))
+            LOG.info( ' | '.join(msg))
+        dl_songs.append(album.songs)
+
     else:
         pass

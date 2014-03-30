@@ -12,6 +12,7 @@ url_xiami="http://www.xiami.com"
 url_login="https://login.xiami.com/member/login"
 url_song = "http://www.xiami.com/app/android/song?id=%s"
 url_album = "http://www.xiami.com/app/android/album?id=%s"
+url_fav = "http://www.xiami.com/app/android/lib-songs?uid=%s&page=%s"
 url_collect = "http://www.xiami.com/app/android/collect?id=%s"
 url_artist_albums = "http://www.xiami.com/app/android/artist-albums?id=%s&page=%s"
 url_artist_top_song = "http://www.xiami.com/app/android/artist-topsongs?id=%s"
@@ -34,7 +35,7 @@ class Song(object):
     def init_by_json(self, song_json):
         self.song_id = song_json['song_id']
         self.album_id = song_json['album_id']
-        self.song_name = song_json['name']
+        self.song_name = song_json['name'].replace('&#039;',"'")
         self.dl_link = song_json['location']
         # lyrics link
         self.lyrics_link = song_json['lyric']
@@ -51,7 +52,7 @@ class Song(object):
         self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
         j = self.xm.read_link(url_song % self.song_id).json()
         #name
-        self.song_name = j['song']['song_name']
+        self.song_name = j['song']['song_name'].replace('&#039;',"'")
         # download link
         self.dl_link = j['song']['song_location']
         # lyrics link
@@ -99,16 +100,28 @@ class Album(object):
             song = Song(self.xm, song_json=jsong)
             self.songs.append(song)
 
-
-
-
-
-
-
-
 class Favorite(object):
-    def __init__(self,url):
+    """ xiami Favorite songs by user"""
+    def __init__(self,xm_obj, url):
         self.url = url
+        self.xm = xm_obj
+        #user id in url
+        self.uid = re.search(r'(?<=/lib-song/u/)\d+', self.url).group(0)
+        self.songs = []
+        self.init_fav()
+
+    def init_fav(self):
+        page = 1
+        while True:
+            j = self.xm.read_link(url_fav % (self.uid, str(page)) ).json()
+            if j['songs'] :
+                for jsong in j['songs']:
+                    song = Song(self.xm, song_json=jsong)
+                    self.songs.append(song)
+                page += 1
+            else:
+                break
+            
 
 
 
@@ -129,7 +142,7 @@ class Xiami(object):
         self.email = email
         self.password = password
         self.cookie_file = cookie_file
-        self.member_auth = ""
+        self.member_auth = ''
         #do login
         self.login_with_cookie()
         
