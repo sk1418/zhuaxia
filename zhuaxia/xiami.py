@@ -138,7 +138,7 @@ class Xiami(object):
     def login_with_cookie(self):
         ts = str(int(time.time()))
         if path.exists(self.cookie_file):
-            LOG.info('read member_auth from cookie file ...')
+            LOG.info('[Login] read member_auth from cookie file ...')
             with open(self.cookie_file) as f:
                 cif = f.read().split(' ')
                 ts_expired = (int(ts) - int(cif[0])) > 18000 
@@ -152,13 +152,13 @@ class Xiami(object):
     def write_cookie(self, ts):
         if not self.login():
             exit(1)
-        LOG.info( 'Writing cookie file ...')
+        LOG.info( '[Login] Writing cookie file ...')
         with open(self.cookie_file, 'w') as f:
             f.write(ts + ' ' + self.member_auth)
 
 
     def login(self):
-        LOG.info( 'login with email and password....')
+        LOG.info( '[Login] login with email and password....')
         _form = {
             'email': self.email,
             'password': self.password,

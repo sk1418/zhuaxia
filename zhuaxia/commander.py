@@ -6,12 +6,30 @@ import xiami as xm
 
 LOG = log.get_logger("zxLogger")
 
+dl_songs = []
 
-def from_file(file):
+
+def from_file(xm_obj, input):
     """ download objects (songs, albums...) from an input file.  """
     pass
 
 
-def parse_and_dl(input):
+def parse_and_prepare(xm_obj, url, verbose=False):
     """ parse the input string (xiami url), and do download"""
-    pass
+    if '/song/' in url:
+        song = xm.Song(xm_obj, url=url)
+        LOG.info('Parsing "%s" ..... [Song] %s'% url, song.song_name)
+        dl_songs.append(song)
+    if '/album/' in url:
+        album = xm.Album(xm_obj, url)
+        msg = ['Parsing: "%s" ..... [Album] %s'% (url,album.album_name)]
+        if verbose:
+            for s in album.songs:
+                msg.append('[Song] %s'%s.song_name)
+            LOG.info('\n    |-> '.join(msg))
+        else:
+            msg.append('%d Songs.' % len(album.songs))
+            LOG.info( ' | '.join(msg))
+        dl_songs.append(album.songs)
+    else:
+        pass
