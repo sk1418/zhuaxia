@@ -3,6 +3,7 @@ import os
 import shutil, sys
 import ConfigParser
 import log, util
+import traceback
 
 
 VERSION     = '1.0.0'                #software version
@@ -27,7 +28,7 @@ def load_config():
 
     config_warn_msg = "Cannot load %s config, use default: %s"
 
-    global LOG_LVL_FILE, LOG_LVL_CONSOLE, THREAD_POOL_SIZE, \
+    global LOG_LVL_FILE, LOG_LVL_CONSOLE, THREAD_POOL_SIZE, DOWNLOAD_DIR,\
             SHOW_DONE_NUMBER, XIAMI_LOGIN_EMAIL, XIAMI_LOGIN_PASSWORD
     """
         load config from config file 
@@ -43,6 +44,7 @@ def load_config():
 
     #load options here
     try:
+        #FIXME for each should do check and catch
         XIAMI_LOGIN_EMAIL = cf.get('settings','xiami.auth.email')
         XIAMI_LOGIN_PASSWORD = cf.get('settings','xiami.auth.password')
         download_dir = cf.get('settings','download.dir')
@@ -52,7 +54,6 @@ def load_config():
         done_number = cf.get('settings','show.done.number')
 
         #read download dir, if not exists, create the dir
-        util.create_dir()
 
         if not download_dir or '/' not in download_dir:
             log.print_warn(config_warn_msg % 'download.dir',DOWNLOAD_DIR)
@@ -79,8 +80,8 @@ def load_config():
             log.print_warn( config_warn_msg % 'log.level.console',LOG_LVL_CONSOLE)
         else:
             LOG_LVL_CONSOLE = lvl_console
-    except:
-
+    except Exception, e:
+        log.warn(str(e))
         log.warn('Error occured when loading config, using all default values')
         return False
     return True;

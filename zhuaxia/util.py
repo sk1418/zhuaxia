@@ -20,7 +20,7 @@ def get_line(s):
 
 def create_dir(dir_name):
     """create dir if doesn't exist"""
-    if not dir_name:
+    if dir_name:
         if not os.path.isdir(dir_name):
             os.makedirs(dir_name)
 
