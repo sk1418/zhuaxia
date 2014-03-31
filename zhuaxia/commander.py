@@ -12,6 +12,10 @@ dl_songs = []
 total = 0
 done = 0
 
+fmt_parsing = u'解析: "%s" ..... [%s] %s' 
+fmt_has_song_nm = u'包含%d首歌曲.' 
+fmt_single_song = u'[曲目] %s'
+
 def xiami_url_abbr(url):
     return url.replace('http://www.xiami.com/', '...')
 
@@ -24,41 +28,41 @@ def parse_and_prepare(xm_obj, url, verbose=False):
     if '/showcollect/id/' in url:
         collect = xm.Collection(xm_obj, url)
         dl_songs.extend(collect.songs)
-        msgs = [u'解析: "%s" ..... [精选集] %s' % (xiami_url_abbr(url),collect.collection_name)]
+        msgs = [ fmt_parsing % (xiami_url_abbr(url),u'精选集',collect.collection_name)]
         if verbose:
             for s in collect.songs:
-                msgs.append(u'[曲目] %s'%s.song_name)
+                msgs.append( fmt_single_song % s.song_name)
             msg = u'\n    |-> '.join(msgs)
         else:
-            msgs.append(u'包含%d首歌曲.' % len(collect.songs))
+            msgs.append(fmt_has_song_nm % len(collect.songs))
             msg= u' => '.join(msgs)
 
     elif '/song/' in url:
         song = xm.Song(xm_obj, url=url)
         dl_songs.append(song)
-        msg = u'解析: "%s" ..... [曲目] %s'% (xiami_url_abbr(url), song.song_name)
+        msg = fmt_parsing % (xiami_url_abbr(url),u'曲目',  song.song_name)
     elif '/album/' in url:
         album = xm.Album(xm_obj, url)
         dl_songs.extend(album.songs)
-        msgs = [u'解析: "%s" ..... [专辑] %s' % (xiami_url_abbr(url),album.album_name)]
+        msgs = [fmt_parsing % (xiami_url_abbr(url),u'专辑', album.album_name)]
         if verbose:
             for s in album.songs:
-                msgs.append(u'[曲目] %s'%s.song_name)
+                msgs.append(fmt_single_song %s.song_name)
             msg = u'\n    |-> '.join(msgs)
         else:
-            msgs.append(u'包含%d首歌曲.' % len(album.songs))
+            msgs.append(fmt_has_song_nm % len(album.songs))
             msg= u' => '.join(msgs)
 
     elif '/lib-song/u/' in url:
         fav = xm.Favorite(xm_obj, url)
         dl_songs.extend(fav.songs)
-        msgs = [u'解析: "%s" ..... [用户收藏]'% xiami_url_abbr(url)]
+        msgs = [fmt_parsing % (xiami_url_abbr(url), u'用户收藏','')]
         if verbose:
             for s in fav.songs:
-                msgs.append(u'[曲目] %s'%s.song_name)
+                msgs.append(fmt_single_song %s.song_name)
             msg = u'\n    |-> '.join(msgs)
         else:
-            msgs.append(u'包含%d首歌曲.' % len(fav.songs))
+            msgs.append( fmt_has_song_nm % len(fav.songs))
             msg = u' => '.join(msgs)
 
     global total, done

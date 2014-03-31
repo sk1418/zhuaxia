@@ -42,7 +42,7 @@ class Song(object):
 
         self.song_id = song_json['song_id']
         self.album_id = song_json['album_id']
-        self.song_name = song_json['name'].replace('&#039;',"'")
+        self.song_name = util.decode_html(song_json['name'])
         self.dl_link = song_json['location']
         # lyrics link
         self.lyrics_link = song_json['lyric']

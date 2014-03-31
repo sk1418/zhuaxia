@@ -6,6 +6,7 @@ import os
 import config
 import shutil
 import random, string
+import HTMLParser
 
 
 
@@ -24,4 +25,5 @@ def create_dir(dir_name):
         if not os.path.isdir(dir_name):
             os.makedirs(dir_name)
 
-
+def decode_html(s):
+    return HTMLParser.HTMLParser().unescape(s)
