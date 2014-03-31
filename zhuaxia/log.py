@@ -27,7 +27,6 @@ STYLE={
 
 
 def hl(text,style_key):
-    print "############################->" + text
     """highlight the give text"""
     k = style_key.lower()
     if k not in STYLE.keys():
