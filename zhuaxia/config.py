@@ -2,7 +2,7 @@ from os import path
 import os
 import shutil, sys
 import ConfigParser
-import log
+import log, util
 
 
 VERSION     = '1.0.0'                #software version
@@ -50,8 +50,16 @@ def load_config():
         lvl_console = cf.get('settings','log.level.console')
         pool_size = cf.getint('settings', 'thread.pool.size')
         done_number = cf.get('settings','show.done.number')
-        #TODO
+
         #read download dir, if not exists, create the dir
+        util.create_dir()
+
+        if not download_dir or '/' not in download_dir:
+            log.print_warn(config_warn_msg % 'download.dir',DOWNLOAD_DIR)
+        else:
+            DOWNLOAD_DIR = download_dir
+            #create dir if doesn't exist
+            util.create_dir(DOWNLOAD_DIR)
 
         if not pool_size: 
             log.print_warn(config_warn_msg % 'thread.pool.size',THREAD_POOL_SIZE)

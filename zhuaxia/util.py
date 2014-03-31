@@ -18,3 +18,10 @@ def get_line(s):
     """get a gui line with given char"""
     return str(s)*72
 
+def create_dir(dir_name):
+    """create dir if doesn't exist"""
+    if not dir_name:
+        if not os.path.isdir(dir_name):
+            os.makedirs(dir_name)
+
+

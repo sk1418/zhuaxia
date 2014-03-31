@@ -2,7 +2,7 @@
 import time
 import re
 import requests
-import log, config
+import log, config, util
 from os import path
 
 LOG = log.get_logger("zxLogger")
@@ -100,12 +100,19 @@ class Album(object):
         #description
         self.album_desc = j['album']['description']
 
+
+
         #handle songs
         for jsong in j['album']['songs']:
             song = Song(self.xm, song_json=jsong)
             song.group_dir = song.artist_name + u'_' + song.album_name
             song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
             self.songs.append(song)
+
+        if len(self.songs):
+            #creating the dir
+            util.create_dir(path.dirname(self.songs[-1].abs_path))
+
 
 class Favorite(object):
     """ xiami Favorite songs by user"""
@@ -131,6 +138,9 @@ class Favorite(object):
                 page += 1
             else:
                 break
+        if len(self.songs):
+            #creating the dir
+            util.create_dir(path.dirname(self.songs[-1].abs_path))
             
 
 

@@ -39,12 +39,15 @@ if __name__ == '__main__':
     
 
     #album = xm.Album(xiami_obj, 'http://www.xiami.com/album/253320')
-    fav = xm.Favorite(xiami_obj, 'http://www.xiami.com/lib-song/u/25531126')
+    #fav = xm.Favorite(xiami_obj, 'http://www.xiami.com/lib-song/u/25531126')
 
 
-    for s in fav.songs:
-        LOG.warning(s.song_name)
+    #for s in fav.songs:
+        #LOG.warning(s.song_name)
 
+
+    #test input file
+    commander.from_file(xiami_obj, '/tmp/in.txt')
 
     #LOG.error(u"test error")
     #LOG.info("test info")

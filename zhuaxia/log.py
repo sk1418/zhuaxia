@@ -15,7 +15,8 @@ STYLE={
     'bold'    : u'\x1b[1m',
     'clear'   : u'\x1b[0m',
     'uline'   : u'\x1b[4m', # Underline Texth
-    'error'   : u'\x1b[31;5m', #blink, bold, red
+    #'error'   : u'\x1b[31;5m', #blink, bold, red
+    'error'   : u'\x1b[31;1m', #blink, bold, red
     'red'     : u'\x1b[31;1m', # bold, red
     'warning' : u'\x1b[33m', # bold, yellow
     'cyan'    : u'\x1b[36m',
@@ -24,9 +25,6 @@ STYLE={
     'purple'  : u'\x1b[35m',
 }
 
-def test_hl():
-    for x in STYLE:
-        print hl("["+x+"]: this is test", x)
 
 def hl(text,style_key):
     """highlight the give text"""
@@ -34,6 +32,10 @@ def hl(text,style_key):
     if k not in STYLE.keys():
         return text
     return ('%('+k+')s'+ text.replace('%','%%') + '%(clear)s') % STYLE
+
+def test_hl():
+    for x in STYLE:
+        print hl('['+x+']: this is test', x)
 
 def err(msg):
     """this is for normal error output before the logger was setup"""

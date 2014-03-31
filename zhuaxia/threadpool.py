@@ -2,6 +2,7 @@
 import log
 from Queue import Queue
 from threading import Thread
+import traceback
 
 LOG = log.get_logger('zxLogger')
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
@@ -32,7 +33,9 @@ class Worker(Thread):
             func ,args, kargs = self.tasks.get()
             try:
                 func(*args, **kargs)
-            except Exception, e: 
-                LOG.error(str(e))
+            except: #Exception, e: 
+                #LOG.error(str(e))
+                LOG.error(traceback.format_exc())
+
             finally:
                 self.tasks.task_done()
