@@ -19,43 +19,56 @@ def xiami_url_abbr(url):
 def parse_and_prepare(xm_obj, url, verbose=False):
     """ parse the input string (xiami url), and do download"""
 
-    msg = ''
-    if '/song/' in url:
+    LOG.debug('processing url: "%s"'% url)
+    msg = u''
+    if '/showcollect/id/' in url:
+        collect = xm.Collection(xm_obj, url)
+        dl_songs.extend(collect.songs)
+        msgs = [u'解析: "%s" ..... [精选集] %s' % (xiami_url_abbr(url),collect.collection_name)]
+        if verbose:
+            for s in collect.songs:
+                msgs.append(u'[曲目] %s'%s.song_name)
+            msg = u'\n    |-> '.join(msgs)
+        else:
+            msgs.append(u'包含%d首歌曲.' % len(collect.songs))
+            msg= u' => '.join(msgs)
+
+    elif '/song/' in url:
         song = xm.Song(xm_obj, url=url)
         dl_songs.append(song)
-        msg = 'Parsing: "%s" ..... [Song] %s'% (xiami_url_abbr(url), song.song_name)
-    if '/album/' in url:
+        msg = u'解析: "%s" ..... [曲目] %s'% (xiami_url_abbr(url), song.song_name)
+    elif '/album/' in url:
         album = xm.Album(xm_obj, url)
         dl_songs.extend(album.songs)
-        msgs = ['Parsing: "%s" ..... [Album] %s' % (xiami_url_abbr(url),album.album_name)]
+        msgs = [u'解析: "%s" ..... [专辑] %s' % (xiami_url_abbr(url),album.album_name)]
         if verbose:
             for s in album.songs:
-                msgs.append('[Song] %s'%s.song_name)
-            msg = '\n    |-> '.join(msgs)
+                msgs.append(u'[曲目] %s'%s.song_name)
+            msg = u'\n    |-> '.join(msgs)
         else:
-            msgs.append('%d songs parsed.' % len(album.songs))
-            msg=' => '.join(msgs)
+            msgs.append(u'包含%d首歌曲.' % len(album.songs))
+            msg= u' => '.join(msgs)
 
-    if '/lib-song/u/' in url:
+    elif '/lib-song/u/' in url:
         fav = xm.Favorite(xm_obj, url)
         dl_songs.extend(fav.songs)
-        msgs = ['Parsing: "%s" ..... [Favorite]'% xiami_url_abbr(url)]
+        msgs = [u'解析: "%s" ..... [用户收藏]'% xiami_url_abbr(url)]
         if verbose:
             for s in fav.songs:
-                msgs.append('[Song] %s'%s.song_name)
-            msg = '\n    |-> '.join(msgs)
+                msgs.append(u'[曲目] %s'%s.song_name)
+            msg = u'\n    |-> '.join(msgs)
         else:
-            msgs.append('%d songs parsed.' % len(fav.songs))
-            msg = ' => '.join(msgs)
+            msgs.append(u'包含%d首歌曲.' % len(fav.songs))
+            msg = u' => '.join(msgs)
 
     global total, done
     done +=1
+    pre = ('[%d/%d] ' % (done, total)) if not verbose else ''
     if not msg:
         #unknown url
-        LOG.error('unknown resource url [%s].' % url)
+        LOG.error(u'%s 不能识别的url [%s].' % (pre,url))
     else:
-        pre = ('[%d/%d] ' % (done, total)) if not verbose else ''
-        LOG.info('%s%s'% (pre,msg))
+        LOG.info(u'%s%s'% (pre,msg))
 
 def from_file(xm_obj, infile):
     """ download objects (songs, albums...) from an input file.  """
@@ -71,7 +84,7 @@ def from_file(xm_obj, infile):
     LOG.info(u' 文件包含链接总数: %d' % total)
     print border
     pool = ThreadPool(config.THREAD_POOL_SIZE)
-    for link in urls:
+    for link in [u for u in urls if u]:
         pool.add_task(parse_and_prepare, xm_obj,link.rstrip('\n'))
 
     pool.wait_completion()

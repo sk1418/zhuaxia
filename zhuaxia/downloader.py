@@ -49,6 +49,28 @@ def print_progress():
 
     sys.stdout.flush()
 
+def download_by_url(url,filepath,show_progress=False):
+    """ 
+    basic downloading function, download url and save to 
+    file path
+    """
+    if ( not filepath ) or (not url):
+        LOG.err( 'Url or filepath is not valid, resouce cannot be downloaded.')
+        return
+
+    r = requests.get(url, stream=True)
+    if r.status_code == 200:
+        total_length = int(r.headers.get('content-length'))
+        done_length = 0
+        with open(filepath,'wb') as f:
+            for chunk in r.iter_content(1024):
+                done_length += len(chunk)
+                f.write(chunk)
+                if show_progress:
+                    percent = float(done_length) / float(total_length)
+                    progress[song.filename] = percent
+    return 0
+
 def download(song):
     global done, progress
     if ( not song.filename ) or (not song.dl_link):
@@ -56,16 +78,8 @@ def download(song):
         return
     mp3_file = song.abs_path
 
-    r = requests.get(song.dl_link, stream=True)
-    if r.status_code == 200:
-        total_length = int(r.headers.get('content-length'))
-        done_length = 0
-        with open(mp3_file,'wb') as mp3:
-            for chunk in r.iter_content(1024):
-                done_length += len(chunk)
-                mp3.write(chunk)
-                percent = float(done_length) / float(total_length)
-                progress[song.filename] = percent
+    download_by_url(song.dl_link, mp3_file, show_progress=True)
+
     write_mp3_meta(song)
     done += 1
     fill_done2show(song.filename)

@@ -4,6 +4,7 @@ import re
 import requests
 import log, config, util
 from os import path
+import downloader
 
 LOG = log.get_logger("zxLogger")
 
@@ -13,10 +14,9 @@ url_login="https://login.xiami.com/member/login"
 url_song = "http://www.xiami.com/app/android/song?id=%s"
 url_album = "http://www.xiami.com/app/android/album?id=%s"
 url_fav = "http://www.xiami.com/app/android/lib-songs?uid=%s&page=%s"
-url_collect = "http://www.xiami.com/app/android/collect?id=%s"
-url_artist_albums = "http://www.xiami.com/app/android/artist-albums?id=%s&page=%s"
-url_artist_top_song = "http://www.xiami.com/app/android/artist-topsongs?id=%s"
-url_lib_songs = "http://www.xiami.com/app/android/lib-songs?uid=%s&page=%s"
+url_collection = "http://www.xiami.com/app/android/collect?id=%s"
+#url_artist_albums = "http://www.xiami.com/app/android/artist-albums?id=%s&page=%s"
+#url_artist_top_song = "http://www.xiami.com/app/android/artist-topsongs?id=%s"
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
@@ -71,7 +71,7 @@ class Song(object):
         #used only for album/collection etc. create a dir to group all songs
         self.group_dir = None
         #filename  artistName_songName.mp3
-        self.filename = (self.artist_name + "_" if self.artist_name  else "" ) + self.song_name + u'.mp3'
+        self.filename = (self.artist_name + u"_" if self.artist_name  else "" ) + self.song_name + u'.mp3'
         self.abs_path = path.join(config.DOWNLOAD_DIR,self.filename)
 
 
@@ -82,6 +82,7 @@ class Album(object):
         self.xm = xm_obj
         self.url = url 
         self.album_id = re.search(r'(?<=/album/)\d+', self.url).group(0)
+        LOG.debug(u'开始初始化专辑[%s]'% self.album_id)
 
         self.year = None
         self.track=None
@@ -89,29 +90,32 @@ class Album(object):
         self.init_album()
 
     def init_album(self):
-        j = self.xm.read_link(url_album % self.album_id).json()
+        j = self.xm.read_link(url_album % self.album_id).json()['album']
         #name
-        self.album_name = j['album']['title']
+        self.album_name = j['title']
         #album logo
-        self.logo = j['album']['album_logo']
+        self.logo = j['album_logo']
         # artist_name
-        self.artist_name = j['album']['artist_name']
+        self.artist_name = j['artist_name']
 
         #description
-        self.album_desc = j['album']['description']
-
-
+        self.album_desc = j['description']
 
         #handle songs
-        for jsong in j['album']['songs']:
+        for jsong in j['songs']:
             song = Song(self.xm, song_json=jsong)
             song.group_dir = song.artist_name + u'_' + song.album_name
             song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
             self.songs.append(song)
 
-        if len(self.songs):
-            #creating the dir
-            util.create_dir(path.dirname(self.songs[-1].abs_path))
+        d = path.dirname(self.songs[-1].abs_path)
+        #creating the dir
+        LOG.debug(u'创建专辑目录[%s]' % d)
+        util.create_dir(d)
+
+        #download album logo images
+        LOG.debug(u'下载专辑[%s]封面'% self.album_name)
+        downloader.download_by_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
 
 
 class Favorite(object):
@@ -142,7 +146,29 @@ class Favorite(object):
             #creating the dir
             util.create_dir(path.dirname(self.songs[-1].abs_path))
             
+class Collection(object):
+    """ xiami song - collections made by user"""
+    def __init__(self,xm_obj, url):
+        self.url = url
+        self.xm = xm_obj
+        #user id in url
+        self.collection_id = re.search(r'(?<=/showcollect/id/)\d+', self.url).group(0)
+        self.songs = []
+        self.init_collection()
 
+    def init_collection(self):
+        j = self.xm.read_link(url_collection % (self.collection_id) ).json()['collect']
+        self.collection_name = j['name']
+        for jsong in j['songs']:
+            song = Song(self.xm, song_json=jsong)
+            #rewrite filename, make it different
+            song.group_dir = self.collection_name
+            song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
+            self.songs.append(song)
+        if len(self.songs):
+            #creating the dir
+            util.create_dir(path.dirname(self.songs[-1].abs_path))
+            
 
 
 checkin_headers = {
