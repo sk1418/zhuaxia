@@ -79,7 +79,6 @@ def fill_done2show(filename):
 def start_download(songs):
     global total, progress
     total = len(songs)
-    LOG.info(u'下载任务总数: %s' % total)
     pool = ThreadPool(config.THREAD_POOL_SIZE)
 
     for song in songs:
