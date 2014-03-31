@@ -22,9 +22,14 @@ url_lib_songs = "http://www.xiami.com/app/android/lib-songs?uid=%s&page=%s"
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
 
 class Song(object):
-    """xiami Song class"""
+    """
+    xiami Song class, if song_json was given, 
+    the group_dir and abs_path of the object needs to be set by the caller
+    """
+
     def __init__(self,xiami_obj,url=None,song_json=None):
         self.xm = xiami_obj
+        self.group_dir = None
         if url:
             self.url = url
             self.init_by_url(url)
@@ -33,6 +38,8 @@ class Song(object):
 
 
     def init_by_json(self, song_json):
+        """ the group dir and abs_path would be set by the caller"""
+
         self.song_id = song_json['song_id']
         self.album_id = song_json['album_id']
         self.song_name = song_json['name'].replace('&#039;',"'")
@@ -45,8 +52,6 @@ class Song(object):
         self.album_name = song_json['title']
 
         self.filename = self.song_name + u'.mp3'
-        self.group_dir = self.artist_name + u'_' + self.album_name
-        self.abs_path = path.join(config.DOWNLOAD_DIR, self.group_dir, self.filename)
 
     def init_by_url(self,url):
         self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
@@ -98,6 +103,8 @@ class Album(object):
         #handle songs
         for jsong in j['album']['songs']:
             song = Song(self.xm, song_json=jsong)
+            song.group_dir = song.artist_name + u'_' + song.album_name
+            song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
             self.songs.append(song)
 
 class Favorite(object):
@@ -117,6 +124,9 @@ class Favorite(object):
             if j['songs'] :
                 for jsong in j['songs']:
                     song = Song(self.xm, song_json=jsong)
+                    #rewrite filename, make it different
+                    song.group_dir = 'favorite_%s' % self.uid
+                    song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
                     self.songs.append(song)
                 page += 1
             else:
