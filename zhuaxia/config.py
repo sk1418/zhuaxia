@@ -16,13 +16,13 @@ CONF_FILE   = path.join(USER_PATH, "zhuaxia.conf")
 
 
 ######user config####
-XIAMI_LOGIN_EMAIL=''
-XIAMI_LOGIN_PASSWORD=''
-LOG_LVL_FILE = 'INFO'
-LOG_LVL_CONSOLE = 'INFO'
-THREAD_POOL_SIZE = 3
-DOWNLOAD_DIR='/tmp'
-SHOW_DONE_NUMBER=5
+XIAMI_LOGIN_EMAIL    = ''
+XIAMI_LOGIN_PASSWORD = ''
+LOG_LVL_FILE         = 'INFO'
+LOG_LVL_CONSOLE      = 'INFO'
+THREAD_POOL_SIZE     = 3
+DOWNLOAD_DIR         = '/tmp'
+SHOW_DONE_NUMBER     = 5
 
 #a variable name dict for dynamic assignment
 var_dict = {
