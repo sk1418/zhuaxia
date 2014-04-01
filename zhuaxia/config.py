@@ -24,67 +24,47 @@ THREAD_POOL_SIZE = 3
 DOWNLOAD_DIR='/tmp'
 SHOW_DONE_NUMBER=5
 
+#a variable name dict for dynamic assignment
+var_dict = {
+        'xiami.auth.email'    : ('XIAMI_LOGIN_EMAIL'   , 's'),
+        'xiami.auth.password' : ('XIAMI_LOGIN_PASSWORD', 's'),
+        'download.dir'        : ('DOWNLOAD_DIR'        , 'p'),
+        'log.level.file'      : ('LOG_LVL_FILE'        , 's'),
+        'log.level.console'   : ('LOG_LVL_CONSOLE'     , 's'),
+        'thread.pool.size'    : ('THREAD_POOL_SIZE'    , 'n'),
+        'show.done.number'    : ('SHOW_DONE_NUMBER'    , 'n')
+        }
+
+def load_single_config(conf_parser, conf_key):
+    config_warn_msg = "Cannot load config [%s], use default value: %s"
+    try:
+        v = conf_parser.get('settings', conf_key)
+        if not v:
+            raise Exception('ConfigError','invalid')
+        gkey = var_dict[conf_key][0]
+        ty = var_dict[conf_key][1]
+
+        if ty == 'n':
+            globals()[gkey] = int(v)
+        else:
+            if ty =='p':
+                util.create_dir(v)
+            globals()[gkey] = v
+    except:
+        log.warn(config_warn_msg % (conf_key, str(globals()[var_dict[conf_key][0]])))
+
 def load_config():
-
-    config_warn_msg = "Cannot load %s config, use default: %s"
-
-    global LOG_LVL_FILE, LOG_LVL_CONSOLE, THREAD_POOL_SIZE, DOWNLOAD_DIR,\
-            SHOW_DONE_NUMBER, XIAMI_LOGIN_EMAIL, XIAMI_LOGIN_PASSWORD
-    """
-        load config from config file 
-        return True if sucessful, otherwise False
-    """
-    cf = ConfigParser.ConfigParser()
     
     # if conf file doesn't exist, cp default conf there
     if not path.exists(CONF_FILE):
         init_config()
 
+    cf = ConfigParser.ConfigParser()
     cf.read(CONF_FILE);
 
-    #load options here
-    try:
-        #FIXME for each should do check and catch
-        XIAMI_LOGIN_EMAIL = cf.get('settings','xiami.auth.email')
-        XIAMI_LOGIN_PASSWORD = cf.get('settings','xiami.auth.password')
-        download_dir = cf.get('settings','download.dir')
-        lvl_file = cf.get('settings','log.level.file')
-        lvl_console = cf.get('settings','log.level.console')
-        pool_size = cf.getint('settings', 'thread.pool.size')
-        done_number = cf.get('settings','show.done.number')
+    for k in var_dict:
+        load_single_config(cf, k)
 
-        #read download dir, if not exists, create the dir
-
-        if not download_dir or '/' not in download_dir:
-            log.print_warn(config_warn_msg % 'download.dir',DOWNLOAD_DIR)
-        else:
-            DOWNLOAD_DIR = download_dir
-            #create dir if doesn't exist
-            util.create_dir(DOWNLOAD_DIR)
-
-        if not pool_size: 
-            log.print_warn(config_warn_msg % 'thread.pool.size',THREAD_POOL_SIZE)
-        else:
-            THREAD_POOL_SIZE = pool_size
-
-        if lvl_file.lower() not in log.LVL_DICT.keys():
-            log.print_warn(config_warn_msg % 'log.level.file',LOG_LVL_FILE)
-        else:
-            LOG_LVL_FILE = lvl_file
-
-        if not done_number:
-            log.print_warn( config_warn_msg % 'show.done.number',SHOW_DONE_NUMBER)
-        else:
-            SHOW_DONE_NUMBER = int(done_number)
-        if lvl_console.lower() not in log.LVL_DICT.keys():
-            log.print_warn( config_warn_msg % 'log.level.console',LOG_LVL_CONSOLE)
-        else:
-            LOG_LVL_CONSOLE = lvl_console
-    except Exception, e:
-        log.warn(str(e))
-        log.warn('Error occured when loading config, using all default values')
-        return False
-    return True;
 
 def init_config():
     """
