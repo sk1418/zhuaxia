@@ -95,4 +95,5 @@ def from_file(xm_obj, infile):
     print border
     LOG.info(u' 下载任务总数: %d' % len(dl_songs))
     sleep(3)
+    downloader.start_download(dl_songs)
 

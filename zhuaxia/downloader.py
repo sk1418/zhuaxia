@@ -2,12 +2,10 @@
 from os import path
 import sys
 import requests
-import config
-import log
+import config, log, util
 import datetime,time
 from threadpool import ThreadPool
 from Queue import Queue
-from threading import Thread
 from mutagen.id3 import ID3,TRCK,TIT2,TALB,TPE1,APIC,TDRC,COMM,TPOS,USLT
 
 LOG = log.get_logger('zxLogger')
@@ -23,29 +21,35 @@ done2show=[]
 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
-# print progress 
+# output progress 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 def print_progress():
-    line = log.hl(u' %s\n'% ('-'*90), 'cyan')
+    width = util.get_terminal_size()[1]
+    per_part = int(width * 0.5)
+    bar_count = (per_part-2/10) # number of percent bar
+    #line = log.hl(u' %s\n'% ('-'*90), 'cyan')
+    line = log.hl(u' %s\n'% ('-'*width), 'cyan')
     sys.stdout.write(u'\x1b[2J\x1b[H') #clear screen
     sys.stdout.write(line)
     header = u' 线程池:[%d] | 总进度:[%d/%d]\n'% (config.THREAD_POOL_SIZE,done,total)
-    header = header.rjust(80)
+    #header = header.rjust(80)
+    header = header.rjust(width-10)
     sys.stdout.write(log.hl(u' %s'%header,'warning'))
     sys.stdout.write(line)
     for filename, percent in progress.items():
-        bar = ('=' * int(percent * 40)).ljust(40)
+        #bar = ('=' * int(percent * 40)).ljust(40)
+        bar = ('=' * int(percent * bar_count)).ljust(bar_count)
         percent = percent * 100
         single_p =  "%40s [%s] %.1f%%\n" % (filename, bar, percent) 
         sys.stdout.write(log.hl(single_p,'green'))
 
     if len(done2show):
         sys.stdout.write(line)
-        sys.stdout.write(log.hl((u'最近完成(只显示%d个):\n'% config.SHOW_DONE_NUMBER).rjust(80),'warning'))
+        sys.stdout.write(log.hl((u'最近完成(只显示%d个):\n'% config.SHOW_DONE_NUMBER).rjust(width-10),'warning'))
         sys.stdout.write(line)
         #display finished jobs
         for d in done2show:
-            sys.stdout.write(log.hl((u' - %s\n'% d).rjust(80),'cyan'))
+            sys.stdout.write(log.hl((u' - %s\n'% d).rjust(width-10),'cyan'))
 
     sys.stdout.flush()
 
@@ -58,6 +62,7 @@ def download_by_url(url,filepath,show_progress=False):
         LOG.err( 'Url or filepath is not valid, resouce cannot be downloaded.')
         return
 
+    fname = path.basename(filepath)
     r = requests.get(url, stream=True)
     if r.status_code == 200:
         total_length = int(r.headers.get('content-length'))
@@ -68,7 +73,7 @@ def download_by_url(url,filepath,show_progress=False):
                 f.write(chunk)
                 if show_progress:
                     percent = float(done_length) / float(total_length)
-                    progress[song.filename] = percent
+                    progress[fname] = percent
     return 0
 
 def download(song):
@@ -95,10 +100,10 @@ def start_download(songs):
     total = len(songs)
     pool = ThreadPool(config.THREAD_POOL_SIZE)
 
+
     for song in songs:
         progress[song.filename] = 0.0
         pool.add_task(download, song)
-
 
     while done < total:
         time.sleep(1)

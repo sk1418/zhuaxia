@@ -23,35 +23,42 @@ if __name__ == '__main__':
     xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,config.XIAMI_LOGIN_PASSWORD,'/tmp/test/xm.cookie')
     #commander.parse_and_prepare(xiami_obj, 'http://www.xiami.com/album/253320')
     
-    #slist = ['http://www.xiami.com/song/1769901638',
-            #'http://www.xiami.com/song/1769915743',
-            #'http://www.xiami.com/song/1769915737',
-            #'http://www.xiami.com/song/1769915742'
-            #]
-    #song_list=[]
-    #for s in slist:
-        #LOG.info('parsing %s...'% s)
-        #song = xm.Song(xiami_obj,url=s)
-        #LOG.info('\b\b.. -> %s'% song.filename)
-        #song_list.append(song)
-    #downloader.start_download(song_list)
+    slist = ['http://www.xiami.com/song/1769901638',
+            'http://www.xiami.com/song/1769915743',
+            'http://www.xiami.com/song/1769915743',
+            'http://www.xiami.com/song/1769915737',
+            'http://www.xiami.com/song/1769915742',
+            'http://www.xiami.com/song/1769915742',
+            'http://www.xiami.com/song/1769915742',
+            'http://www.xiami.com/song/1769915742',
+            'http://www.xiami.com/song/1769915742',
+            'http://www.xiami.com/song/1769915737',
+            'http://www.xiami.com/song/1769915742'
+            ]
+    song_list=[]
+    for s in slist:
+        LOG.info('parsing %s...'% s)
+        song = xm.Song(xiami_obj,url=s)
+        LOG.info('\b\b.. -> %s'% song.filename)
+        song_list.append(song)
+    downloader.start_download(song_list)
 
     
 
     #album = xm.Album(xiami_obj, 'http://www.xiami.com/album/253320')
+    #downloader.start_download(album.songs)
     #fav = xm.Favorite(xiami_obj, 'http://www.xiami.com/lib-song/u/25531126')
 
 
-    #for s in fav.songs:
+    #for s in album.songs:
         #LOG.warning(s.song_name)
 
 
     #test input file
-    commander.from_file(xiami_obj, '/tmp/in.txt')
+    #commander.from_file(xiami_obj, '/tmp/in.txt')
 
     #LOG.error(u"test error")
     #LOG.info("test info")
     #LOG.warn("test warn")
     #print "============"
     #log.test_hl()
-
