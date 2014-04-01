@@ -190,7 +190,8 @@ class Xiami(object):
         self.cookie_file = cookie_file
         self.member_auth = ''
         #do login
-        self.login_with_cookie()
+        #self.login_with_cookie()
+        self.login()
         
 
 
@@ -221,7 +222,7 @@ class Xiami(object):
         _form = {
             'email': self.email,
             'password': self.password,
-            'submit': '登录',
+            #'submit': '登录',
         }
         headers = {'User-Agent': AGENT}
         headers['Referer'] = url_login

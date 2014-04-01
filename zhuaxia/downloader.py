@@ -7,6 +7,7 @@ import datetime,time
 from threadpool import ThreadPool
 from Queue import Queue
 from mutagen.id3 import ID3,TRCK,TIT2,TALB,TPE1,APIC,TDRC,COMM,TPOS,USLT
+from threading import Thread
 
 LOG = log.get_logger('zxLogger')
 
@@ -24,7 +25,7 @@ done2show=[]
 # output progress 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 def print_progress():
-    width = util.get_terminal_size()[1]
+    width = util.get_terminal_size()[1] -5
     per_part = int(width * 0.5)
     bar_count = (per_part-2/10) # number of percent bar
     #line = log.hl(u' %s\n'% ('-'*90), 'cyan')
@@ -49,7 +50,7 @@ def print_progress():
         sys.stdout.write(line)
         #display finished jobs
         for d in done2show:
-            sys.stdout.write(log.hl((u' - %s\n'% d).rjust(width-10),'cyan'))
+            sys.stdout.write(log.hl((u' - %s\n'% d).ljust(width-10),'cyan'))
 
     sys.stdout.flush()
 
@@ -100,17 +101,26 @@ def start_download(songs):
     total = len(songs)
     pool = ThreadPool(config.THREAD_POOL_SIZE)
 
-
-    for song in songs:
-        progress[song.filename] = 0.0
-        pool.add_task(download, song)
+    downloader = Downloader(songs, pool)
+    downloader.start()
 
     while done < total:
         time.sleep(1)
         print_progress()
 
-    pool.wait_completion()
 
+class Downloader(Thread):
+    def __init__(self, songs, pool):
+        Thread.__init__(self)
+        self.songs = songs
+        self.pool = pool
+
+    def run(self):
+        global progress
+        for song in self.songs:
+            progress[song.filename] = 0.0
+            self.pool.add_task(download, song)
+        self.pool.wait_completion()
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 # write mp3 meta data to downloaded mp3 files
