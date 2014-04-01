@@ -41,7 +41,7 @@ def print_progress():
         #bar = ('=' * int(percent * 40)).ljust(40)
         bar = ('=' * int(percent * bar_count)).ljust(bar_count)
         percent = percent * 100
-        single_p =  "%40s [%s] %.1f%%\n" % (filename, bar, percent) 
+        single_p =  "%s [%s] %.1f%%\n" % (filename.ljust(width - bar_count-10), bar, percent) 
         sys.stdout.write(log.hl(single_p,'green'))
 
     if len(done2show):
@@ -50,7 +50,7 @@ def print_progress():
         sys.stdout.write(line)
         #display finished jobs
         for d in done2show:
-            sys.stdout.write(log.hl((u' - %s\n'% d).ljust(width-10),'cyan'))
+            sys.stdout.write(log.hl((u' - %s\n'% d)),'cyan')
 
     sys.stdout.flush()
 
@@ -79,6 +79,11 @@ def download_by_url(url,filepath,show_progress=False):
 
 def download(song):
     global done, progress
+
+    #if file not in progress, add
+    if song.filename not in progress:
+        progress[song.filename] = 0.0
+
     if ( not song.filename ) or (not song.dl_link):
         LOG.err( 'Song [id:%s] cannot be downloaded' % song.song_id)
         return
@@ -89,6 +94,8 @@ def download(song):
     write_mp3_meta(song)
     done += 1
     fill_done2show(song.filename)
+    #remove from progress
+    del progress[song.filename]
 
 def fill_done2show(filename):
     global done2show
@@ -118,7 +125,6 @@ class Downloader(Thread):
     def run(self):
         global progress
         for song in self.songs:
-            progress[song.filename] = 0.0
             self.pool.add_task(download, song)
         self.pool.wait_completion()
 

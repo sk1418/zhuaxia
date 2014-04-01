@@ -232,9 +232,9 @@ class Xiami(object):
             sess.headers['User-Agent'] = AGENT
             sess.verify = False
             sess.mount('https://', requests.adapters.HTTPAdapter())
-            res = sess.post(url_login, data=_form)
-            self.memeber_auth = sess.cookies['member_auth']
-            LOG.info( 'login success')
+            #res = sess.post(url_login, data=_form)
+            #self.memeber_auth = sess.cookies['member_auth']
+            #LOG.info( 'login success')
             return True
         except:
             LOG.error( "login failed")
