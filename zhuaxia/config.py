@@ -16,8 +16,8 @@ CONF_FILE   = path.join(USER_PATH, "zhuaxia.conf")
 
 
 ######user config####
-XIAMI_LOGIN_EMAIL    = ''
-XIAMI_LOGIN_PASSWORD = ''
+XIAMI_LOGIN_EMAIL    = None
+XIAMI_LOGIN_PASSWORD = None
 LOG_LVL_FILE         = 'INFO'
 LOG_LVL_CONSOLE      = 'INFO'
 THREAD_POOL_SIZE     = 3

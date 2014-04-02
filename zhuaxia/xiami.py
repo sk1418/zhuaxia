@@ -187,12 +187,19 @@ class Xiami(object):
     def __init__(self, email, password, cookie_file):
         self.email = email
         self.password = password
+        self.skip_login = False
+        #if either email or password is empty skip login
+        if not email or not password:
+            self.skip_login = True
+            
         self.cookie_file = cookie_file
         self.member_auth = ''
         #do login
-        #self.login_with_cookie()
-        self.login()
-        
+        if self.skip_login:
+            LOG.warning('Download resources without authentication (Low Quaulity only).')
+        else:
+            self.login_with_cookie()
+
 
 
     def login_with_cookie(self):
@@ -211,7 +218,8 @@ class Xiami(object):
 
     def write_cookie(self, ts):
         if not self.login():
-            exit(1)
+            LOG.warning('Login failed, download resources without authentication (Low Quaulity only).')
+            return
         LOG.info( '[Login] Writing cookie file ...')
         with open(self.cookie_file, 'w') as f:
             f.write(ts + ' ' + self.member_auth)
@@ -232,12 +240,11 @@ class Xiami(object):
             sess.headers['User-Agent'] = AGENT
             sess.verify = False
             sess.mount('https://', requests.adapters.HTTPAdapter())
-            #res = sess.post(url_login, data=_form)
-            #self.memeber_auth = sess.cookies['member_auth']
-            #LOG.info( 'login success')
+            res = sess.post(url_login, data=_form)
+            self.memeber_auth = sess.cookies['member_auth']
+            LOG.info( 'login success')
             return True
         except:
-            LOG.error( "login failed")
             return False
 
     def read_link(self, link):

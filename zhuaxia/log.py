@@ -51,7 +51,7 @@ class LogFormatter(logging.Formatter):
     err_fmt  = hl(u'ERROR: _(msg)s', 'error').replace('_','%')
     dbg_fmt  = u"DEBUG: %(module)s: %(lineno)d: %(msg)s"
     info_fmt = hl(u'_(msg)s', 'blue').replace('_','%')
-    warning_fmt = hl(u'WARNING: _(msg)s','warning').replace('_','%')
+    warning_fmt = hl(u'WARNING: _(msg)s','purple').replace('_','%')
 
     def __init__(self, fmt=u"%(levelno)s: %(msg)s"):
         logging.Formatter.__init__(self, fmt)
