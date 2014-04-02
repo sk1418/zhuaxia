@@ -230,7 +230,7 @@ class Xiami(object):
         _form = {
             'email': self.email,
             'password': self.password,
-            #'submit': '登录',
+            'submit': '登 录',
         }
         headers = {'User-Agent': AGENT}
         headers['Referer'] = url_login

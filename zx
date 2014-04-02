@@ -8,6 +8,49 @@ import zhuaxia.log as log
 import zhuaxia.xiami as xm
 import zhuaxia.downloader as downloader
 import zhuaxia.commander as commander
+help_info = u""" %(cyan)s
+                                 ##             
+        ##         ###           ##   ##########
+        ##  ##########           ##   ##########
+        ##  ########          ########   ##     
+        ##  ## ## ##          ########   ##     
+     ###### ## ## ##          ## ## ##   ##     
+     ###### ## ## ##          ## ## ##   ##     
+        ##  ## ## ##          ## ## ##   ## ##  
+        ##  ## ## ##          ## ## ##   ## ##  
+        ### ## ## ##          ########   ##  ## 
+     ###### ## ## ##          ########   ##  ## 
+     #####  ## ##  ##         ## ##      ##   ##
+        ##  ## ##  ##            ## ##   ##   ##
+        ##  ## ##  ##            ## ##   ##     
+        ##  ## ##   ##           ######  ##     
+        ## ##  ##   ##        #########  ##     
+      #### ##  ##    ##       ####   ##  ##     
+      ### ##   ##     #                  ##     
+                     -- 抓取 xiami.com 音乐
+
+    [%(uline)sUSAGE%(clear)s] 
+
+        %(bold)szx <URL>%(clear)s
+            : 下载指定URL资源 (歌曲，专辑，精选集，用户收藏) 例子：
+
+              zx "http://www.xiami.com/space/lib-song/u/25531126"
+
+        %(bold)szx -f  <file>%(clear)s 
+            : 多个URL在一个文件中，每个URL一行。 URLs可以是不同资源类型。例子：
+              $ zx -f /tmp/foo.txt
+
+              $ cat /tmp/foo.txt
+              http://www.xiami.com/album/51786
+              http://www.xiami.com/space/lib-song/u/25531126
+
+        %(bold)szx -h%(clear)s ：显示帮助
+
+        config file: $HOME/.zhuaxia/zhuaxia.conf"""
+
+def usage():
+    """print usage information"""
+    print help_info % log.STYLE
 
 if __name__ == '__main__':
     logger_name = 'zxLogger'
@@ -17,6 +60,16 @@ if __name__ == '__main__':
     log.setup_log(logger_name, config.LOG_LVL_CONSOLE, config.LOG_LVL_FILE)
     LOG = log.get_logger(logger_name)
 
+    if len(sys.argv)<2 or (sys.argv[1] == '-f' and len(sys.argv)!=3):
+        usage()
+        sys.exit(1)
+    elif sys.argv[1] == '-h': 
+        usage()
+    elif sys.argv[1] == '-f':
+        commander.shall_I_begin(sys.argv[2], True)
+    else:
+        commander.shall_I_begin(sys.argv[1])
+
     #test input file
     #commander.shall_I_begin('/tmp/in.txt', True)
-    commander.shall_I_begin('http://www.xiami.com/space/lib-song/u/25531126')
+    #commander.shall_I_begin('http://www.xiami.com/space/lib-song/u/25531126')
