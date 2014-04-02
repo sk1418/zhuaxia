@@ -25,32 +25,32 @@ done2show=[]
 # output progress 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 def print_progress():
+    #the factor of width used for progress bar
+    percent_bar_factor = 0.6
     width = util.get_terminal_size()[1] -5
-    per_part = int(width * 0.5)
-    bar_count = (per_part-2/10) # number of percent bar
+    bar_count = (int(width*percent_bar_factor)-2/10) # number of percent bar
     #line = log.hl(u' %s\n'% ('-'*90), 'cyan')
-    line = log.hl(u' %s\n'% ('-'*width), 'cyan')
+    line = log.hl(u' %s\n'% ('+'*width), 'cyan')
     sys.stdout.write(u'\x1b[2J\x1b[H') #clear screen
     sys.stdout.write(line)
     header = u' 线程池:[%d] | 总进度:[%d/%d]\n'% (config.THREAD_POOL_SIZE,done,total)
-    #header = header.rjust(80)
-    header = header.rjust(width-10)
+    header = util.rjust(header, width)
     sys.stdout.write(log.hl(u' %s'%header,'warning'))
     sys.stdout.write(line)
     for filename, percent in progress.items():
-        #bar = ('=' * int(percent * 40)).ljust(40)
-        bar = ('=' * int(percent * bar_count)).ljust(bar_count)
-        percent = percent * 100
-        single_p =  "%s [%s] %.1f%%\n" % (filename.ljust(width - bar_count-10), bar, percent) 
+        bar = util.ljust('=' * int(percent * bar_count), bar_count)
+        per100 = percent * 100 
+        single_p =  "%s [%s] %.1f%%\n" % \
+                (util.rjust(filename,(width - bar_count -10)), bar, per100) # the -10 is for the xx.x% and [ and ]
         sys.stdout.write(log.hl(single_p,'green'))
 
     if len(done2show):
         sys.stdout.write(line)
-        sys.stdout.write(log.hl((u'最近完成(只显示%d个):\n'% config.SHOW_DONE_NUMBER).rjust(width-10),'warning'))
+        sys.stdout.write(log.hl(util.rjust(u'最近完成(只显示%d个):\n'% config.SHOW_DONE_NUMBER, width),'warning'))
         sys.stdout.write(line)
         #display finished jobs
         for d in done2show:
-            sys.stdout.write(log.hl((u' - %s\n'% d)),'cyan')
+            sys.stdout.write(log.hl((u' + %s\n'% d)),'cyan')
 
     sys.stdout.flush()
 

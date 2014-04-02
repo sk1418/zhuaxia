@@ -8,6 +8,9 @@ import shutil
 import random, string
 import HTMLParser
 
+#used by get_terminal_size
+import fcntl, termios, struct
+
 def get_terminal_size(fd=1):
     """
       Returns height and width of current terminal. First tries to get
@@ -19,7 +22,6 @@ def get_terminal_size(fd=1):
       from: http://blog.taz.net.au/2012/04/09/getting-the-terminal-size-in-python/
   """
     try:
-        import fcntl, termios, struct
         hw = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
     except Exception:
         try:
@@ -45,3 +47,18 @@ def create_dir(dir_name):
 
 def decode_html(s):
     return HTMLParser.HTMLParser().unescape(s)
+
+
+
+def ljust(s,n,fillchar=' '):
+    """ if string has unicode chars, the built-in l/rjust cannot 
+    auto-adjust and align, that's why this two functions come"""
+    no_ascii_list = re.findall(r'[^\x00-\x7F]+', s)
+    ln = len(''.join(no_ascii_list))
+    return s.ljust(n-ln, fillchar)
+
+
+def rjust(s,n,fillchar=' '):
+    no_ascii_list = re.findall(r'[^\x00-\x7F]+', s)
+    ln = len(''.join(no_ascii_list))
+    return s.rjust(n-ln, fillchar)
