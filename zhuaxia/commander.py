@@ -5,6 +5,7 @@ import config ,util ,logging ,log,downloader
 import xiami as xm
 from threadpool import ThreadPool
 from time import sleep
+from os import path
 
 LOG = log.get_logger("zxLogger")
 
@@ -15,12 +16,24 @@ done = 0
 fmt_parsing = u'解析: "%s" ..... [%s] %s' 
 fmt_has_song_nm = u'包含%d首歌曲.' 
 fmt_single_song = u'[曲目] %s'
-
-def xiami_url_abbr(url):
-    return url.replace('http://www.xiami.com/', '...')
+border = log.hl(u'%s'% ('='*90), 'cyan')
 
 
-def parse_and_prepare(xm_obj, url, verbose=False):
+def shall_I_begin(in_str, is_file=False):
+    xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,\
+            config.XIAMI_LOGIN_PASSWORD, \
+            path.join(config.USER_PATH, 'xm.cookie'))
+    if is_file:
+        from_file(xiami_obj, in_str)
+    else:
+        from_url(xiami_obj, in_str)
+
+    print border
+    LOG.info(u' 下载任务总数: %d' % len(dl_songs))
+    sleep(3)
+    downloader.start_download(dl_songs)
+
+def from_url(xm_obj, url, verbose=True):
     """ parse the input string (xiami url), and do download"""
 
     LOG.debug('processing url: "%s"'% url)
@@ -77,7 +90,6 @@ def parse_and_prepare(xm_obj, url, verbose=False):
 def from_file(xm_obj, infile):
     """ download objects (songs, albums...) from an input file.  """
 
-    border = log.hl(u'%s'% ('='*90), 'cyan')
     urls = []
     with open(infile) as f:
         urls = f.readlines() 
@@ -89,11 +101,9 @@ def from_file(xm_obj, infile):
     print border
     pool = ThreadPool(config.THREAD_POOL_SIZE)
     for link in [u for u in urls if u]:
-        pool.add_task(parse_and_prepare, xm_obj,link.rstrip('\n'))
+        pool.add_task(from_url, xm_obj,link.rstrip('\n'), False)
 
     pool.wait_completion()
-    print border
-    LOG.info(u' 下载任务总数: %d' % len(dl_songs))
-    sleep(3)
-    downloader.start_download(dl_songs)
 
+def xiami_url_abbr(url):
+    return url.replace('http://www.xiami.com/', '...')
