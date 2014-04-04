@@ -74,12 +74,14 @@ zhuaxia 是一个基于命令行的虾米(xiami.com)音乐多线程批量下载�
 		zx -h ：显示帮助
 
 ##Screenshots / 运行截图
+
+- downloading (gif animation)
+![progress](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/progress.gif)
+
 - parse input file
 ![file view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/fileParse.png)
 
 - parse url
 ![url view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/urlParse.png)
 
-- downloading (gif animation)
-![progress](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/progress.gif)
 		
