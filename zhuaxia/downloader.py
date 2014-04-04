@@ -26,14 +26,14 @@ done2show=[]
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 def print_progress():
     #the factor of width used for progress bar
-    percent_bar_factor = 0.6
+    percent_bar_factor = 0.4
     width = util.get_terminal_size()[1] -5
     bar_count = (int(width*percent_bar_factor)-2/10) # number of percent bar
     #line = log.hl(u' %s\n'% ('-'*90), 'cyan')
     line = log.hl(u' %s\n'% ('+'*width), 'cyan')
     sys.stdout.write(u'\x1b[2J\x1b[H') #clear screen
     sys.stdout.write(line)
-    header = u' 线程池:[%d] | 总进度:[%d/%d]\n'% (config.THREAD_POOL_SIZE,done,total)
+    header = u' 保存目录:[%s] | 线程池:[%d] | 总进度:[%d/%d]\n'% (config.DOWNLOAD_DIR, config.THREAD_POOL_SIZE,done,total)
     header = util.rjust(header, width)
     sys.stdout.write(log.hl(u' %s'%header,'warning'))
     sys.stdout.write(line)
@@ -50,7 +50,7 @@ def print_progress():
         sys.stdout.write(line)
         #display finished jobs
         for d in done2show:
-            sys.stdout.write(log.hl((u' + %s\n'% d)),'cyan')
+            sys.stdout.write(log.hl(u' √ %s\n'% d,'cyan'))
 
     sys.stdout.flush()
 
