@@ -133,11 +133,7 @@ class Downloader(Thread):
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 def write_mp3_meta(song):
     id3 = ID3()
-    #id3.add(TRCK(encoding=3, text=song.track if song.track else ""))
-    #id3.add(TDRC(encoding=3, text=song.year if song.year else ""))
     id3.add(TIT2(encoding=3, text=song.song_name))
     id3.add(TALB(encoding=3, text=song.album_name))
     id3.add(TPE1(encoding=3, text=song.artist_name))
-    #id3.add(TPOS(encoding=3, text=mp3_meta['cd_serial']))
-    #id3.add(COMM(encoding=3, desc=u'Comment', text=u'\n\n'.join([mp3_meta['url_song'], mp3_meta['album_description']])))
     id3.save(song.abs_path)
