@@ -38,7 +38,7 @@ zhuaxia 是一个基于命令行的虾米(xiami.com)音乐多线程批量下载�
 - 自动解析URL (目前支持：歌曲，专辑， 用户收藏，精选集)
 - 多线程(可配置线程池)解析URL
 - 多线程(可配置线程池)下载歌曲
-- 进度显示 (色彩高亮，自适应终端宽度，总进度，下载线程进度...)
+- 进度显示 (色彩高亮，终端宽度改变自动适应，总进度，下载线程进度...)
 - 更新mp3 meta信息，自动下载封面...等等
 
 ##To Do
@@ -74,5 +74,12 @@ zhuaxia 是一个基于命令行的虾米(xiami.com)音乐多线程批量下载�
 		zx -h ：显示帮助
 
 ##Screenshots / 运行截图
+- parse input file
+![file view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/fileParse.png)
 
-{coming soon}
+- parse url
+![url view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/urlParse.png)
+
+- downloading (gif animation)
+![progress](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/progress.gif)
+		
