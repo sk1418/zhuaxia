@@ -57,7 +57,7 @@ def from_url(xm_obj, url, verbose=True):
     elif '/album/' in url:
         album = xm.Album(xm_obj, url)
         dl_songs.extend(album.songs)
-        msgs = [fmt_parsing % (xiami_url_abbr(url),u'专辑', album.album_name)]
+        msgs = [fmt_parsing % (xiami_url_abbr(url),u'专辑',  album.artist_name+u' => '+album.album_name)]
         if verbose:
             for s in album.songs:
                 msgs.append(fmt_single_song %s.song_name)

@@ -83,7 +83,6 @@ class Album(object):
         self.url = url 
         self.album_id = re.search(r'(?<=/album/)\d+', self.url).group(0)
         LOG.debug(u'开始初始化专辑[%s]'% self.album_id)
-
         self.year = None
         self.track=None
         self.songs = [] # list of Song
@@ -116,6 +115,15 @@ class Album(object):
         #download album logo images
         LOG.debug(u'下载专辑[%s]封面'% self.album_name)
         downloader.download_by_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
+
+        LOG.debug(u'保存专辑[%s]介绍'% self.album_name)
+        if self.album_desc:
+            self.album_desc = re.sub(r'&lt;\s*[bB][rR]\s*/&gt;','\n',self.album_desc)
+            self.album_desc = re.sub(r'&lt;.*?&gt;','',self.album_desc)
+            self.album_desc = util.decode_html(self.album_desc)
+            import codecs
+            with codecs.open(path.join(d,'album_description.txt'), 'w', 'utf-8') as f:
+                f.write(self.album_desc)
 
 
 class Favorite(object):
