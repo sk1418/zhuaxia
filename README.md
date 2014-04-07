@@ -23,7 +23,7 @@
 
 ##Introduction / 简介
 
-zhuaxia(抓虾) is a little tool to batch download music resources in multiple threads from www.xiami.com. Due to the site is a Chinese website, the output/log messages contains Chinese. Also this readme would be written in Chinese as well. All comments in codes are in English.
+zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resources in multiple threads from www.xiami.com. Due to the site is a Chinese website, the output/log messages contains Chinese. Also this readme would be written in Chinese as well. All comments in codes are in English.
 
 zhuaxia 是一个基于命令行的虾米(xiami.com)音乐多线程批量下载工具
 
@@ -51,7 +51,7 @@ zhuaxia 是一个基于命令行的虾米(xiami.com)音乐多线程批量下载�
 
 ##Installation / 安装
 
-{coming soon}
+{coming soon: setup.py and AUR package for Archlinux}
 
 ##Usage / 使用
 
