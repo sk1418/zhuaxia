@@ -204,7 +204,7 @@ class Xiami(object):
         self.member_auth = ''
         #do login
         if self.skip_login:
-            LOG.warning('Download resources without authentication (Low Quaulity only).')
+            LOG.warning('Download resources without authentication (128kbps mp3 only).')
         else:
             self.login_with_cookie()
 
@@ -226,7 +226,7 @@ class Xiami(object):
 
     def write_cookie(self, ts):
         if not self.login():
-            LOG.warning('Login failed, download resources without authentication (Low Quaulity only).')
+            LOG.warning('Login failed, download resources without authentication (128kbps mp3 only).')
             return
         LOG.info( '[Login] Writing cookie file ...')
         with open(self.cookie_file, 'w') as f:
