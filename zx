@@ -46,12 +46,17 @@ help_info = u""" %(cyan)s
 
         %(bold)szx -h%(clear)s ：显示帮助
 
+        %(bold)szx -v%(clear)s ：显示版本信息
+
         config file: $HOME/.zhuaxia/zhuaxia.conf"""
 
 def usage():
     """print usage information"""
     print help_info % log.STYLE
 
+def version():
+    """print version"""
+    print u'zhuaxia (抓虾) ' + config.VERSION
 if __name__ == '__main__':
     logger_name = 'zxLogger'
 
@@ -63,6 +68,8 @@ if __name__ == '__main__':
     if len(sys.argv)<2 or (sys.argv[1] == '-f' and len(sys.argv)!=3):
         usage()
         sys.exit(1)
+    elif sys.argv[1] == '-v': 
+        version()
     elif sys.argv[1] == '-h': 
         usage()
     elif sys.argv[1] == '-f':
