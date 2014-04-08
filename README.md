@@ -51,7 +51,13 @@ zhuaxia 是一个基于命令行的虾米(xiami.com)音乐多线程批量下载�
 
 ##Installation / 安装
 
-{coming soon: setup.py and AUR package for Archlinux}
+Archlinux 用户, zhuaxia可以从AUR中获取, 比如
+
+	yaourt -S zhuaxia
+
+其他用户:
+
+	sudo python setup.py install
 
 ##Usage / 使用
 
