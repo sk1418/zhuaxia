@@ -94,7 +94,9 @@ Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 			zx -h ：显示帮助
 
 			zx -v ：显示版本信息
+
 - 例子
+
 			zx -H /tmp/in.txt
 			zx  http://www.xiami.com/song/123456
 			zx -H http://www.xiami.com/album/51786
