@@ -65,7 +65,7 @@ if __name__ == '__main__':
     log.setup_log(logger_name, config.LOG_LVL_CONSOLE, config.LOG_LVL_FILE)
     LOG = log.get_logger(logger_name)
 
-    if len(sys.argv)<2 or (sys.argv[1] == '-f' and len(sys.argv)!=3):
+    if len(sys.argv)<2 or (sys.argv[1] == '-f' and len(sys.argv)<3):
         usage()
         sys.exit(1)
     elif sys.argv[1] == '-v': 

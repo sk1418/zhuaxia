@@ -3,6 +3,7 @@ import time
 import re
 import requests
 import log, config, util
+import urllib
 from os import path
 import downloader
 
@@ -37,6 +38,10 @@ class Song(object):
             self.init_by_url(url)
         elif song_json:
             self.init_by_json(song_json)
+        
+        #if hq_first, get the hq location to overwrite the dl_link
+        if self.xm.hq_first:
+            self.dl_link = self.xm.get_hq_link(self.song_id)
 
 
     def init_by_json(self, song_json):
@@ -195,7 +200,7 @@ checkin_headers = {
 
 class Xiami(object):
 
-    def __init__(self, email, password, cookie_file):
+    def __init__(self, email, password, cookie_file, hq_first=True):
         self.token = None
         self.uid = ''
         self.user_name = ''
@@ -203,6 +208,7 @@ class Xiami(object):
         self.password = password
         self.skip_login = False
         self.session = None
+        self.hq_first = hq_first
         #if either email or password is empty skip login
         if not email or not password:
             self.skip_login = True
@@ -212,33 +218,9 @@ class Xiami(object):
         #do login
         if self.skip_login:
             LOG.warning('Download resources without authentication (128kbps mp3 only).')
+            hq_first = False
         else:
-            self.login_with_cookie()
-
-
-
-    def login_with_cookie(self):
-        ts = str(int(time.time()))
-        if path.exists(self.cookie_file):
-            LOG.info('[Login] read member_auth from cookie file ...')
-            with open(self.cookie_file) as f:
-                cif = f.read().split(' ')
-                ts_expired = (int(ts) - int(cif[0])) > 18000 
-                self.member_auth = cif[1]
-                if ts_expired:
-                    self.write_cookie(ts)
-        else:
-           self.write_cookie(ts)
-        
-
-    def write_cookie(self, ts):
-        if not self.login():
-            LOG.warning('Login failed, download resources without authentication (128kbps mp3 only).')
-            return
-        LOG.info( '[Login] Writing cookie file ...')
-        with open(self.cookie_file, 'w') as f:
-            f.write(ts + ' ' + self.member_auth)
-
+            self.login()
 
     def login(self):
         LOG.info( '[Login] login with email and password....')
@@ -263,50 +245,37 @@ class Xiami(object):
             LOG.info( u'[Login] 用户 %s (id:%s) 登录成功.' % (self.user_name,self.uid) )
             return True
         except:
+            LOG.warning('Login failed, download resources without authentication (128kbps mp3 only).')
             return False
 
     def read_link(self, link):
         headers = {'User-Agent':AGENT}
-        headers['Cookie'] = 'member_auth=%s' % self.member_auth
-        return requests.get(link,headers=headers)
+        headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
+
+        return self.session.get(link,headers=headers)
 
 
-    #def getVip(self):
-        #vip_headers = {
-                #'User-Agent': AGENT,
-                #'Referer': 'http://img.xiami.com/static/swf/seiya/player.swf?v=%d'%int(time.time()),
-                #}
+    def get_hq_link(self, song_id):
+        mess = self.read_link(url_hq%song_id).json()['location']
+        return self.decode_xiami_link(mess)
 
-        #vip_form = {
-                #'user_id':self.uid,
-                #'tone_type':'1',
-                #'_xiamitoken':self.token
-                #}
+    def decode_xiami_link(self,mess):
+        """decode xm song link"""
+        rows = int(mess[0])
+        url = mess[1:]
+        len_url = len(url)
+        cols = len_url / rows
+        re_col = len_url % rows # how many rows need to extend 1 col for the remainder
 
-        #if not self.session:
-            #if not self.login():
-                #return False
+        l = []
+        for row in xrange(rows):
+            ln = cols + 1 if row < re_col else cols
+            l.append(url[:ln])
+            url = url[ln:]
 
-        #self.session.post(url_vip, data=vip_form, headers=vip_headers)
-        #return True
+        durl = ''
+        for i in xrange(len_url):
+            durl += l[i%rows][i/rows]
 
-def decode_xiami_link(mess):
-    """decode xm song link"""
-    rows = int(mess[0])
-    url = mess[1:]
-    len_url = len(url)
-    cols = len_url / rows
-    re_col = len_url % rows # how many rows need to extend 1 col for the remainder
-
-    l = []
-    for row in xrange(rows):
-        ln = cols + 1 if row < re_col else cols
-        l.append(url[:ln])
-        url = url[ln:]
-
-    durl = ''
-    for i in xrange(len_url):
-        durl += l[i%rows][i/rows]
-
-    return urllib.unquote(durl).replace('^', '0')
+        return urllib.unquote(durl).replace('^', '0')
 
