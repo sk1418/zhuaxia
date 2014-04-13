@@ -43,7 +43,6 @@ zhuaxia 是一个基于命令行的虾米(xiami.com)音乐多线程批量下载�
 - 更新mp3 meta信息，自动下载封面...等等
 
 ##Todos
-鉴于xiami要在近期做帐号整合，除了专辑介绍下载以外的功能打算等xiami迁移整合后再着手
 - 对于用户收藏，每次下载做增量下载，即不下载曾经下载过的歌曲，当然有选项开关.这样更便于随时把收藏的歌拉到本地
 - 保存下载/解析历史，对于重复的下载可以更快获得下载地址
 - 完善Error Handling(错误处理)
@@ -96,9 +95,9 @@ Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 
 			zx -v ：显示版本信息
 - 例子
-		zx -H /tmp/in.txt
-		zx  http://www.xiami.com/song/123456
-		zx -H http://www.xiami.com/album/51786
+			zx -H /tmp/in.txt
+			zx  http://www.xiami.com/song/123456
+			zx -H http://www.xiami.com/album/51786
 
 ##Screenshots / 运行截图
 
