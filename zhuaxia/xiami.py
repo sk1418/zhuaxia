@@ -10,6 +10,7 @@ LOG = log.get_logger("zxLogger")
 
 #xiami android/iphone api urls
 url_xiami="http://www.xiami.com"
+url_hq="http://www.xiami.com/song/gethqsong/sid/%s"
 url_vip="http://www.xiami.com/vip/update-tone"
 url_login="https://login.xiami.com/member/login"
 url_song = "http://www.xiami.com/app/android/song?id=%s"
