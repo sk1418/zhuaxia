@@ -48,8 +48,6 @@ def create_dir(dir_name):
 def decode_html(s):
     return HTMLParser.HTMLParser().unescape(s)
 
-
-
 def ljust(s,n,fillchar=' '):
     """ if string has unicode chars, the built-in l/rjust cannot 
     auto-adjust and align, that's why this two functions come"""

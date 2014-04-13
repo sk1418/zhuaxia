@@ -10,6 +10,7 @@ LOG = log.get_logger("zxLogger")
 
 #xiami android/iphone api urls
 url_xiami="http://www.xiami.com"
+url_vip="http://www.xiami.com/vip/update-tone"
 url_login="https://login.xiami.com/member/login"
 url_song = "http://www.xiami.com/app/android/song?id=%s"
 url_album = "http://www.xiami.com/app/android/album?id=%s"
@@ -190,12 +191,17 @@ checkin_headers = {
     'Content-Length': '0',
 }
 
+
 class Xiami(object):
 
     def __init__(self, email, password, cookie_file):
+        self.token = None
+        self.uid = ''
+        self.user_name = ''
         self.email = email
         self.password = password
         self.skip_login = False
+        self.session = None
         #if either email or password is empty skip login
         if not email or not password:
             self.skip_login = True
@@ -248,9 +254,12 @@ class Xiami(object):
             sess.headers['User-Agent'] = AGENT
             sess.verify = False
             sess.mount('https://', requests.adapters.HTTPAdapter())
+            self.session = sess
             res = sess.post(url_login, data=_form)
             self.memeber_auth = sess.cookies['member_auth']
-            LOG.info( 'login success')
+            self.uid, self.user_name = sess.cookies['user'].split('%22')[0:2]
+            self.token = sess.cookies['_xiamitoken']
+            LOG.info( u'[Login] 用户 %s (id:%s) 登录成功.' % (self.user_name,self.uid) )
             return True
         except:
             return False
@@ -260,4 +269,43 @@ class Xiami(object):
         headers['Cookie'] = 'member_auth=%s' % self.member_auth
         return requests.get(link,headers=headers)
 
+
+    #def getVip(self):
+        #vip_headers = {
+                #'User-Agent': AGENT,
+                #'Referer': 'http://img.xiami.com/static/swf/seiya/player.swf?v=%d'%int(time.time()),
+                #}
+
+        #vip_form = {
+                #'user_id':self.uid,
+                #'tone_type':'1',
+                #'_xiamitoken':self.token
+                #}
+
+        #if not self.session:
+            #if not self.login():
+                #return False
+
+        #self.session.post(url_vip, data=vip_form, headers=vip_headers)
+        #return True
+
+def decode_xiami_link(mess):
+    """decode xm song link"""
+    rows = int(mess[0])
+    url = mess[1:]
+    len_url = len(url)
+    cols = len_url / rows
+    re_col = len_url % rows # how many rows need to extend 1 col for the remainder
+
+    l = []
+    for row in xrange(rows):
+        ln = cols + 1 if row < re_col else cols
+        l.append(url[:ln])
+        url = url[ln:]
+
+    durl = ''
+    for i in xrange(len_url):
+        durl += l[i%rows][i/rows]
+
+    return urllib.unquote(durl).replace('^', '0')
 
