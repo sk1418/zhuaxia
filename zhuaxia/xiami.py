@@ -39,8 +39,8 @@ class Song(object):
         elif song_json:
             self.init_by_json(song_json)
         
-        #if hq_first, get the hq location to overwrite the dl_link
-        if self.xm.hq_first:
+        #if is_hq, get the hq location to overwrite the dl_link
+        if self.xm.is_hq:
             self.dl_link = self.xm.get_hq_link(self.song_id)
 
 
@@ -200,7 +200,7 @@ checkin_headers = {
 
 class Xiami(object):
 
-    def __init__(self, email, password, cookie_file, hq_first=True):
+    def __init__(self, email, password, is_hq=False):
         self.token = None
         self.uid = ''
         self.user_name = ''
@@ -208,17 +208,16 @@ class Xiami(object):
         self.password = password
         self.skip_login = False
         self.session = None
-        self.hq_first = hq_first
+        self.is_hq = is_hq
         #if either email or password is empty skip login
         if not email or not password:
             self.skip_login = True
             
-        self.cookie_file = cookie_file
         self.member_auth = ''
         #do login
         if self.skip_login:
             LOG.warning('Download resources without authentication (128kbps mp3 only).')
-            hq_first = False
+            is_hq = False
         else:
             self.login()
 
