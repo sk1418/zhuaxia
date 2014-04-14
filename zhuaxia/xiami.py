@@ -219,7 +219,10 @@ class Xiami(object):
             LOG.warning('Download resources without authentication (128kbps mp3 only).')
             is_hq = False
         else:
-            self.login()
+            if self.login():
+                LOG.info( u'[Login] 用户: %s (id:%s) 登录成功.' % (self.user_name.decode('utf-8'),self.uid) )
+            else:
+                is_hq = False
 
     def login(self):
         LOG.info( '[Login] login with email and password....')
@@ -239,9 +242,8 @@ class Xiami(object):
             self.session = sess
             res = sess.post(url_login, data=_form)
             self.memeber_auth = sess.cookies['member_auth']
-            self.uid, self.user_name = sess.cookies['user'].split('%22')[0:2]
+            self.uid, self.user_name = urllib.unquote(sess.cookies['user']).split('"')[0:2]
             self.token = sess.cookies['_xiamitoken']
-            LOG.info( u'[Login] 用户 %s (id:%s) 登录成功.' % (self.user_name,self.uid) )
             return True
         except:
             LOG.warning('Login failed, download resources without authentication (128kbps mp3 only).')
