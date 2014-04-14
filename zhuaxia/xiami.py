@@ -57,7 +57,8 @@ class Song(object):
         self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
         j = self.xm.read_link(url_song % self.song_id).json()
         #name
-        self.song_name = j['song']['song_name'].replace('&#039;',"'")
+        #self.song_name = j['song']['song_name'].replace('&#039;',"'")
+        self.song_name = util.decode_html(j['song']['song_name'])
         # download link
         self.dl_link = j['song']['song_location']
         # lyrics link
@@ -65,7 +66,7 @@ class Song(object):
         # artist_name
         self.artist_name = j['song']['artist_name']
         # album id, name
-        self.album_name = j['song']['album_name']
+        self.album_name = util.decode_html(j['song']['album_name'])
         self.album_id = j['song']['album_id']
 
         #used only for album/collection etc. create a dir to group all songs
