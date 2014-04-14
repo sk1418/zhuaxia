@@ -252,7 +252,10 @@ class Xiami(object):
         headers = {'User-Agent':AGENT}
         headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
 
-        return self.session.get(link,headers=headers)
+        if self.skip_login:
+            return requests.get(link, headers=headers)
+        else:
+            return self.session.get(link,headers=headers)
 
 
     def get_hq_link(self, song_id):
