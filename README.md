@@ -97,9 +97,9 @@ Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 
 - 例子
 
-			zx -H /tmp/in.txt
-			zx  http://www.xiami.com/song/123456
-			zx -H http://www.xiami.com/album/51786
+			zx -H -f "tmp/in.txt"
+			zx  "http://www.xiami.com/song/123456"
+			zx -H "http://www.xiami.com/album/51786"
 
 ##Screenshots / 运行截图
 
