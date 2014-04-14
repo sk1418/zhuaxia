@@ -3,6 +3,7 @@ import time
 import re
 import requests
 import log, config, util
+import urllib
 from os import path
 import downloader
 
@@ -10,6 +11,8 @@ LOG = log.get_logger("zxLogger")
 
 #xiami android/iphone api urls
 url_xiami="http://www.xiami.com"
+url_hq="http://www.xiami.com/song/gethqsong/sid/%s"
+url_vip="http://www.xiami.com/vip/update-tone"
 url_login="https://login.xiami.com/member/login"
 url_song = "http://www.xiami.com/app/android/song?id=%s"
 url_album = "http://www.xiami.com/app/android/album?id=%s"
@@ -35,6 +38,10 @@ class Song(object):
             self.init_by_url(url)
         elif song_json:
             self.init_by_json(song_json)
+        
+        #if is_hq, get the hq location to overwrite the dl_link
+        if self.xm.is_hq:
+            self.dl_link = self.xm.get_hq_link(self.song_id)
 
 
     def init_by_json(self, song_json):
@@ -191,48 +198,29 @@ checkin_headers = {
     'Content-Length': '0',
 }
 
+
 class Xiami(object):
 
-    def __init__(self, email, password, cookie_file):
+    def __init__(self, email, password, is_hq=False):
+        self.token = None
+        self.uid = ''
+        self.user_name = ''
         self.email = email
         self.password = password
         self.skip_login = False
+        self.session = None
+        self.is_hq = is_hq
         #if either email or password is empty skip login
         if not email or not password:
             self.skip_login = True
             
-        self.cookie_file = cookie_file
         self.member_auth = ''
         #do login
         if self.skip_login:
             LOG.warning('Download resources without authentication (128kbps mp3 only).')
+            is_hq = False
         else:
-            self.login_with_cookie()
-
-
-
-    def login_with_cookie(self):
-        ts = str(int(time.time()))
-        if path.exists(self.cookie_file):
-            LOG.info('[Login] read member_auth from cookie file ...')
-            with open(self.cookie_file) as f:
-                cif = f.read().split(' ')
-                ts_expired = (int(ts) - int(cif[0])) > 18000 
-                self.member_auth = cif[1]
-                if ts_expired:
-                    self.write_cookie(ts)
-        else:
-           self.write_cookie(ts)
-        
-
-    def write_cookie(self, ts):
-        if not self.login():
-            LOG.warning('Login failed, download resources without authentication (128kbps mp3 only).')
-            return
-        LOG.info( '[Login] Writing cookie file ...')
-        with open(self.cookie_file, 'w') as f:
-            f.write(ts + ' ' + self.member_auth)
-
+            self.login()
 
     def login(self):
         LOG.info( '[Login] login with email and password....')
@@ -249,16 +237,45 @@ class Xiami(object):
             sess.headers['User-Agent'] = AGENT
             sess.verify = False
             sess.mount('https://', requests.adapters.HTTPAdapter())
+            self.session = sess
             res = sess.post(url_login, data=_form)
             self.memeber_auth = sess.cookies['member_auth']
-            LOG.info( 'login success')
+            self.uid, self.user_name = sess.cookies['user'].split('%22')[0:2]
+            self.token = sess.cookies['_xiamitoken']
+            LOG.info( u'[Login] 用户 %s (id:%s) 登录成功.' % (self.user_name,self.uid) )
             return True
         except:
+            LOG.warning('Login failed, download resources without authentication (128kbps mp3 only).')
             return False
 
     def read_link(self, link):
         headers = {'User-Agent':AGENT}
-        headers['Cookie'] = 'member_auth=%s' % self.member_auth
-        return requests.get(link,headers=headers)
+        headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
 
+        return self.session.get(link,headers=headers)
+
+
+    def get_hq_link(self, song_id):
+        mess = self.read_link(url_hq%song_id).json()['location']
+        return self.decode_xiami_link(mess)
+
+    def decode_xiami_link(self,mess):
+        """decode xm song link"""
+        rows = int(mess[0])
+        url = mess[1:]
+        len_url = len(url)
+        cols = len_url / rows
+        re_col = len_url % rows # how many rows need to extend 1 col for the remainder
+
+        l = []
+        for row in xrange(rows):
+            ln = cols + 1 if row < re_col else cols
+            l.append(url[:ln])
+            url = url[ln:]
+
+        durl = ''
+        for i in xrange(len_url):
+            durl += l[i%rows][i/rows]
+
+        return urllib.unquote(durl).replace('^', '0')
 

@@ -1,6 +1,6 @@
 #!/bin/python
 # -*- coding:utf-8 -*-
-import sys
+import sys,getopt
 import zhuaxia.config as config
 import zhuaxia.util as util
 import logging
@@ -9,34 +9,27 @@ import zhuaxia.xiami as xm
 import zhuaxia.downloader as downloader
 import zhuaxia.commander as commander
 help_info = u""" %(cyan)s
-                                 ##             
-        ##         ###           ##   ##########
-        ##  ##########           ##   ##########
-        ##  ########          ########   ##     
-        ##  ## ## ##          ########   ##     
-     ###### ## ## ##          ## ## ##   ##     
-     ###### ## ## ##          ## ## ##   ##     
-        ##  ## ## ##          ## ## ##   ## ##  
-        ##  ## ## ##          ## ## ##   ## ##  
-        ### ## ## ##          ########   ##  ## 
-     ###### ## ## ##          ########   ##  ## 
-     #####  ## ##  ##         ## ##      ##   ##
-        ##  ## ##  ##            ## ##   ##   ##
-        ##  ## ##  ##            ## ##   ##     
-        ##  ## ##   ##           ######  ##     
-        ## ##  ##   ##        #########  ##     
-      #### ##  ##    ##       ####   ##  ##     
-      ### ##   ##     #                  ##     
-                     -- 抓取 xiami.com 音乐
+    zhuaxia (抓虾) -- 抓取 xiami.com 音乐%(clear)s
+
+    [%(uline)sCONFIG FILE%(clear)s] 
+        $HOME/.zhuaxia/zhuaxia.conf
+
+    [%(uline)sOPTION%(clear)s] 
+        %(bold)s-H%(clear)s
+            首选HQ质量(320kbps), 
+                - 配置文件中需给出正确登录信箱和密码
+                - 登录用户需拥有VIP身份
+                - 用户需在xiami vip设置页面设置默认高音质
+                - 此选项对不满足上3点情况无效，仍下载128kbps资源
 
     [%(uline)sUSAGE%(clear)s] 
 
-        %(bold)szx <URL>%(clear)s
-            : 下载指定URL资源 (歌曲，专辑，精选集，用户收藏) 例子：
-
+        %(bold)szx [OPTION] <URL>%(clear)s
+            : 下载指定URL资源 (歌曲，专辑，精选集，用户收藏)
+            例子： 
               zx "http://www.xiami.com/space/lib-song/u/25531126"
 
-        %(bold)szx -f  <file>%(clear)s 
+        %(bold)szx [OPTION] -f <file>%(clear)s 
             : 多个URL在一个文件中，每个URL一行。 URLs可以是不同资源类型。例子：
               $ zx -f /tmp/foo.txt
 
@@ -47,8 +40,8 @@ help_info = u""" %(cyan)s
         %(bold)szx -h%(clear)s ：显示帮助
 
         %(bold)szx -v%(clear)s ：显示版本信息
+        """
 
-        config file: $HOME/.zhuaxia/zhuaxia.conf"""
 
 def usage():
     """print usage information"""
@@ -57,6 +50,7 @@ def usage():
 def version():
     """print version"""
     print u'zhuaxia (抓虾) ' + config.VERSION
+
 if __name__ == '__main__':
     logger_name = 'zxLogger'
 
@@ -64,18 +58,58 @@ if __name__ == '__main__':
     config.load_config()
     log.setup_log(logger_name, config.LOG_LVL_CONSOLE, config.LOG_LVL_FILE)
     LOG = log.get_logger(logger_name)
+    
+    try:
+        hq = False
+        infile = ''
+        inUrl = ''
+        if len(sys.argv)<2: raise getopt.GetoptError("parameters are missing...")
 
-    if len(sys.argv)<2 or (sys.argv[1] == '-f' and len(sys.argv)!=3):
+        opts, args = getopt.getopt(sys.argv[1:],":f:Hhv")
+        for o, a in opts:
+            if o == '-h':
+                usage()
+                sys.exit(0)
+            elif o == '-H':
+                hq = True
+            elif o == '-v':
+                version()
+                sys.exit(0)
+            elif o == '-f':
+                infile = a
+
+        if not infile:
+            if not len(args):
+                raise getopt.GetoptError("input file or xiami url is needed")
+            else:
+                inUrl = args[0]
+        LOG.debug("hq:"+str(hq))
+        LOG.debug( "infile:"+infile)
+        LOG.debug( "inurl:"+inUrl)
+
+        if infile:
+            commander.shall_I_begin(infile, is_file=True, is_hq=hq)
+        else:
+            commander.shall_I_begin(inUrl, is_hq=hq)
+                
+    except getopt.GetoptError as e:
+        LOG.error(str(e))
         usage()
-        sys.exit(1)
-    elif sys.argv[1] == '-v': 
-        version()
-    elif sys.argv[1] == '-h': 
-        usage()
-    elif sys.argv[1] == '-f':
-        commander.shall_I_begin(sys.argv[2], True)
-    else:
-        commander.shall_I_begin(sys.argv[1])
+        sys.exit(2)
+        
+
+
+    #if len(sys.argv)<2 or (sys.argv[1] == '-f' and len(sys.argv)<3):
+        #usage()
+        #sys.exit(1)
+    #elif sys.argv[1] == '-v': 
+        #version()
+    #elif sys.argv[1] == '-h': 
+        #usage()
+    #elif sys.argv[1] == '-f':
+        #commander.shall_I_begin(sys.argv[2], True)
+    #else:
+        #commander.shall_I_begin(sys.argv[1])
 
     #test input file
     #commander.shall_I_begin('/tmp/in.txt', True)

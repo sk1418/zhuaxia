@@ -1,0 +1,13 @@
+2014-04-13  Version 1.1.0
+=========================
+- add -H option for HQ (320kbps) downloading
+- improve the args parsing
+
+2014-04-08  Version 1.0.0
+=========================
+save album description to file
+
+
+2014-04-04  Version 1.0.0
+=========================
+initial release

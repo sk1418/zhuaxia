@@ -18,11 +18,10 @@ fmt_has_song_nm = u'包含%d首歌曲.'
 fmt_single_song = u'[曲目] %s'
 border = log.hl(u'%s'% ('='*90), 'cyan')
 
-
-def shall_I_begin(in_str, is_file=False):
+def shall_I_begin(in_str, is_file=False, is_hq=False):
     xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,\
             config.XIAMI_LOGIN_PASSWORD, \
-            path.join(config.USER_PATH, 'xm.cookie'))
+            is_hq)
     if is_file:
         from_file(xiami_obj, in_str)
     else:
@@ -101,7 +100,7 @@ def from_file(xm_obj, infile):
     print border
     pool = ThreadPool(config.THREAD_POOL_SIZE)
     for link in [u for u in urls if u]:
-        pool.add_task(from_url, xm_obj,link.rstrip('\n'), False)
+        pool.add_task(from_url, xm_obj,link.rstrip('\n'), verbose=False)
 
     pool.wait_completion()
 
