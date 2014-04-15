@@ -6,7 +6,7 @@ import log, util
 import traceback
 
 
-VERSION     = '1.1.0'                #software version
+VERSION     = '1.1.1'                #software version
 #the separator of tmux command output
 PKG_PATH    = path.dirname(__file__)
 APP_PATH    = path.join(PKG_PATH,"../")

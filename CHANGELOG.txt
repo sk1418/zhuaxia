@@ -1,3 +1,8 @@
+2014-04-15  Version 1.1.1
+=========================
+- [bugfix] user name decoded with utf-8 for output
+- [bugfix] low/high Quality checking logic (setting flag)
+
 2014-04-13  Version 1.1.0
 =========================
 - add -H option for HQ (320kbps) downloading
