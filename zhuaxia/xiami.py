@@ -211,7 +211,7 @@ class Xiami(object):
         self.session = None
         self.is_hq = is_hq
         #if either email or password is empty skip login
-        if not email or not password:
+        if not email or not password or not is_hq:
             self.skip_login = True
             
         self.member_auth = ''
