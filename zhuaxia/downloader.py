@@ -31,22 +31,48 @@ def print_progress():
     bar_count = (int(width*percent_bar_factor)-2/10) # number of percent bar
     #line = log.hl(u' %s\n'% ('-'*90), 'cyan')
     line = log.hl(u' %s\n'% ('+'*width), 'cyan')
+    sep = log.hl(u' %s\n'% ('='*width), 'cyan')
     sys.stdout.write(u'\x1b[2J\x1b[H') #clear screen
     sys.stdout.write(line)
-    header = u' 保存目录:[%s] | 线程池:[%d] | 总进度:[%d/%d]\n'% (config.DOWNLOAD_DIR, config.THREAD_POOL_SIZE,done,total)
+    header = u' 保存目录:[%s] | 线程池:[%d]\n'% (config.DOWNLOAD_DIR, config.THREAD_POOL_SIZE)
     header = util.rjust(header, width)
     sys.stdout.write(log.hl(u' %s'%header,'warning'))
     sys.stdout.write(line)
+
+    fmt_progress = '%s [%s] %.1f%%\n'
+
+
+    all_p = [] #all progress bars, filled by following for loop
+    sum_percent = 0 # total percent for running job
+    total_percent = 0
+
     for filename, percent in progress.items():
+        sum_percent += percent
         bar = util.ljust('=' * int(percent * bar_count), bar_count)
         per100 = percent * 100 
-        single_p =  "%s [%s] %.1f%%\n" % \
+        single_p =  fmt_progress % \
                 (util.rjust(filename,(width - bar_count -10)), bar, per100) # the -10 is for the xx.x% and [ and ]
-        sys.stdout.write(log.hl(single_p,'green'))
+        all_p.append(log.hl(single_p,'green'))
+    
+    #calculate total progress percent
+    total_percent = float(sum_percent+done)/total
+    
+    #global progress
+    g_text = u'总进度[%d/%d]:'% (done, total)
+    g_bar = util.ljust('#' * int(total_percent* bar_count), bar_count)
+    g_progress =  fmt_progress % \
+                (util.rjust(g_text,(width - bar_count -10)), g_bar, 100*total_percent) # the -10 is for the xx.x% and [ and ]
+
+    #output all total progress bars
+    sys.stdout.write(log.hl(u'%s'%g_progress, 'red'))
+    sys.stdout.write(sep)
+
+    #output all downloads' progress bars
+    sys.stdout.write(''.join(all_p))
 
     if len(done2show):
         sys.stdout.write(line)
-        sys.stdout.write(log.hl(util.rjust(u'最近完成(只显示%d个):\n'% config.SHOW_DONE_NUMBER, width),'warning'))
+        sys.stdout.write(log.hl(util.rjust(u'最近%d个完成任务:\n'% config.SHOW_DONE_NUMBER, width),'warning'))
         sys.stdout.write(line)
         #display finished jobs
         for d in done2show:
