@@ -1,3 +1,7 @@
+2014-04-25  Version 1.1.2
+=========================
+- [bugfix] if the song name had slash "/", downloader cannot save file
+
 2014-04-15  Version 1.1.1
 =========================
 - [bugfix] user name decoded with utf-8 for output

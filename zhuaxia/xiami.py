@@ -45,7 +45,7 @@ class Song(object):
 
 
     def init_by_json(self, song_json):
-        """ the group dir and abs_path would be set by the caller"""
+        """ the group dir and abs_path should be set by the caller"""
 
         self.song_id = song_json['song_id']
         self.album_id = song_json['album_id']
@@ -58,7 +58,7 @@ class Song(object):
         # album id, name
         self.album_name = song_json['title']
 
-        self.filename = self.song_name + u'.mp3'
+        self.filename = (self.song_name + u'.mp3').replace('/','_')
 
     def init_by_url(self,url):
         self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
@@ -78,8 +78,9 @@ class Song(object):
 
         #used only for album/collection etc. create a dir to group all songs
         self.group_dir = None
-        #filename  artistName_songName.mp3
-        self.filename = (self.artist_name + u"_" if self.artist_name  else "" ) + self.song_name + u'.mp3'
+        #filename  artistName_songName.mp3 and replace slash "/" with "_"
+        self.filename = ((self.artist_name + u"_" if self.artist_name  else "" ) + self.song_name + u'.mp3').replace('/','_')
+        
         self.abs_path = path.join(config.DOWNLOAD_DIR,self.filename)
 
 
