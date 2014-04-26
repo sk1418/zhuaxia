@@ -35,7 +35,7 @@ def print_progress():
     sys.stdout.write(u'\x1b[2J\x1b[H') #clear screen
     sys.stdout.write(line)
     header = u' 保存目录:[%s] | 线程池:[%d]\n'% (config.DOWNLOAD_DIR, config.THREAD_POOL_SIZE)
-    header = util.rjust(header, width)
+    #header = util.ljust(header, width)
     sys.stdout.write(log.hl(u' %s'%header,'warning'))
     sys.stdout.write(line)
 
@@ -72,7 +72,7 @@ def print_progress():
 
     if len(done2show):
         sys.stdout.write(line)
-        sys.stdout.write(log.hl(util.rjust(u'最近%d个完成任务:\n'% config.SHOW_DONE_NUMBER, width),'warning'))
+        sys.stdout.write(log.hl(u'  最近%d个完成任务:\n'% config.SHOW_DONE_NUMBER,'warning'))
         sys.stdout.write(line)
         #display finished jobs
         for d in done2show:
@@ -127,7 +127,7 @@ def fill_done2show(filename):
     global done2show
     if len(done2show) == config.SHOW_DONE_NUMBER:
         done2show.pop()
-    done2show.append(filename)
+    done2show.insert(0, filename)
 
 def start_download(songs):
     global total, progress
