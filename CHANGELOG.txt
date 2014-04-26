@@ -1,3 +1,9 @@
+2014-04-25  Version 1.2.0
+=========================
+- [bugfix] diplay last x finished jobs in a wrong order
+- add total progress bar
+- adjust output alignment (header text left align)
+
 2014-04-25  Version 1.1.2
 =========================
 - [bugfix] if the song name had slash "/", downloader cannot save file
