@@ -1,4 +1,4 @@
-2014-04-25  Version 1.2.0
+2014-04-27  Version 1.2.0
 =========================
 - [bugfix] diplay last x finished jobs in a wrong order
 - add total progress bar
