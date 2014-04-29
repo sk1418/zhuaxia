@@ -30,9 +30,11 @@ zhuaxia 是一个基于命令行的虾米(xiami.com)音乐多线程批量下载�
 **zhuaxia** was written and tested with:
 - python 2.7.6
 
-##Dependencies / 依赖
-- requests module
-- mutagen module
+##Requirements / 运行需求
+- python 2.7.6
+- python2 requests module
+- python2 mutagen module
+- a terminal with UTF-8 supports
 
 ##Features / 功能
 - 自动解析URL (目前支持：歌曲，专辑， 用户收藏，精选集)
