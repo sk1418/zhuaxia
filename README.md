@@ -23,7 +23,7 @@
 
 ##Introduction / 简介
 
-zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resources in multiple threads from www.xiami.com. Due to the site is a Chinese website, the output/log messages contains Chinese. Also this readme would be written in Chinese as well. All comments in codes are in English.
+zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resources in multiple threads from www.xiami.com. Due to the localization of site, the output/log messages contain Chinese. Moreover, this readme would be written in Chinese as well. However all comments in codes are in English.
 
 zhuaxia 是一个基于命令行的虾米(xiami.com)音乐多线程批量下载工具
 
@@ -44,11 +44,11 @@ zhuaxia 是一个基于命令行的虾米(xiami.com)音乐多线程批量下载�
 - 更新mp3 meta信息，自动下载封面...等等
 
 ##Todos
-- 对于用户收藏，每次下载做增量下载，即不下载曾经下载过的歌曲，当然有选项开关.这样更便于随时把收藏的歌拉到本地
-- 保存下载/解析历史，对于重复的下载可以更快获得下载地址
-- 完善Error Handling(错误处理)
-- [done] ~~对于专辑，也下载专辑介绍保存文本文件~~
-- [done] ~~目前只能下载一般质量的mp3,因为我个人没有vip帐号，不知道HQ的地址什么格式。但是登录以及获取cookie都已经写好并测试。只差可用的vip账户来看看格式。~~
+- [x] 对于专辑，也下载专辑介绍保存文本文件
+- [x] 目前只能下载一般质量的mp3,因为我个人没有vip帐号，不知道HQ的地址什么格式。但是登录以及获取cookie都已经写好并测试。只差可用的vip账户来看看格式
+- [ ] 下载艺人的Top10热门歌曲
+- [ ] 完善Error Handling(错误处理)
+
 
 ##Installation / 安装
 
