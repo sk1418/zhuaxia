@@ -23,16 +23,18 @@ LOG_LVL_CONSOLE      = 'INFO'
 THREAD_POOL_SIZE     = 3
 DOWNLOAD_DIR         = '/tmp'
 SHOW_DONE_NUMBER     = 5
+DOWNLOAD_TOP_SONG    = 10
 
 #a variable name dict for dynamic assignment
 var_dict = {
-        'xiami.auth.email'    : ('XIAMI_LOGIN_EMAIL'   , 's'),
-        'xiami.auth.password' : ('XIAMI_LOGIN_PASSWORD', 's'),
-        'download.dir'        : ('DOWNLOAD_DIR'        , 'p'),
-        'log.level.file'      : ('LOG_LVL_FILE'        , 's'),
-        'log.level.console'   : ('LOG_LVL_CONSOLE'     , 's'),
-        'thread.pool.size'    : ('THREAD_POOL_SIZE'    , 'n'),
-        'show.done.number'    : ('SHOW_DONE_NUMBER'    , 'n')
+        'xiami.auth.email'        : ('XIAMI_LOGIN_EMAIL'   , 's'),
+        'xiami.auth.password'     : ('XIAMI_LOGIN_PASSWORD', 's'),
+        'download.dir'            : ('DOWNLOAD_DIR'        , 'p'),
+        'log.level.file'          : ('LOG_LVL_FILE'        , 's'),
+        'log.level.console'       : ('LOG_LVL_CONSOLE'     , 's'),
+        'thread.pool.size'        : ('THREAD_POOL_SIZE'    , 'n'),
+        'show.done.number'        : ('SHOW_DONE_NUMBER'    , 'n'),
+        'download.artist.topsong' : ('DOWNLOAD_TOP_SONG'   , 'n')
         }
 
 def load_single_config(conf_parser, conf_key):
@@ -45,6 +47,9 @@ def load_single_config(conf_parser, conf_key):
         ty = var_dict[conf_key][1]
 
         if ty == 'n':
+            #here check topx should less than 30
+            if conf_key == 'download.artist.topsong' and int(v) >30:
+                return 
             globals()[gkey] = int(v)
         else:
             if ty =='p':
