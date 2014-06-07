@@ -204,6 +204,10 @@ class TopSong(object):
             song.group_dir = song.artist_name + '_TopSongs'
             song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
             self.songs.append(song)
+            #check config for top X
+            if len(self.songs) >= config.DOWNLOAD_TOP_SONG:
+                break
+
         if len(self.songs):
             #set the artist name
             self.artist_name = self.songs[-1].artist_name
