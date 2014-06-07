@@ -3,6 +3,7 @@
 import sys
 import config ,util ,logging ,log,downloader
 import xiami as xm
+import re
 from threadpool import ThreadPool
 from time import sleep
 from os import path
@@ -76,6 +77,18 @@ def from_url(xm_obj, url, verbose=True):
         else:
             msgs.append( fmt_has_song_nm % len(fav.songs))
             msg = u' => '.join(msgs)
+    elif re.search(r'/artist/\d+', url):
+        topsong=xm.TopSong(xm_obj, url)
+        dl_songs.extend(topsong.songs)
+        msgs = [fmt_parsing % (xiami_url_abbr(url), u'艺人热门歌曲',topsong.artist_name)]
+        if verbose:
+            for s in topsong.songs:
+                msgs.append(fmt_single_song %s.song_name)
+            msg = u'\n    |-> '.join(msgs)
+        else:
+            msgs.append( fmt_has_song_nm % len(topsong.songs))
+            msg = u' => '.join(msgs)
+        
 
     global total, done
     done +=1

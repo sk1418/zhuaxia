@@ -18,8 +18,8 @@ url_song = "http://www.xiami.com/app/android/song?id=%s"
 url_album = "http://www.xiami.com/app/android/album?id=%s"
 url_fav = "http://www.xiami.com/app/android/lib-songs?uid=%s&page=%s"
 url_collection = "http://www.xiami.com/app/android/collect?id=%s"
+url_artist_top_song = "http://www.xiami.com/app/android/artist-topsongs?id=%s"
 #url_artist_albums = "http://www.xiami.com/app/android/artist-albums?id=%s&page=%s"
-#url_artist_top_song = "http://www.xiami.com/app/android/artist-topsongs?id=%s"
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
@@ -185,8 +185,30 @@ class Collection(object):
         if len(self.songs):
             #creating the dir
             util.create_dir(path.dirname(self.songs[-1].abs_path))
-            
 
+class TopSong(object):
+    """download top songs of given artist"""
+    def __init__(self, xm_obj, url):
+        self.url = url
+        self.xm = xm_obj
+        #artist id
+        self.artist_id = re.search(r'(?<=/artist/)\d+', self.url).group(0)
+        self.artist_name = ""
+        self.songs = []
+        self.init_topsong()
+
+    def init_topsong(self):
+        j = self.xm.read_link(url_artist_top_song % (self.artist_id)).json()
+        for jsong in j['songs']:
+            song = Song(self.xm, song_json=jsong)
+            song.group_dir = song.artist_name + '_TopSongs'
+            song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
+            self.songs.append(song)
+        if len(self.songs):
+            #set the artist name
+            self.artist_name = self.songs[-1].artist_name
+            #creating the dir
+            util.create_dir(path.dirname(self.songs[-1].abs_path))
 
 checkin_headers = {
     'User-Agent': AGENT,
