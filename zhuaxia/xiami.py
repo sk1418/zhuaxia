@@ -6,6 +6,7 @@ import log, config, util
 import urllib
 from os import path
 import downloader
+from obj import Song
 
 LOG = log.get_logger("zxLogger")
 
@@ -24,18 +25,22 @@ url_artist_top_song = "http://www.xiami.com/app/android/artist-topsongs?id=%s"
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
 
-class Song(object):
+class XiamiSong(Song):
     """
     xiami Song class, if song_json was given, 
-    the group_dir and abs_path of the object needs to be set by the caller
+    Song.post_set() needs to be called for post-setting 
+    abs_path, filename, etc.
     """
 
     def __init__(self,xiami_obj,url=None,song_json=None):
+        self.song_type=1
         self.xm = xiami_obj
         self.group_dir = None
         if url:
             self.url = url
             self.init_by_url(url)
+            #set filename, abs_path etc.
+            self.post_set()
         elif song_json:
             self.init_by_json(song_json)
         
@@ -44,7 +49,7 @@ class Song(object):
             self.dl_link = self.xm.get_hq_link(self.song_id)
 
 
-    def init_by_json(self, song_json):
+    def init_by_json(self, song_json ):
         """ the group dir and abs_path should be set by the caller"""
 
         self.song_id = song_json['song_id']
@@ -58,7 +63,7 @@ class Song(object):
         # album id, name
         self.album_name = song_json['title']
 
-        self.filename = (self.song_name + u'.mp3').replace('/','_')
+        #self.filename = (self.song_name + u'.mp3').replace('/','_')
 
     def init_by_url(self,url):
         self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
@@ -78,10 +83,6 @@ class Song(object):
 
         #used only for album/collection etc. create a dir to group all songs
         self.group_dir = None
-        #filename  artistName_songName.mp3 and replace slash "/" with "_"
-        self.filename = ((self.artist_name + u"_" if self.artist_name  else "" ) + self.song_name + u'.mp3').replace('/','_')
-        
-        self.abs_path = path.join(config.DOWNLOAD_DIR,self.filename)
 
 
 class Album(object):
@@ -111,9 +112,9 @@ class Album(object):
 
         #handle songs
         for jsong in j['songs']:
-            song = Song(self.xm, song_json=jsong)
+            song = XiamiSong(self.xm, song_json=jsong)
             song.group_dir = song.artist_name + u'_' + song.album_name
-            song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
+            song.post_set()
             self.songs.append(song)
 
         d = path.dirname(self.songs[-1].abs_path)
@@ -151,10 +152,10 @@ class Favorite(object):
             j = self.xm.read_link(url_fav % (self.uid, str(page)) ).json()
             if j['songs'] :
                 for jsong in j['songs']:
-                    song = Song(self.xm, song_json=jsong)
+                    song = XiamiSong(self.xm, song_json=jsong)
                     #rewrite filename, make it different
                     song.group_dir = 'favorite_%s' % self.uid
-                    song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
+                    song.post_set()
                     self.songs.append(song)
                 page += 1
             else:
@@ -180,7 +181,7 @@ class Collection(object):
             song = Song(self.xm, song_json=jsong)
             #rewrite filename, make it different
             song.group_dir = self.collection_name
-            song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
+            song.post_set()
             self.songs.append(song)
         if len(self.songs):
             #creating the dir
@@ -200,9 +201,9 @@ class TopSong(object):
     def init_topsong(self):
         j = self.xm.read_link(url_artist_top_song % (self.artist_id)).json()
         for jsong in j['songs']:
-            song = Song(self.xm, song_json=jsong)
+            song = XiamiSong(self.xm, song_json=jsong)
             song.group_dir = song.artist_name + '_TopSongs'
-            song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
+            song.post_set()
             self.songs.append(song)
             #check config for top X
             if len(self.songs) >= config.DOWNLOAD_TOP_SONG:

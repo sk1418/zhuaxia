@@ -51,7 +51,7 @@ def from_url(xm_obj, url, verbose=True):
             msg= u' => '.join(msgs)
 
     elif '/song/' in url:
-        song = xm.Song(xm_obj, url=url)
+        song = xm.XiamiSong(xm_obj, url=url)
         dl_songs.append(song)
         msg = fmt_parsing % (xiami_url_abbr(url),u'曲目',  song.song_name)
     elif '/album/' in url:
