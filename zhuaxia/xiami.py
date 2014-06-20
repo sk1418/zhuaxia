@@ -41,7 +41,11 @@ class Song(object):
         
         #if is_hq, get the hq location to overwrite the dl_link
         if self.xm.is_hq:
-            self.dl_link = self.xm.get_hq_link(self.song_id)
+            try:
+                self.dl_link = self.xm.get_hq_link(self.song_id)
+            except:
+                #if user was not VIP, don't change the dl_link
+                pass
 
 
     def init_by_json(self, song_json):
@@ -275,6 +279,7 @@ class Xiami(object):
             return True
         except:
             LOG.warning('Login failed, download resources without authentication (128kbps mp3 only).')
+            self.is_hq = False
             return False
 
     def read_link(self, link):
