@@ -12,41 +12,58 @@ LOG = log.get_logger("zxLogger")
 
 #163 music api url
 url_163="http://music.163.com"
-url_hq="http://www.xiami.com/song/gethqsong/sid/%s"
-url_vip="http://www.xiami.com/vip/update-tone"
-url_song = "http://www.xiami.com/app/android/song?id=%s"
-url_album = "http://www.xiami.com/app/android/album?id=%s"
-url_fav = "http://www.xiami.com/app/android/lib-songs?uid=%s&page=%s"
-url_collection = "http://www.xiami.com/app/android/collect?id=%s"
-url_artist_top_song = "http://www.xiami.com/app/android/artist-topsongs?id=%s"
-#url_artist_albums = "http://www.xiami.com/app/android/artist-albums?id=%s&page=%s"
+url_album="http://music.163.com/api/album/%s/"
+url_song="http://music.163.com/api/song/detail/?id=%s&ids=[%s]"
+url_playlist="http://music.163.com/api/playlist/detail?id=%s"
+url_artist_top_song = "tbd"
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
 
-class XiamiSong(Song):
+
+class NeteaseSong(Song):
     """
-    xiami Song class, if song_json was given, 
+    163 Song class, if song_json was given, 
     Song.post_set() needs to be called for post-setting 
     abs_path, filename, etc.
+    url example: http://music.163.com/song?id=209235
     """
 
-    def __init__(self,xiami_obj,url=None,song_json=None):
-        self.song_type=1
-        self.xm = xiami_obj
+    def __init__(self,o163,url=None,song_json=None):
+        self.song_type=2
+        self.o163 = o163
         self.group_dir = None
+    #TODO for 163.com music, init_json should be called by init_url, or skip the "init_url"
         if url:
             self.url = url
             self.init_by_url(url)
             #set filename, abs_path etc.
             self.post_set()
+
         elif song_json:
             self.init_by_json(song_json)
-        
-        #if is_hq, get the hq location to overwrite the dl_link
-        if self.xm.is_hq:
-            self.dl_link = self.xm.get_hq_link(self.song_id)
 
+
+    def init_by_url(self,url):
+        self.song_id = re.search(r'(?<=/song?id=)\d+', url).group(0)
+
+        j = self.o163.read_link(url_song % (self.song_id,self.song_id)).json()
+        js = j['songs'][0]
+        #name
+        #self.song_name = j['song']['song_name'].replace('&#039;',"'")
+        self.song_name = util.decode_html(j['songs'][0]['name'])
+        # lyrics link
+        self.lyrics_link = j['song']['song_lrc']
+        # artist_name
+        self.artist_name = j['song']['artist_name']
+        # album id, name
+        self.album_name = util.decode_html(j['song']['album_name'])
+        self.album_id = j['song']['album_id']
+
+        # download link
+        self.dl_link = j['song']['song_location']
+        #used only for album/collection etc. create a dir to group all songs
+        self.group_dir = None
 
     def init_by_json(self, song_json ):
         """ the group dir and abs_path should be set by the caller"""
@@ -64,24 +81,6 @@ class XiamiSong(Song):
 
         #self.filename = (self.song_name + u'.mp3').replace('/','_')
 
-    def init_by_url(self,url):
-        self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
-        j = self.xm.read_link(url_song % self.song_id).json()
-        #name
-        #self.song_name = j['song']['song_name'].replace('&#039;',"'")
-        self.song_name = util.decode_html(j['song']['song_name'])
-        # download link
-        self.dl_link = j['song']['song_location']
-        # lyrics link
-        self.lyrics_link = j['song']['song_lrc']
-        # artist_name
-        self.artist_name = j['song']['artist_name']
-        # album id, name
-        self.album_name = util.decode_html(j['song']['album_name'])
-        self.album_id = j['song']['album_id']
-
-        #used only for album/collection etc. create a dir to group all songs
-        self.group_dir = None
 
 
 class Album(object):
@@ -226,88 +225,27 @@ checkin_headers = {
 }
 
 
-class Xiami(object):
+class Netease(object):
 
-    def __init__(self, email, password, is_hq=False):
-        self.token = None
-        self.uid = ''
-        self.user_name = ''
-        self.email = email
-        self.password = password
-        self.skip_login = False
-        self.session = None
+    def __init__(self, is_hq=False):
         self.is_hq = is_hq
-        #if either email or password is empty skip login
-        if not email or not password or not is_hq:
-            self.skip_login = True
-            
-        self.member_auth = ''
-        #do login
-        if self.skip_login:
-            LOG.warning('Download resources without authentication (128kbps mp3 only).')
-            is_hq = False
-        else:
-            if self.login():
-                LOG.info( u'[Login] 用户: %s (id:%s) 登录成功.' % (self.user_name.decode('utf-8'),self.uid) )
-            else:
-                is_hq = False
 
-    def login(self):
-        LOG.info( '[Login] login with email and password....')
-        _form = {
-            'email': self.email,
-            'password': self.password,
-            'submit': '登 录',
-        }
-        headers = {'User-Agent': AGENT}
-        headers['Referer'] = url_login
-        # do http post login
-        try:
-            sess = requests.Session()
-            sess.headers['User-Agent'] = AGENT
-            sess.verify = False
-            sess.mount('https://', requests.adapters.HTTPAdapter())
-            self.session = sess
-            res = sess.post(url_login, data=_form)
-            self.memeber_auth = sess.cookies['member_auth']
-            self.uid, self.user_name = urllib.unquote(sess.cookies['user']).split('"')[0:2]
-            self.token = sess.cookies['_xiamitoken']
-            return True
-        except:
-            LOG.warning('Login failed, download resources without authentication (128kbps mp3 only).')
-            return False
 
     def read_link(self, link):
         headers = {'User-Agent':AGENT}
-        headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
+        headers['Referer'] = url_163
+        headers['Cookie'] = 'appver=1.7.3'
+        return requests.get(link, headers=headers)
 
-        if self.skip_login:
-            return requests.get(link, headers=headers)
-        else:
-            return self.session.get(link,headers=headers)
-
-
-    def get_hq_link(self, song_id):
-        mess = self.read_link(url_hq%song_id).json()['location']
-        return self.decode_xiami_link(mess)
-
-    def decode_xiami_link(self,mess):
-        """decode xm song link"""
-        rows = int(mess[0])
-        url = mess[1:]
-        len_url = len(url)
-        cols = len_url / rows
-        re_col = len_url % rows # how many rows need to extend 1 col for the remainder
-
-        l = []
-        for row in xrange(rows):
-            ln = cols + 1 if row < re_col else cols
-            l.append(url[:ln])
-            url = url[ln:]
-
-        durl = ''
-        for i in xrange(len_url):
-            durl += l[i%rows][i/rows]
-
-        return urllib.unquote(durl).replace('^', '0')
-
+    def encrypted_id(self,sfid):
+        byte1 = bytearray('3go8&$8*3*3h0k(2)2')
+        byte2 = bytearray(id)
+        byte1_len = len(byte1)
+        for i in xrange(len(byte2)):
+            byte2[i] = byte2[i]^byte1[i%byte1_len]
+        m = md5.new()
+        m.update(byte2)
+        result = m.digest().encode('base64')[:-1]
+        result = result.replace('/', '_')
+        result = result.replace('+', '-')
+        return result
