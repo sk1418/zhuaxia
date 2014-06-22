@@ -104,7 +104,7 @@ class Album(object):
     def init_album(self):
         j = self.xm.read_link(url_album % self.album_id).json()['album']
         #name
-        self.album_name = j['title']
+        self.album_name = util.decode_html(j['title'])
         #album logo
         self.logo = j['album_logo']
         # artist_name
@@ -116,7 +116,7 @@ class Album(object):
         #handle songs
         for jsong in j['songs']:
             song = Song(self.xm, song_json=jsong)
-            song.group_dir = song.artist_name + u'_' + song.album_name
+            song.group_dir = self.artist_name + u'_' + self.album_name
             song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
             self.songs.append(song)
 
