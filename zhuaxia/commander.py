@@ -3,6 +3,7 @@
 import sys
 import config ,util ,logging ,log,downloader
 import xiami as xm
+import netease as m163
 import re
 from threadpool import ThreadPool
 from time import sleep
@@ -19,10 +20,17 @@ fmt_has_song_nm = u'包含%d首歌曲.'
 fmt_single_song = u'[曲目] %s'
 border = log.hl(u'%s'% ('='*90), 'cyan')
 
+pat_xm = r'^https?://[^/.]*\.xiami\.com/'
+pat_163 = r'^https?://music\.163\.com/'
+
 def shall_I_begin(in_str, is_file=False, is_hq=False):
+    #xiami obj
     xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,\
             config.XIAMI_LOGIN_PASSWORD, \
             is_hq)
+    #netease obj
+    o163 = m163.Netease(is_hq)
+
     if is_file:
         from_file(xiami_obj, in_str)
     else:
@@ -118,4 +126,7 @@ def from_file(xm_obj, infile):
     pool.wait_completion()
 
 def xiami_url_abbr(url):
-    return url.replace('http://www.xiami.com/', '...')
+    return re.sub(pat_xm,u'[虾]',url)
+
+def m163_url_abbr(url):
+    return re.sub(pat_163,u'[易]',url)

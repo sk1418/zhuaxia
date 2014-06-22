@@ -97,7 +97,6 @@ if __name__ == '__main__':
         usage()
         sys.exit(2)
         
-
     #test input file
     #commander.shall_I_begin('/tmp/in.txt', True)
     #commander.shall_I_begin('http://www.xiami.com/space/lib-song/u/25531126')
