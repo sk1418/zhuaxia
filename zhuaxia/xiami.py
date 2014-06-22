@@ -205,7 +205,7 @@ class TopSong(object):
         j = self.xm.read_link(url_artist_top_song % (self.artist_id)).json()
         for jsong in j['songs']:
             song = Song(self.xm, song_json=jsong)
-            song.group_dir = song.artist_name + '_TopSongs'
+            song.group_dir = self.artist_name + '_TopSongs'
             song.abs_path = path.join(config.DOWNLOAD_DIR, song.group_dir, song.filename)
             self.songs.append(song)
             #check config for top X
