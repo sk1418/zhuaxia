@@ -3,7 +3,7 @@
 import sys
 import config ,util ,logging ,log,downloader
 import xiami as xm
-import netease as m163
+import netease
 import re
 from threadpool import ThreadPool
 from time import sleep
@@ -29,22 +29,57 @@ def shall_I_begin(in_str, is_file=False, is_hq=False):
             config.XIAMI_LOGIN_PASSWORD, \
             is_hq)
     #netease obj
-    o163 = m163.Netease(is_hq)
+    m163 = netease.Netease(is_hq)
 
     if is_file:
         from_file(xiami_obj, in_str)
-    else:
-        from_url(xiami_obj, in_str)
+    elif re.match(pat_xm, in_str):
+        from_url_xm(xiami_obj, in_str)
+    elif re.match(pat_163, in_str):
+        from_url_163(m163, in_str)
 
     print border
     LOG.info(u' 下载任务总数: %d \n 3秒后开始下载' % len(dl_songs))
     sleep(3)
     downloader.start_download(dl_songs)
 
-def from_url(xm_obj, url, verbose=True):
+def from_url_163(m163, url, verbose=True):
+    """ parse the input string (163 url), and do download""" 
+
+    LOG.debug('processing 163 url: "%s"'% url)
+    msg = u''
+    if '163.com/song?id=' in url:
+        song =netease.NeteaseSong(m163,url=url)
+        dl_songs.append(song)
+        msg = fmt_parsing % (m163_url_abbr(url),u'曲目',  song.song_name)
+
+    elif '163.com/album?id=' in url:
+        album = netease.NeteaseAlbum(m163, url)
+        dl_songs.extend(album.songs)
+        msgs = [fmt_parsing % (m163_url_abbr(url),u'专辑',  album.artist_name+u' => '+album.album_name)]
+        if verbose:
+            for s in album.songs:
+                msgs.append(fmt_single_song %s.song_name)
+            msg = u'\n    |-> '.join(msgs)
+        else:
+            msgs.append(fmt_has_song_nm % len(album.songs))
+            msg= u' => '.join(msgs)
+
+
+    global total, done
+    done +=1
+    pre = ('[%d/%d] ' % (done, total)) if not verbose else ''
+    if not msg:
+        #unknown url
+        LOG.error(u'%s 不能识别的url [%s].' % (pre,url))
+    else:
+        LOG.info(u'%s%s'% (pre,msg))
+
+
+def from_url_xm(xm_obj, url, verbose=True):
     """ parse the input string (xiami url), and do download"""
 
-    LOG.debug('processing url: "%s"'% url)
+    LOG.debug('processing xiami url: "%s"'% url)
     msg = u''
     if '/showcollect/id/' in url:
         collect = xm.Collection(xm_obj, url)
@@ -126,7 +161,7 @@ def from_file(xm_obj, infile):
     pool.wait_completion()
 
 def xiami_url_abbr(url):
-    return re.sub(pat_xm,u'[虾]',url)
+    return re.sub(pat_xm,u'[虾] ',url)
 
 def m163_url_abbr(url):
-    return re.sub(pat_163,u'[易]',url)
+    return re.sub(pat_163,u'[易] ',url)

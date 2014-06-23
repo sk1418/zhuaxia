@@ -34,16 +34,16 @@ class NeteaseSong(Song):
     url example: http://music.163.com/song?id=209235
     """
 
-    def __init__(self,o163,url=None,song_json=None):
+    def __init__(self,m163,url=None,song_json=None):
         self.song_type=2
-        self.o163 = o163
+        self.m163 = m163
         self.group_dir = None
 
         if url:
             self.url = url
             self.song_id = re.search(r'(?<=/song\?id=)\d+', url).group(0)
 
-            j = self.o163.read_link(url_song % (self.song_id,self.song_id)).json()['songs'][0]
+            j = self.m163.read_link(url_song % (self.song_id,self.song_id)).json()['songs'][0]
             self.init_by_json(j)
             #set filename, abs_path etc.
             self.post_set()
@@ -64,11 +64,11 @@ class NeteaseSong(Song):
 
         # download link
         dfsId = ''
-        if o163.is_hq:
+        if self.m163.is_hq:
             dfsId = js['hMusic']['dfsId']
         else:
             dfsId = js['mMusic']['dfsId']
-        self.dl_link = url_mp3 % (o163.encrypt_dfsId(dfsId), dfsId)
+        self.dl_link = url_mp3 % (self.m163.encrypt_dfsId(dfsId), dfsId)
 
         #used only for album/collection etc. create a dir to group all songs
         #if it is needed, it should be set by the caller
@@ -77,10 +77,10 @@ class NeteaseSong(Song):
 class NeteaseAlbum(object):
     """The netease album object"""
 
-    def __init__(self, o163, url):
+    def __init__(self, m163, url):
         """url example: http://music.163.com/album?id=2646379"""
 
-        self.o163=o163
+        self.m163=m163
         self.url = url 
         self.album_id = re.search(r'(?<=/album\?id=)\d+', self.url).group(0)
         LOG.debug(u'[易]开始初始化专辑[%s]'% self.album_id)
@@ -91,7 +91,7 @@ class NeteaseAlbum(object):
 
     def init_album(self):
         #album json
-        js = self.o163.read_link(url_album % self.album_id).json()['album']
+        js = self.m163.read_link(url_album % self.album_id).json()['album']
         #name
         self.album_name = util.decode_html(js['name'])
         #album logo
@@ -102,7 +102,7 @@ class NeteaseAlbum(object):
 
         #handle songs
         for jsong in js['songs']:
-            song = NeteaseSong(self.o163, song_json=jsong)
+            song = NeteaseSong(self.m163, song_json=jsong)
             song.group_dir = self.artist_name + u'_' + self.album_name
             song.post_set()
             self.songs.append(song)
@@ -139,10 +139,10 @@ class Netease(object):
         return result
 
 if __name__ == '__main__':
-    o163 = Netease()
+    m163 = Netease()
     url = 'http://music.163.com/album?id=2646379'
 
-    album = NeteaseAlbum(o163, url)
+    album = NeteaseAlbum(m163, url)
     for song in album.songs:
         print song.group_dir
         print song.dl_link
