@@ -50,8 +50,8 @@ zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾
 - mp3文件重命名, 更新mp3 meta信息，自动下载专辑封面, 专辑文本介绍(仅[虾])...等等
 
 ##Todos
-- [x] 对于专辑，也下载专辑介绍保存文本文件
-- [x] 目前只能下载一般质量的mp3,因为我个人没有vip帐号，不知道HQ的地址什么格式。但是登录以及获取cookie都已经写好并测试。只差可用的vip账户来看看格式
+- [x] [虾]对于专辑，也下载专辑介绍保存文本文件
+- [x] [虾]目前只能下载一般质量的mp3,因为我个人没有vip帐号，不知道HQ的地址什么格式。但是登录以及获取cookie都已经写好并测试。只差可用的vip账户来看看格式
 - [x] 下载艺人的Top10热门歌曲
 - [x] 支持网易云音乐的歌曲下载，通过URL自动区分网易和虾米
 - [ ] 完善Error Handling(错误处理)
@@ -86,7 +86,7 @@ Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 					- 用户需在xiami vip设置页面设置默认高音质
 					- 此选项对不满足上两项情况无效，仍下载128kbps资源
 				> 网易音乐 <
-					无需特殊设置
+					无需特殊要求,直接下载高音质资源
 
 		[USAGE] 
 
@@ -100,13 +100,13 @@ Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 
 			zx [OPTION] -f <file> 
 				: 多个URL在一个文件中，每个URL一行。 URLs可以是混合[虾]和[易]的不同类型音乐资源。例子：
-				  $ zx -f /tmp/foo.txt
-
 				  $ cat /tmp/foo.txt
 					http://music.163.com/artist?id=5345
 					http://www.xiami.com/song/1772130322
 					http://music.163.com/album?id=2635059
 					http://www.xiami.com/album/32449
+
+				  $ zx -f /tmp/foo.txt
 
 			zx -h ：显示帮助
 
