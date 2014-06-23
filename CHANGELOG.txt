@@ -1,8 +1,9 @@
-2014-06-20  Version 1.3.1
+2014-06-23  Version 1.3.1
 =========================
 - [bugfix] -H option has problem to download xiami mp3 if user login successful but not VIP
 - [bugfix] album html encoding problem
 - [bugfix] album: song.group_dir applys albums' artist_name and name, instead of songs.
+- [bugfix] after parsing url/input file, if no dl tasks, should exit zx. don't hand over to downloader
 
 2014-06-07  Version 1.3.0
 =========================
