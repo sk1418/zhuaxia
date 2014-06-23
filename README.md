@@ -23,9 +23,9 @@
 
 ##Introduction / 简介
 
-zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resources in multiple threads from www.xiami.com and music.163.com. Due to the localization of site, the output/log messages contain Chinese. Moreover, this readme would be written in Chinese as well. However all comments in codes are in English.
+zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resources in multiple threads from www.xiami.com and music.163.com. Due to the localization of site, the output/log messages contain Chinese. Moreover, this readme was written in Chinese as well. However all comments in codes are in English.
 
-zhuaxia 是一个基于命令行的虾米音乐(www.xiami.com)和网易云音乐(music.163.com)多线程批量下载工具
+zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾])和网易云音乐( music.163.com 以下简称[易]) 多线程批量下载工具
 
 
 **zhuaxia** was written and tested with:
@@ -38,8 +38,8 @@ zhuaxia 是一个基于命令行的虾米音乐(www.xiami.com)和网易云音乐
 
 ##Features / 功能
 - 自动识别解析URL. 目前支持：
-	- [虾] 歌曲，专辑，精选集，用户收藏,艺人TopN
-	- [易] 歌曲，专辑，歌单，艺人TopN
+	- [虾] 歌曲，专辑，精选集，用户收藏, 歌手热门
+	- [易] 歌曲，专辑，歌单，歌手热门
 - 下载歌手热门歌曲:数量可配置(小于30) ，默认Top10。 配置项: `download.artist.topsong`，需要艺人页面链接
 - 支持混合[虾]和[易]不同音乐类型URL作为输入文件来批量下载资源 (`-f` 参数)
 - 多线程(可配置线程池)解析URL
@@ -74,21 +74,24 @@ Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 - 使用：
 
 			
-		[CONFIG FILE:]   $HOME/.zhuaxia/zhuaxia.conf
+		[CONFIG FILE:]   
+			$HOME/.zhuaxia/zhuaxia.conf
 
 		[OPTION] 
 			-H    
 				:首选HQ质量(320kbps), 
+
 				> 虾米音乐 <
 					- 配置文件中需给出正确登录信箱和密码, 登录用户需拥有VIP身份
 					- 用户需在xiami vip设置页面设置默认高音质
 					- 此选项对不满足上两项情况无效，仍下载128kbps资源
-				> 网易音乐无需特殊设置 <
+				> 网易音乐 <
+					无需特殊设置
 
 		[USAGE] 
 
 			zx [OPTION] <URL>
-				: 下载指定URL资源, 抓虾自动识别链接, 支持
+				: 下载指定URL资源, 自动识别链接, 支持
 					- [虾] 歌曲，专辑，精选集，用户收藏,艺人TopN
 					- [易] 歌曲，专辑，歌单，艺人TopN
 				例子： 
