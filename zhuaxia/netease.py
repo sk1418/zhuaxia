@@ -16,7 +16,7 @@ url_mp3="http://m1.music.126.net/%s/%s.mp3"
 url_album="http://music.163.com/api/album/%s/"
 url_song="http://music.163.com/api/song/detail/?id=%s&ids=[%s]"
 url_playlist="http://music.163.com/api/playlist/detail?id=%s"
-url_artist_top_song = "tbd"
+url_artist_top_song = "http://music.163.com/api/artist/%s"
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
@@ -137,6 +137,33 @@ class NeteasePlayList(object):
             #creating the dir
             util.create_dir(path.dirname(self.songs[-1].abs_path))
 
+class NeteaseTopSong(object):
+    """download top songs of given artist"""
+    def __init__(self, m163, url):
+        self.url = url
+        self.m163 = m163
+        #artist id
+        self.artist_id = re.search(r'(?<=/artist\?id=)\d+', self.url).group(0)
+        self.artist_name = ""
+        self.songs = []
+        self.init_topsong()
+
+    def init_topsong(self):
+        j = self.m163.read_link(url_artist_top_song % (self.artist_id)).json()
+        self.artist_name = j['artist']['name']
+        for jsong in j['hotSongs']:
+            song = NeteaseSong(self.m163, song_json=jsong)
+            song.group_dir = self.artist_name + '_TopSongs'
+            song.post_set()
+            self.songs.append(song)
+            #check config for top X
+            if len(self.songs) >= config.DOWNLOAD_TOP_SONG:
+                break
+
+        if len(self.songs):
+            #creating the dir
+            util.create_dir(path.dirname(self.songs[-1].abs_path))
+
 class Netease(object):
 
     def __init__(self, is_hq=False):
@@ -158,16 +185,3 @@ class Netease(object):
         result = result.replace('/', '_')
         result = result.replace('+', '-')
         return result
-
-if __name__ == '__main__':
-    m163 = Netease()
-    url = 'http://music.163.com/album?id=2646379'
-
-    album = NeteaseAlbum(m163, url)
-    for song in album.songs:
-        print song.group_dir
-        print song.dl_link
-        print song.song_name
-        print song.artist_name
-        print song.album_name
-        print '-'*10

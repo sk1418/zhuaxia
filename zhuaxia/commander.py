@@ -77,6 +77,19 @@ def from_url_163(m163, url, verbose=True):
             msgs.append(fmt_has_song_nm % len(playlist.songs))
             msg= u' => '.join(msgs)
 
+    elif '/artist?id=' in url:
+        topsong= netease.NeteaseTopSong(m163, url)
+        dl_songs.extend(topsong.songs)
+        msgs = [fmt_parsing % (m163_url_abbr(url), u'艺人热门歌曲',topsong.artist_name)]
+        if verbose:
+            for s in topsong.songs:
+                msgs.append(fmt_single_song %s.song_name)
+            msg = u'\n    |-> '.join(msgs)
+        else:
+            msgs.append( fmt_has_song_nm % len(topsong.songs))
+            msg = u' => '.join(msgs)
+
+
     global total, done
     done +=1
     pre = ('[%d/%d] ' % (done, total)) if not verbose else ''
