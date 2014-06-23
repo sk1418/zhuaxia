@@ -48,12 +48,12 @@ def from_url_163(m163, url, verbose=True):
 
     LOG.debug('processing 163 url: "%s"'% url)
     msg = u''
-    if '163.com/song?id=' in url:
+    if '/song?id=' in url:
         song =netease.NeteaseSong(m163,url=url)
         dl_songs.append(song)
         msg = fmt_parsing % (m163_url_abbr(url),u'曲目',  song.song_name)
 
-    elif '163.com/album?id=' in url:
+    elif '/album?id=' in url:
         album = netease.NeteaseAlbum(m163, url)
         dl_songs.extend(album.songs)
         msgs = [fmt_parsing % (m163_url_abbr(url),u'专辑',  album.artist_name+u' => '+album.album_name)]
@@ -65,6 +65,17 @@ def from_url_163(m163, url, verbose=True):
             msgs.append(fmt_has_song_nm % len(album.songs))
             msg= u' => '.join(msgs)
 
+    elif '/playlist?id=' in url:
+        playlist = netease.NeteasePlayList(m163, url)
+        dl_songs.extend(playlist.songs)
+        msgs = [ fmt_parsing % (m163_url_abbr(url),u'歌单',playlist.playlist_name)]
+        if verbose:
+            for s in playlist.songs:
+                msgs.append( fmt_single_song % s.song_name)
+            msg = u'\n    |-> '.join(msgs)
+        else:
+            msgs.append(fmt_has_song_nm % len(playlist.songs))
+            msg= u' => '.join(msgs)
 
     global total, done
     done +=1

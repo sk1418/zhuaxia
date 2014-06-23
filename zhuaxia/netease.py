@@ -98,8 +98,6 @@ class NeteaseAlbum(object):
         self.logo = js['picUrl']
         # artist_name
         self.artist_name = js['artists'][0]['name']
-
-
         #handle songs
         for jsong in js['songs']:
             song = NeteaseSong(self.m163, song_json=jsong)
@@ -115,6 +113,29 @@ class NeteaseAlbum(object):
         #download album logo images
         LOG.debug(u'下载专辑[%s]封面'% self.album_name)
         downloader.download_by_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
+
+class NeteasePlayList(object):
+    """The netease playlist object"""
+    def __init__(self, m163, url):
+        self.url = url
+        self.m163 = m163
+        #user id in url
+        self.playlist_id = re.search(r'(?<=/playlist\?id=)\d+', self.url).group(0)
+        self.songs = []
+        self.init_playlist()
+
+    def init_playlist(self):
+        j = self.m163.read_link(url_playlist % (self.playlist_id) ).json()['result']
+        self.playlist_name = j['name']
+        for jsong in j['tracks']:
+            song = NeteaseSong(self.m163, song_json=jsong)
+            #rewrite filename, make it different
+            song.group_dir = self.playlist_name
+            song.post_set()
+            self.songs.append(song)
+        if len(self.songs):
+            #creating the dir
+            util.create_dir(path.dirname(self.songs[-1].abs_path))
 
 class Netease(object):
 
