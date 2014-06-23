@@ -33,7 +33,7 @@ help_info = u""" %(cyan)s
               zx "http://music.163.com/song?id=27552647"
 
         %(bold)szx [OPTION] -f <file>%(clear)s 
-            : 多个URL在一个文件中，每个URL一行。 URLs可以是混合[虾]和[易]的不同资源类型。例子：
+            : 多个URL在一个文件中，每个URL一行。 URLs可以是混合[虾]和[易]的不同类型音乐资源。例子：
               $ zx -f /tmp/foo.txt
 
               $ cat /tmp/foo.txt
