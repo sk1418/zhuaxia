@@ -48,7 +48,7 @@ class Song(object):
                 self.filename = (self.artist_name + u"_" if self.artist_name  else "" ) + self.filename
 
             #replace slash if there is
-            self.filename.replace('/','_')
+            self.filename = self.filename.replace('/','_')
             
             if self.group_dir:
                 self.abs_path = path.join(config.DOWNLOAD_DIR, self.group_dir, self.filename)
