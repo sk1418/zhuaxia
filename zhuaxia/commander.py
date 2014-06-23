@@ -180,12 +180,13 @@ def from_file(xm_obj,m163, infile):
     print border
     pool = ThreadPool(config.THREAD_POOL_SIZE)
     for link in [u for u in urls if u]:
+        link = link.rstrip('\n')
         if re.match(pat_xm, link):
-            pool.add_task(from_url_xm, xm_obj,link.rstrip('\n'), verbose=False)
+            pool.add_task(from_url_xm, xm_obj,link, verbose=False)
         elif re.match(pat_163, link):
-            pool.add_task(from_url_163, m163,link.rstrip('\n'), verbose=False)
+            pool.add_task(from_url_163, m163,link, verbose=False)
         else:
-            LOG.warning(u' 略过不能识别的url [%s].' % url)
+            LOG.warning(u' 略过不能识别的url [%s].' % link)
 
     pool.wait_completion()
 
