@@ -29,9 +29,13 @@ def shall_I_begin(in_str, is_file=False, is_hq=False):
         from_url(xiami_obj, in_str)
 
     print border
-    LOG.info(u' 下载任务总数: %d \n 3秒后开始下载' % len(dl_songs))
-    sleep(3)
-    downloader.start_download(dl_songs)
+    if len(dl_songs):
+        LOG.info(u' 下载任务总数: %d \n 3秒后开始下载' % len(dl_songs))
+        sleep(3)
+        downloader.start_download(dl_songs)
+    else:
+        LOG.warning(u' 没有可下载任务,自动退出.')
+
 
 def from_url(xm_obj, url, verbose=True):
     """ parse the input string (xiami url), and do download"""
