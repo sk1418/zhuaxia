@@ -32,7 +32,7 @@ def shall_I_begin(in_str, is_file=False, is_hq=False):
     m163 = netease.Netease(is_hq)
 
     if is_file:
-        from_file(xiami_obj, in_str)
+        from_file(xiami_obj, m163,in_str)
     elif re.match(pat_xm, in_str):
         from_url_xm(xiami_obj, in_str)
     elif re.match(pat_163, in_str):
@@ -95,7 +95,7 @@ def from_url_163(m163, url, verbose=True):
     pre = ('[%d/%d] ' % (done, total)) if not verbose else ''
     if not msg:
         #unknown url
-        LOG.error(u'%s 不能识别的url [%s].' % (pre,url))
+        LOG.error(u'%s [易]不能识别的url [%s].' % (pre,url))
     else:
         LOG.info(u'%s%s'% (pre,msg))
 
@@ -162,11 +162,11 @@ def from_url_xm(xm_obj, url, verbose=True):
     pre = ('[%d/%d] ' % (done, total)) if not verbose else ''
     if not msg:
         #unknown url
-        LOG.error(u'%s 不能识别的url [%s].' % (pre,url))
+        LOG.error(u'%s [虾]不能识别的url [%s].' % (pre,url))
     else:
         LOG.info(u'%s%s'% (pre,msg))
 
-def from_file(xm_obj, infile):
+def from_file(xm_obj,m163, infile):
     """ download objects (songs, albums...) from an input file.  """
 
     urls = []
@@ -180,7 +180,12 @@ def from_file(xm_obj, infile):
     print border
     pool = ThreadPool(config.THREAD_POOL_SIZE)
     for link in [u for u in urls if u]:
-        pool.add_task(from_url, xm_obj,link.rstrip('\n'), verbose=False)
+        if re.match(pat_xm, link):
+            pool.add_task(from_url_xm, xm_obj,link.rstrip('\n'), verbose=False)
+        elif re.match(pat_163, link):
+            pool.add_task(from_url_163, m163,link.rstrip('\n'), verbose=False)
+        else:
+            LOG.warning(u' 略过不能识别的url [%s].' % url)
 
     pool.wait_completion()
 
