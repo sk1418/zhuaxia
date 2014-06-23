@@ -1,3 +1,7 @@
+2014-06-23  Version 2.0.0
+=========================
+- [feature] supports netease (music.163.com) mp3 downloading now
+
 2014-06-23  Version 1.3.1
 =========================
 - [bugfix] -H option has problem to download xiami mp3 if user login successful but not VIP

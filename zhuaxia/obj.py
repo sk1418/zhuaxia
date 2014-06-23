@@ -35,7 +35,6 @@ class Song(object):
         self.group_dir = None
 
         self.filename = ''
-        self.filename = ((self.artist_name + u"_" if self.artist_name  else "" ) + self.song_name + u'.mp3').replace('/','_')
         
     def type_txt(self):
         return Song_Type[self.song_type]
