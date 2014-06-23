@@ -46,7 +46,11 @@ class XiamiSong(Song):
         
         #if is_hq, get the hq location to overwrite the dl_link
         if self.xm.is_hq:
-            self.dl_link = self.xm.get_hq_link(self.song_id)
+            try:
+                self.dl_link = self.xm.get_hq_link(self.song_id)
+            except:
+                #if user was not VIP, don't change the dl_link
+                pass
 
 
     def init_by_json(self, song_json ):
@@ -101,7 +105,7 @@ class Album(object):
     def init_album(self):
         j = self.xm.read_link(url_album % self.album_id).json()['album']
         #name
-        self.album_name = j['title']
+        self.album_name = util.decode_html(j['title'])
         #album logo
         self.logo = j['album_logo']
         # artist_name
@@ -113,7 +117,7 @@ class Album(object):
         #handle songs
         for jsong in j['songs']:
             song = XiamiSong(self.xm, song_json=jsong)
-            song.group_dir = song.artist_name + u'_' + song.album_name
+            song.group_dir = self.artist_name + u'_' + self.album_name
             song.post_set()
             self.songs.append(song)
 
@@ -202,7 +206,7 @@ class TopSong(object):
         j = self.xm.read_link(url_artist_top_song % (self.artist_id)).json()
         for jsong in j['songs']:
             song = XiamiSong(self.xm, song_json=jsong)
-            song.group_dir = song.artist_name + '_TopSongs'
+            song.group_dir = self.artist_name + '_TopSongs'
             song.post_set()
             self.songs.append(song)
             #check config for top X
@@ -276,6 +280,7 @@ class Xiami(object):
             return True
         except:
             LOG.warning('Login failed, download resources without authentication (128kbps mp3 only).')
+            self.is_hq = False
             return False
 
     def read_link(self, link):
