@@ -125,7 +125,7 @@ Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 ![progress](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/progress.gif)
 
 - parse input file
-![file view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/fileParse.png)
+![file view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/fileParse.gif)
 
 - parse url
 ![url view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/urlParse.png)
