@@ -249,7 +249,7 @@ class Xiami(object):
         self.member_auth = ''
         #do login
         if self.skip_login:
-            LOG.warning('Download resources without authentication (128kbps mp3 only).')
+            LOG.warning(u'[虾] 不登录虾米进行下载, 虾米资源质量为128kbps.')
             is_hq = False
         else:
             if self.login():
@@ -258,7 +258,7 @@ class Xiami(object):
                 is_hq = False
 
     def login(self):
-        LOG.info( '[Login] login with email and password....')
+        LOG.info( u'[虾] 登录虾米...')
         _form = {
             'email': self.email,
             'password': self.password,
@@ -279,7 +279,7 @@ class Xiami(object):
             self.token = sess.cookies['_xiamitoken']
             return True
         except:
-            LOG.warning('Login failed, download resources without authentication (128kbps mp3 only).')
+            LOG.warning(u'[虾] 登录失败, 略过登录, 虾米资源质量为 128kbps.')
             self.is_hq = False
             return False
 
