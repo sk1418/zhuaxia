@@ -64,7 +64,7 @@ class NeteaseSong(Song):
 
         # download link
         dfsId = ''
-        if self.m163.is_hq:
+        if self.m163.is_hq and js['hMusic']:
             dfsId = js['hMusic']['dfsId']
         else:
             dfsId = js['mMusic']['dfsId']

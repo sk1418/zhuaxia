@@ -1,3 +1,7 @@
+2014-07-27  Version 2.0.1
+=========================
+- [bugfix] [163]check if there is HQ json data available before fetching the dfsid
+
 2014-06-23  Version 2.0.0
 =========================
 - [feature] supports netease (music.163.com) mp3 downloading now
