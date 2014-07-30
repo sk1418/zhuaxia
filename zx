@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import sys,getopt
 import zhuaxia.config as config
