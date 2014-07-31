@@ -286,11 +286,15 @@ class Xiami(object):
     def read_link(self, link):
         headers = {'User-Agent':AGENT}
         headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
+        proxies = None
+        if config.XIAMI_PROXY_HTTP:
+            proxies = { 'http':config.XIAMI_PROXY_HTTP}
 
+        print config.XIAMI_PROXY_HTTP
         if self.skip_login:
-            return requests.get(link, headers=headers)
+            return requests.get(link, headers=headers, proxies=proxies)
         else:
-            return self.session.get(link,headers=headers)
+            return self.session.get(link,headers=headers, proxies=proxies)
 
 
     def get_hq_link(self, song_id):
