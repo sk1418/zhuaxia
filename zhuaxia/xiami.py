@@ -290,7 +290,6 @@ class Xiami(object):
         if config.XIAMI_PROXY_HTTP:
             proxies = { 'http':config.XIAMI_PROXY_HTTP}
 
-        print config.XIAMI_PROXY_HTTP
         if self.skip_login:
             return requests.get(link, headers=headers, proxies=proxies)
         else:
