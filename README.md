@@ -48,12 +48,14 @@ zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾
 - [易]支持下载高音质(320kbps) mp3 (`-H` 选项)
 - 进度显示 (色彩高亮，终端宽度改变自动适应，总进度，下载线程进度...)
 - mp3文件重命名, 更新mp3 meta信息，自动下载专辑封面, 专辑文本介绍(仅[虾])...等等
+- **[NEW]**[虾]配置项`xiami.proxy.http=ip:port` 来设置国内的代理服务进行xiami连接的解析。详见："Usage -> 海外IP下载xiami资源" 一节
 
 ##Todos
 - [x] [虾]对于专辑，也下载专辑介绍保存文本文件
 - [x] [虾]目前只能下载一般质量的mp3,因为我个人没有vip帐号，不知道HQ的地址什么格式。但是登录以及获取cookie都已经写好并测试。只差可用的vip账户来看看格式
 - [x] 下载艺人的Top10热门歌曲
 - [x] 支持网易云音乐的歌曲下载，通过URL自动区分网易和虾米
+- [x] [虾]由于xiami屏蔽海外ip的http请求，增加对于xiami的代理服务器选项
 - [ ] 完善Error Handling(错误处理)
 
 
@@ -118,6 +120,14 @@ Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 			zx -H -f "tmp/in.txt"
 			zx  "http://music.163.com/song?id=123456"
 			zx -H "http://www.xiami.com/album/51786"
+
+###海外IP下载xiami资源
+xiami.com屏蔽了海外ip的http请求。在配置文件中添加（如果不存在的话）`xiami.proxy.http=ip:port` 可以让zhuaxia通过代理来解析xiami资源。
+例如：
+
+	xiami.proxy.http=127.0.0.1:8080
+
+这里`ip:port`构成的http代理是国内的代理服务器。 如果你的机器已经是国内的ip，请注释或删除这个选项。获取国内代理的简单方法：到http://proxy-list.org/ 搜索China的代理就好。
 
 ##Screenshots / 运行截图
 

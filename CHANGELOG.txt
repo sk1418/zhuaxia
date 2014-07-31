@@ -1,3 +1,7 @@
+2014-07-31 Version 2.1.0
+=========================
+- [feature] add http proxy option for xiami api request. 
+
 2014-07-27  Version 2.0.1
 =========================
 - [bugfix] [163]check if there is HQ json data available before fetching the dfsid
