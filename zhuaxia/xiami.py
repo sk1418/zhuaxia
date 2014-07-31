@@ -182,7 +182,7 @@ class Collection(object):
         j = self.xm.read_link(url_collection % (self.collection_id) ).json()['collect']
         self.collection_name = j['name']
         for jsong in j['songs']:
-            song = Song(self.xm, song_json=jsong)
+            song = XiamiSong(self.xm, song_json=jsong)
             #rewrite filename, make it different
             song.group_dir = self.collection_name
             song.post_set()
