@@ -1,3 +1,7 @@
+2014-07-31 Version 2.1.1
+=========================
+- [feature] Pressing Ctrl-C will terminate zhuaxia immediately
+
 2014-07-31 Version 2.1.0
 =========================
 - [feature] add http proxy option for xiami api request. 

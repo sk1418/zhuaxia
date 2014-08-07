@@ -5,9 +5,11 @@ import zhuaxia.config as config
 import zhuaxia.util as util
 import logging
 import zhuaxia.log as log
+import zhuaxia.threadpool as threadpool
 import zhuaxia.xiami as xm
 import zhuaxia.downloader as downloader
 import zhuaxia.commander as commander
+
 help_info = u""" %(cyan)s
     zhuaxia (抓虾) -- 抓取[虾米网]和[网易云音乐]的音乐%(clear)s
 
@@ -102,6 +104,8 @@ if __name__ == '__main__':
         usage()
         sys.exit(2)
         
+
+
     #test input file
     #commander.shall_I_begin('/tmp/in.txt', True)
     #commander.shall_I_begin('http://www.xiami.com/space/lib-song/u/25531126')

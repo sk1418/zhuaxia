@@ -8,6 +8,7 @@ import re
 from threadpool import ThreadPool
 from time import sleep
 from os import path
+from threadpool import Terminate_Watcher
 
 LOG = log.get_logger("zxLogger")
 
@@ -24,6 +25,9 @@ pat_xm = r'^https?://[^/.]*\.xiami\.com/'
 pat_163 = r'^https?://music\.163\.com/'
 
 def shall_I_begin(in_str, is_file=False, is_hq=False):
+    #start terminate_watcher
+    Terminate_Watcher()
+
     #xiami obj
     xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,\
             config.XIAMI_LOGIN_PASSWORD, \
