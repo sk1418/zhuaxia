@@ -21,6 +21,13 @@
       ### ##   ##     #                  ##     
                      -- 抓取 xiami.com 音乐
 
+#Note / 注意
+
+Since Xiami.com has changed its API link, downloading from xiami with zhuaxia currently has problem. Xiami blocks accesses outside China, this brings me difficuties to find out the new API of xiami. If someone was interested in extending/fixing xiami download part, please fork the repo and add implementation. Netease downloading works so far.
+
+因为xiami变更了它的api链接以及处理方式，现在zhuaxia的虾米下载部分存在问题。xiami还屏蔽海外ip的访问，这给分析它的新api又带来难度。这个问题不知道何时能修复。 如果谁了解xiami新api的情况，请告知。或者谁有兴趣修改/实现xiami部分的下载，可以fork这个repo. 到目前为止，网易部分下载还正常。(从虾米屏蔽海外ip我就用网易了)
+
+
 ##Introduction / 简介
 
 zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resources in multiple threads from www.xiami.com. Due to the localization of site, the output/log messages contain Chinese. Moreover, this readme would be written in Chinese as well. However all comments in codes are in English.
