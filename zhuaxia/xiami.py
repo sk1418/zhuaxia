@@ -14,33 +14,35 @@ LOG = log.get_logger("zxLogger")
 #----------------------------------------------
 #|             old xiami api                  |
 #----------------------------------------------
-url_xiami="http://www.xiami.com"
-url_hq="http://www.xiami.com/song/gethqsong/sid/%s"
-url_vip="http://www.xiami.com/vip/update-tone"
-url_login="https://login.xiami.com/member/login"
+#url_xiami="http://www.xiami.com"
+#url_hq="http://www.xiami.com/song/gethqsong/sid/%s"
+#url_vip="http://www.xiami.com/vip/update-tone"
+#url_login="https://login.xiami.com/member/login"
 #url_song = "http://www.xiami.com/app/iphone/song?id=%s"
 #url_album = "http://www.xiami.com/app/iphone/album?id=%s"
-url_fav = "http://www.xiami.com/app/iphone/lib-songs?uid=%s&page=%s"
-url_collection = "http://www.xiami.com/app/iphone/collect?id=%s"
-url_artist_top_song = "http://www.xiami.com/app/iphone/artist-topsongs?id=%s"
-#url_artist_albums = "http://www.xiami.com/app/android/artist-albums?id=%s&page=%s"
+#url_fav = "http://www.xiami.com/app/iphone/lib-songs?uid=%s&page=%s"
+#url_collection = "http://www.xiami.com/app/iphone/collect?id=%s"
+#url_artist_top_song = "http://www.xiami.com/app/iphone/artist-topsongs?id=%s"
+##url_artist_albums = "http://www.xiami.com/app/android/artist-albums?id=%s&page=%s"
 
 #----------------------------------------------
 #|             new xiami api                  |
 #----------------------------------------------
 xm_type_dict={
-        'song':0,
-        'album':1,
-        'artist':2,
-        'collection':3,
-        'random':7,
-        'favorite':0,
-        'recommendation':9
+        'song':'0',
+        'album':'1',
+        'artist':'2',
+        'collection':'3',
+        'random':'7',
+        'favorite':'0',
+        'recommendation':'8'
     }
-url_song = 'http://www.xiami.com/song/playlist/id/%s/type/0'
-url_album = 'http://www.xiami.com/song/playlist/id/%s/type/1'
-url_artist_top_song='http://www.xiami.com/song/playlist/id/%s/type/2'
-url_collection='http://www.xiami.com/song/playlist/id/%s/type/3'
+url_xiami="http://www.xiami.com"
+url_parts = ('http://www.xiami.com/song/playlist/id/%s/type/', '/cat/json')
+url_song =  xm_type_dict['song'].join(url_parts)
+url_album = xm_type_dict['album'].join(url_parts)
+url_artist_top_song= xm_type_dict['artist'].join(url_parts)
+url_collection= xm_type_dict['collection'].join(url_parts)
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
@@ -59,7 +61,14 @@ class XiamiSong(Song):
         self.group_dir = None
         if url:
             self.url = url
-            self.init_by_url(url)
+            self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
+            #get the song json data
+            jsong = self.xm.read_link(url_song % self.song_id).json()['data']['trackList'][0]
+
+            self.init_by_json(jsong)
+            #used only for album/collection etc. create a dir to group all songs
+            self.group_dir = None
+
             #set filename, abs_path etc.
             self.post_set()
         elif song_json:
@@ -79,35 +88,16 @@ class XiamiSong(Song):
 
         self.song_id = song_json['song_id']
         self.album_id = song_json['album_id']
-        self.song_name = util.decode_html(song_json['name'])
-        self.dl_link = song_json['location']
+        self.song_name = util.decode_html(song_json['title'])
+        location = song_json['location']
+        #decode download link
+        self.dl_link = self.xm.decode_xiami_link(location)
         # lyrics link
-        self.lyrics_link = song_json['lyric']
+        self.lyrics_link = song_json['lyric_url']
         # artist_name
-        self.artist_name = song_json['artist_name']
+        self.artist_name = song_json['artist']
         # album id, name
-        self.album_name = song_json['title']
-
-        #self.filename = (self.song_name + u'.mp3').replace('/','_')
-
-    def init_by_url(self,url):
-        self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
-        j = self.xm.read_link(url_song % self.song_id).json()
-        #name
-        #self.song_name = j['song']['song_name'].replace('&#039;',"'")
-        self.song_name = util.decode_html(j['song']['song_name'])
-        # download link
-        self.dl_link = j['song']['song_location']
-        # lyrics link
-        self.lyrics_link = j['song']['song_lrc']
-        # artist_name
-        self.artist_name = j['song']['artist_name']
-        # album id, name
-        self.album_name = util.decode_html(j['song']['album_name'])
-        self.album_id = j['song']['album_id']
-
-        #used only for album/collection etc. create a dir to group all songs
-        self.group_dir = None
+        self.album_name = util.decode_html(song_json['album_name'])
 
 
 class Album(object):
@@ -124,19 +114,20 @@ class Album(object):
         self.init_album()
 
     def init_album(self):
-        j = self.xm.read_link(url_album % self.album_id).json()['album']
+        j = self.xm.read_link(url_album % self.album_id).json()['data']['trackList']
+        j_first_song = j[0]
         #name
-        self.album_name = util.decode_html(j['title'])
+        self.album_name = util.decode_html(j_first_song['album_name'])
         #album logo
-        self.logo = j['album_logo']
+        self.logo = j_first_song['album_pic']
         # artist_name
-        self.artist_name = j['artist_name']
+        self.artist_name = j_first_song['artist']
 
         #description
-        self.album_desc = j['description']
+        self.album_desc = '[TODO]'
 
         #handle songs
-        for jsong in j['songs']:
+        for jsong in j:
             song = XiamiSong(self.xm, song_json=jsong)
             song.group_dir = self.artist_name + u'_' + self.album_name
             song.post_set()
