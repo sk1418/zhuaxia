@@ -38,6 +38,7 @@ xm_type_dict={
         'recommendation':'8'
     }
 url_xiami="http://www.xiami.com"
+url_login="https://login.xiami.com/member/login"
 url_parts = ('http://www.xiami.com/song/playlist/id/%s/type/', '/cat/json')
 url_song =  xm_type_dict['song'].join(url_parts)
 url_album = xm_type_dict['album'].join(url_parts)
@@ -103,7 +104,6 @@ class XiamiSong(Song):
 class Album(object):
     """The xiami album object"""
     def __init__(self, xm_obj, url):
-
         self.xm = xm_obj
         self.url = url 
         self.album_id = re.search(r'(?<=/album/)\d+', self.url).group(0)
@@ -191,9 +191,10 @@ class Collection(object):
         self.init_collection()
 
     def init_collection(self):
-        j = self.xm.read_link(url_collection % (self.collection_id) ).json()['collect']
-        self.collection_name = j['name']
-        for jsong in j['songs']:
+        j = self.xm.read_link(url_collection % (self.collection_id) ).json()['data']['trackList']
+        j_first_song = j[0]
+        self.collection_name = u'精选集'+ self.collection_id #TODO parse html and get the real name
+        for jsong in j:
             song = XiamiSong(self.xm, song_json=jsong)
             #rewrite filename, make it different
             song.group_dir = self.collection_name
