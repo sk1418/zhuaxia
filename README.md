@@ -23,9 +23,9 @@
 
 #Note / 注意
 
-Since Xiami.com has changed its API link, downloading from xiami with zhuaxia currently has problem. Xiami blocks accesses outside China, this brings me difficuties to find out the new API of xiami. If someone was interested in extending/fixing xiami download part, please fork the repo and add implementation. Netease downloading works so far.
+Since Xiami.com has changed its API link, downloading from xiami with zhuaxia currently has problem. Xiami blocks accesses outside China, this brings me difficuties to find out the new API of xiami. If someone was interested in extending/fixing xiami download part, please fork the repo and add implementation. Netease downloading works so far. 
 
-因为xiami变更了它的api链接以及处理方式，现在zhuaxia的虾米下载部分存在问题。xiami还屏蔽海外ip的访问，这给分析它的新api又带来难度。这个问题不知道何时能修复。 如果谁了解xiami新api的情况，请告知。或者谁有兴趣修改/实现xiami部分的下载，可以fork这个repo. 到目前为止，网易部分下载还正常。(从虾米屏蔽海外ip我就用网易了)
+因为xiami变更了它的api链接以及处理方式，现在zhuaxia的虾米下载部分存在问题。xiami还屏蔽海外ip的访问，这给分析它的新api又带来难度。~~这个问题不知道何时能修复。 如果谁了解xiami新api的情况，请告知。或者谁有兴趣修改/实现xiami部分的下载，可以fork这个repo.~~ .我会尽快解决这个问题。(已列入todo) 到目前为止，网易部分下载还正常。(从虾米屏蔽海外ip我就用网易了)
 
 
 ##Introduction / 简介
@@ -55,7 +55,7 @@ zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾
 - [易]支持下载高音质(320kbps) mp3 (`-H` 选项)
 - 进度显示 (色彩高亮，终端宽度改变自动适应，总进度，下载线程进度...)
 - mp3文件重命名, 更新mp3 meta信息，自动下载专辑封面, 专辑文本介绍(仅[虾])...等等
-- **[NEW]**[虾]配置项`xiami.proxy.http=ip:port` 来设置国内的代理服务进行xiami连接的解析。详见："Usage -> 海外IP下载xiami资源" 一节
+- ****[虾]配置项`xiami.proxy.http=ip:port` 来设置国内的代理服务进行xiami连接的解析。详见："Usage -> 海外IP下载xiami资源" 一节
 
 ##Todos
 - [x] [虾]对于专辑，也下载专辑介绍保存文本文件
@@ -63,7 +63,7 @@ zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾
 - [x] 下载艺人的Top10热门歌曲
 - [x] 支持网易云音乐的歌曲下载，通过URL自动区分网易和虾米
 - [x] [虾]由于xiami屏蔽海外ip的http请求，增加对于xiami的代理服务器选项
-- [ ] 完善Error Handling(错误处理)
+- [ ] [虾]修复xiami更改api导致xiami部分功能无法正常使用的问题
 
 
 ##Installation / 安装
