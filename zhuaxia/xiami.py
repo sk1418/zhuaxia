@@ -11,19 +11,40 @@ from obj import Song
 LOG = log.get_logger("zxLogger")
 
 #xiami android/iphone api urls
+#----------------------------------------------
+#|             old xiami api                  |
+#----------------------------------------------
 url_xiami="http://www.xiami.com"
 url_hq="http://www.xiami.com/song/gethqsong/sid/%s"
 url_vip="http://www.xiami.com/vip/update-tone"
 url_login="https://login.xiami.com/member/login"
-url_song = "http://www.xiami.com/app/android/song?id=%s"
-url_album = "http://www.xiami.com/app/android/album?id=%s"
-url_fav = "http://www.xiami.com/app/android/lib-songs?uid=%s&page=%s"
-url_collection = "http://www.xiami.com/app/android/collect?id=%s"
-url_artist_top_song = "http://www.xiami.com/app/android/artist-topsongs?id=%s"
+#url_song = "http://www.xiami.com/app/iphone/song?id=%s"
+#url_album = "http://www.xiami.com/app/iphone/album?id=%s"
+url_fav = "http://www.xiami.com/app/iphone/lib-songs?uid=%s&page=%s"
+url_collection = "http://www.xiami.com/app/iphone/collect?id=%s"
+url_artist_top_song = "http://www.xiami.com/app/iphone/artist-topsongs?id=%s"
 #url_artist_albums = "http://www.xiami.com/app/android/artist-albums?id=%s&page=%s"
+
+#----------------------------------------------
+#|             new xiami api                  |
+#----------------------------------------------
+xm_type_dict={
+        'song':0,
+        'album':1,
+        'artist':2,
+        'collection':3,
+        'random':7,
+        'favorite':0,
+        'recommendation':9
+    }
+url_song = 'http://www.xiami.com/song/playlist/id/%s/type/0'
+url_album = 'http://www.xiami.com/song/playlist/id/%s/type/1'
+url_artist_top_song='http://www.xiami.com/song/playlist/id/%s/type/2'
+url_collection='http://www.xiami.com/song/playlist/id/%s/type/3'
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
+#AGNET= 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53'
 
 class XiamiSong(Song):
     """
