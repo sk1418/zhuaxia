@@ -68,7 +68,13 @@ zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾
 
 Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 
+稳定版本：
+
 	yaourt -S zhuaxia
+
+最新git版本:
+
+	yaourt -S zhuaxia-git
 
 其他用户:
 
