@@ -1,13 +1,24 @@
 
+####Table of Contents
+- [Note](#Note)
+- [Introduction](##Introduction)
+- [Dependencies](##Dependencies)
+- [Features](##Features)
+- [Todos](##Todos)
+- [Installation](##Installation)
+- [Usage](##Usage)
+- [代理](###海外IP下载xiami资源)
+- [Screenshots](##Screenshots)
+- [Contributions](## Contributions)
 
-#Note / 注意
+# Note / 注意
 
 Since Xiami.com has changed its API link, downloading from xiami with zhuaxia currently has problem. Xiami blocks accesses outside China, this brings me difficuties to find out the new API of xiami. If someone was interested in extending/fixing xiami download part, please fork the repo and add implementation. Netease downloading works so far. 
 
 因为xiami变更了它的api链接以及处理方式，现在zhuaxia的虾米下载部分存在问题。xiami还屏蔽海外ip的访问，这给分析它的新api又带来难度。~~这个问题不知道何时能修复。 如果谁了解xiami新api的情况，请告知。或者谁有兴趣修改/实现xiami部分的下载，可以fork这个repo.~~ .我会尽快解决这个问题。(已列入todo) 到目前为止，网易部分下载还正常。(从虾米屏蔽海外ip我就用网易了)
 
 
-##Introduction / 简介
+## Introduction
 
 zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resources in multiple threads from www.xiami.com and music.163.com. Due to the localization of site, the output/log messages contain Chinese. Moreover, this readme was written in Chinese as well. However all comments in codes are in English.
 
@@ -18,12 +29,14 @@ zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾
 - python 2.7.6
 
 
-##Dependencies / 依赖
+##Dependencies
+
 - requests module
 - mutagen module
 - beautifulsoup4 module
 
-##Features / 功能
+##Features
+
 - 自动识别解析URL. 目前支持：
 	- [虾] 歌曲，专辑，精选集，用户收藏[todo], 歌手热门
 	- [易] 歌曲，专辑，歌单，歌手热门
@@ -43,7 +56,7 @@ zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾
 - [ ] [虾]针对新API，修复用户收藏的下载
 
 
-##Installation / 安装
+##Installation
 
 Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 
@@ -53,7 +66,7 @@ Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 
 	sudo python setup.py install
 
-##Usage / 使用
+## Usage
 
 - 配置文件， 第一次运行`zx`后， 在`$HOME/.zhuaxia/` 会有配置文件 `zhuaxia.conf` 配置参数有中文说明
 
@@ -105,7 +118,8 @@ Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 			zx  "http://music.163.com/song?id=123456"
 			zx -H "http://www.xiami.com/album/51786"
 
-###海外IP下载xiami资源
+### 海外IP下载xiami资源
+
 xiami.com屏蔽了海外ip的http请求。在配置文件中添加（如果不存在的话）`xiami.proxy.http=ip:port` 可以让zhuaxia通过代理来解析xiami资源。
 例如：
 
@@ -113,7 +127,7 @@ xiami.com屏蔽了海外ip的http请求。在配置文件中添加（如果不�
 
 这里`ip:port`构成的http代理是国内的代理服务器。 如果你的机器已经是国内的ip，请注释或删除这个选项。获取国内代理的简单方法：到http://proxy-list.org/ 搜索China的代理就好。
 
-##Screenshots / 运行截图
+## Screenshots
 
 - downloading (gif animation)
 ![progress](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/progress.gif)
@@ -124,7 +138,7 @@ xiami.com屏蔽了海外ip的http请求。在配置文件中添加（如果不�
 - parse url
 ![url view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/urlParse.png)
 
-## Contributions / 贡献，感谢
+## Contributions
 
 感谢 [lyj](https://github.com/ly0) 提供一个限时VIP测试帐号，这给HQ资源下载部分的完成很大帮助。
 
