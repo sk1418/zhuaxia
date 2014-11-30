@@ -113,7 +113,7 @@ def from_url_xm(xm_obj, url, verbose=True):
 
     LOG.debug('processing xiami url: "%s"'% url)
     msg = u''
-    if '/showcollect/id/' in url:
+    if '/collect/' in url:
         collect = xm.Collection(xm_obj, url)
         dl_songs.extend(collect.songs)
         msgs = [ fmt_parsing % (xiami_url_abbr(url),u'精选集',collect.collection_name)]

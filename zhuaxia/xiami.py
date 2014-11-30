@@ -186,7 +186,7 @@ class Collection(object):
         self.url = url
         self.xm = xm_obj
         #user id in url
-        self.collection_id = re.search(r'(?<=/showcollect/id/)\d+', self.url).group(0)
+        self.collection_id = re.search(r'(?<=/collect/)\d+', self.url).group(0)
         self.songs = []
         self.init_collection()
 
