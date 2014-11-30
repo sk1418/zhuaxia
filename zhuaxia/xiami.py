@@ -194,6 +194,7 @@ class Collection(object):
     def init_collection(self):
         j = self.xm.read_link(url_collection % (self.collection_id) ).json()['data']['trackList']
         j_first_song = j[0]
+        #read collection name
         self.collection_name = self.get_collection_name()
         for jsong in j:
             song = XiamiSong(self.xm, song_json=jsong)
@@ -223,15 +224,17 @@ class TopSong(object):
         self.url = url
         self.xm = xm_obj
         #artist id
-        self.artist_id = re.search(r'(?<=/artist/)\d+', self.url).group(0)
+        self.artist_id = re.search(r'(?<=/artist/top/id/)\d+', self.url).group(0)
         self.artist_name = ""
         self.songs = []
         self.init_topsong()
 
     def init_topsong(self):
-        j = self.xm.read_link(url_artist_top_song % (self.artist_id)).json()
-        for jsong in j['songs']:
+        j = self.xm.read_link(url_artist_top_song % (self.artist_id)).json()['data']['trackList']
+        for jsong in j:
             song = XiamiSong(self.xm, song_json=jsong)
+            if not self.artist_name:
+                self.artist_name = song.artist_name
             song.group_dir = self.artist_name + '_TopSongs'
             song.post_set()
             self.songs.append(song)
