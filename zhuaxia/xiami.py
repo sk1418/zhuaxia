@@ -7,6 +7,7 @@ import urllib
 from os import path
 import downloader
 from obj import Song
+from bs4 import BeautifulSoup
 
 LOG = log.get_logger("zxLogger")
 
@@ -193,7 +194,7 @@ class Collection(object):
     def init_collection(self):
         j = self.xm.read_link(url_collection % (self.collection_id) ).json()['data']['trackList']
         j_first_song = j[0]
-        self.collection_name = u'精选集'+ self.collection_id #TODO parse html and get the real name
+        self.collection_name = self.get_collection_name()
         for jsong in j:
             song = XiamiSong(self.xm, song_json=jsong)
             #rewrite filename, make it different
@@ -203,6 +204,18 @@ class Collection(object):
         if len(self.songs):
             #creating the dir
             util.create_dir(path.dirname(self.songs[-1].abs_path))
+
+    def get_collection_name(self):
+        if not self.url:
+            return 'collection' + self.collection_id
+        else:
+            html = self.xm.read_link(self.url).text
+            soup = BeautifulSoup(html)
+            title = soup.title.string
+            if title:
+                return re.sub(r'_[^_]*$', '', title)
+            else: 
+                return 'collection' + self.collection_id
 
 class TopSong(object):
     """download top songs of given artist"""
