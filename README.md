@@ -1,22 +1,34 @@
+**zhuaxia** README file
+		
+<p><b><font color="red">针对[虾]更改链接以及API的修复</font></b></p>
+
+因为[虾]变更了它的api链接以及处理方式，原zhuaxia(`version 2.1.x`)的[虾]下载部分无法正常工作。在`v2.2.0`版本做了相应的修复。目前修复的[虾]的功能有：
+
+- [虾]曲下载
+- [虾]辑下载，包括封面
+- [虾]选集下载
+- [虾]歌手热门下载 (max Top20)
+
+**Todos / 待完成**
+
+- [x] [虾]修复xiami更改api导致xiami部分功能无法正常使用的问题
+- [ ] [虾]下载专辑时，下载专辑介绍保存本地
+- [ ] [虾]修复用户收藏的下载
+
+xiami还屏蔽海外ip的访问，这给修复和测试又带来难度。我会尽快解决剩下的问题。到目前为止，网易部分下载还正常。(从虾米屏蔽海外ip我就用网易了)
+
 
 ####Table of Contents
-- [Note](#Note)
-	- 
-- [Introduction/介绍](#Introduction)
-- [Dependencies/依赖](#Dependencies)
-- [Features/功能](#Features)
-- [Todos](#Todos)
-- [Installation](#Installation)
-- [Usage](#Usage)
-- [代理](#海外IP下载xiami资源)
-- [Screenshots](#Screenshots)
-- [Contributions](#Contributions)
 
-# Note / 注意
-
-Since Xiami.com has changed its API link, downloading from xiami with zhuaxia currently has problem. Xiami blocks accesses outside China, this brings me difficuties to find out the new API of xiami. If someone was interested in extending/fixing xiami download part, please fork the repo and add implementation. Netease downloading works so far. 
-
-因为xiami变更了它的api链接以及处理方式，现在zhuaxia的虾米下载部分存在问题。xiami还屏蔽海外ip的访问，这给分析它的新api又带来难度。~~这个问题不知道何时能修复。 如果谁了解xiami新api的情况，请告知。或者谁有兴趣修改/实现xiami部分的下载，可以fork这个repo.~~ .我会尽快解决这个问题。(已列入todo) 到目前为止，网易部分下载还正常。(从虾米屏蔽海外ip我就用网易了)
+- [Introduction/简介](#introduction--%E7%AE%80%E4%BB%8B)
+- [Dependencies/依赖](#dependencies--%E4%BE%9D%E8%B5%96)
+- [Features/功能](#features--%E5%8A%9F%E8%83%BD)
+	- [Todos](#todos--%E5%BE%85%E5%AE%8C%E6%88%90)
+- [Installation/安装](#installation--%E5%AE%89%E8%A3%85)
+- [Usage/使用](#usage--%E4%BD%BF%E7%94%A8)
+	- [海外IP使用xiami代理支持](#%E6%B5%B7%E5%A4%96ip%E4%B8%8B%E8%BD%BDxiami%E8%B5%84%E6%BA%90)
+- [Screenshots](#screenshots--%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE)
+- [Contributions](#contributions)
 
 
 ## Introduction / 简介
@@ -51,10 +63,6 @@ zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾
 - mp3文件重命名, 更新mp3 meta信息，自动下载专辑封面, 专辑文本介绍(仅[虾])...等等
 - ***[虾]配置项`xiami.proxy.http=ip:port` 来设置国内的代理服务进行xiami连接的解析。详见："Usage -> 海外IP下载xiami资源" 一节
 
-##Todos / 待完成
-- [x] [虾]修复xiami更改api导致xiami部分功能无法正常使用的问题
-- [ ] [虾]针对新API，下载专辑时，下载专辑介绍保存本地
-- [ ] [虾]针对新API，修复用户收藏的下载
 
 
 ##Installation / 安装
@@ -142,26 +150,3 @@ xiami.com屏蔽了海外ip的http请求。在配置文件中添加（如果不�
 ## Contributions
 
 感谢 [lyj](https://github.com/ly0) 提供一个限时VIP测试帐号，这给HQ资源下载部分的完成很大帮助。
-
-**zhuaxia** README file
-
-                                 ##             
-        ##         ###           ##   ##########
-        ##  ##########           ##   ##########
-        ##  ########          ########   ##     
-        ##  ## ## ##          ########   ##     
-     ###### ## ## ##          ## ## ##   ##     
-     ###### ## ## ##          ## ## ##   ##     
-        ##  ## ## ##          ## ## ##   ## ##  
-        ##  ## ## ##          ## ## ##   ## ##  
-        ### ## ## ##          ########   ##  ## 
-     ###### ## ## ##          ########   ##  ## 
-     #####  ## ##  ##         ## ##      ##   ##
-        ##  ## ##  ##            ## ##   ##   ##
-        ##  ## ##  ##            ## ##   ##     
-        ##  ## ##   ##           ######  ##     
-        ## ##  ##   ##        #########  ##     
-      #### ##  ##    ##       ####   ##  ##     
-      ### ##   ##     #                  ##     
-			 -- 抓取[虾米网]和[网易云音乐]的音乐
-		
