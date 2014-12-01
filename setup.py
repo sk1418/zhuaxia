@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 import glob
 setup(
     name = 'zhuaxia',
-    version = '1.0.0',
-    install_requires=[ 'requests','mutagen' ],
+    version = '2.2.0',
+    install_requires=[ 'requests','mutagen','beautifulsoup4' ],
     packages = find_packages(),
     package_data={'zhuaxia':['conf/*.conf']},
     #data_files=[('conf',glob.glob('conf/*.*'))],
