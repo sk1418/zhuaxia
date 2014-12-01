@@ -66,7 +66,12 @@ class XiamiSong(Song):
             self.url = url
             self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
             #get the song json data
-            jsong = self.xm.read_link(url_song % self.song_id).json()['data']['trackList'][0]
+            try:
+                jsong = self.xm.read_link(url_song % self.song_id).json()['data']['trackList'][0]
+            except Exception, err:
+                LOG.error('[虾]Song cannot be parsed/downloaded: [%s]'%url)
+                raise
+                
 
             self.init_by_json(jsong)
             #used only for album/collection etc. create a dir to group all songs
@@ -126,7 +131,9 @@ class Album(object):
         self.artist_name = j_first_song['artist']
 
         #description
-        self.album_desc = '[TODO]'
+        html = self.xm.read_link(self.url).text
+        soup = BeautifulSoup(html)
+        self.album_desc = soup.find('span', property="v:summary").text
 
         #handle songs
         for jsong in j:
@@ -154,9 +161,12 @@ class Album(object):
                 f.write(self.album_desc)
 
 
+
+
 class Favorite(object):
     """ xiami Favorite songs by user"""
-    def __init__(self,xm_obj, url):
+    def __init__(self,xm_obj, url, verbose):
+        self.verbose = verbose
         self.url = url
         self.xm = xm_obj
         #user id in url
@@ -168,14 +178,27 @@ class Favorite(object):
         """ parse html and load json and init Song object
         for each found song url"""
         page = 1
+        user = ''
+        total = 0
+        cur = 1 #current processing link
         while True:
-            html = self.xml.read_link(url_fav%(self.uid,page)).text
+            html = self.xm.read_link(url_fav%(self.uid,page)).text
             soup = BeautifulSoup(html)
-            user = soup.title.string
-            links = [link.get('href') for link in soup.find_all(href=re.compile(r'xiami.com/song/\d+'))]
+            if not user:
+                user = soup.title.string
+            if not total:
+                total = soup.find('span', class_='counts').string
+
+            links = [link.get('href') for link in soup.find_all(href=re.compile(r'xiami.com/song/\d+')) if link]
             if links:
                 for link in links:
-                    song = XiamiSong(self.xm, url=link)
+                    if self.verbose:
+                        LOG.info('[%d/%s] parsing song: %s'%(cur, total, link))
+                    try:
+                        cur += 1
+                        song = XiamiSong(self.xm, url=link)
+                    except:
+                        continue
                     #rewrite filename, make it different
                     song.group_dir = user
                     song.post_set()

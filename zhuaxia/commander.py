@@ -142,7 +142,10 @@ def from_url_xm(xm_obj, url, verbose=True):
             msg= u' => '.join(msgs)
 
     elif '/lib-song/u/' in url:
-        fav = xm.Favorite(xm_obj, url)
+        if verbose:
+            LOG.warning(u'[虾]如用户收藏较多，解析歌曲需要较长时间，请耐心等待')
+            
+        fav = xm.Favorite(xm_obj, url, verbose)
         dl_songs.extend(fav.songs)
         msgs = [fmt_parsing % (xiami_url_abbr(url), u'用户收藏','')]
         if verbose:
