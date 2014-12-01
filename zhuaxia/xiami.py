@@ -45,6 +45,7 @@ url_song =  xm_type_dict['song'].join(url_parts)
 url_album = xm_type_dict['album'].join(url_parts)
 url_artist_top_song= xm_type_dict['artist'].join(url_parts)
 url_collection= xm_type_dict['collection'].join(url_parts)
+url_fav = "http://www.xiami.com/space/lib-song/u/%s/page/%s"
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
@@ -164,23 +165,29 @@ class Favorite(object):
         self.init_fav()
 
     def init_fav(self):
+        """ parse html and load json and init Song object
+        for each found song url"""
         page = 1
         while True:
-            j = self.xm.read_link(url_fav % (self.uid, str(page)) ).json()
-            if j['songs'] :
-                for jsong in j['songs']:
-                    song = XiamiSong(self.xm, song_json=jsong)
+            html = self.xml.read_link(url_fav%(self.uid,page)).text
+            soup = BeautifulSoup(html)
+            user = soup.title.string
+            links = [link.get('href') for link in soup.find_all(href=re.compile(r'xiami.com/song/\d+'))]
+            if links:
+                for link in links:
+                    song = XiamiSong(self.xm, url=link)
                     #rewrite filename, make it different
-                    song.group_dir = 'favorite_%s' % self.uid
+                    song.group_dir = user
                     song.post_set()
                     self.songs.append(song)
                 page += 1
             else:
                 break
+
         if len(self.songs):
             #creating the dir
             util.create_dir(path.dirname(self.songs[-1].abs_path))
-            
+
 class Collection(object):
     """ xiami song - collections made by user"""
     def __init__(self,xm_obj, url):
