@@ -72,7 +72,7 @@ Archlinux 用户, zhuaxia可以从AUR中获取, 比如
 
 	yaourt -S zhuaxia
 
-最新git版本:
+最新git版本(bleeding branch):
 
 	yaourt -S zhuaxia-git
 
