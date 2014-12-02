@@ -194,7 +194,7 @@ class Favorite(object):
             if links:
                 for link in links:
                     if self.verbose:
-                        sys.stdout.write('\n' + log.hl('[%d/%s] parsing........ '%(cur, total), 'green'))
+                        sys.stdout.write(log.hl('[%d/%s] parsing song ........ '%(cur, total), 'green'))
                     try:
                         cur += 1
                         song = XiamiSong(self.xm, url=link)
