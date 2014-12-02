@@ -5,6 +5,7 @@ import requests
 import log, config, util
 import urllib
 from os import path
+import sys
 import downloader
 from obj import Song
 from bs4 import BeautifulSoup
@@ -193,10 +194,12 @@ class Favorite(object):
             if links:
                 for link in links:
                     if self.verbose:
-                        LOG.info('[%d/%s] parsing song: %s'%(cur, total, link))
+                        sys.stdout.write('\n' + log.hl('[%d/%s] parsing........ '%(cur, total), 'green'))
                     try:
                         cur += 1
                         song = XiamiSong(self.xm, url=link)
+                        if self.verbose:
+                            sys.stdout.write(log.hl('DONE\n', 'green'))
                     except:
                         continue
                     #rewrite filename, make it different
