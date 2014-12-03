@@ -66,6 +66,7 @@ class XiamiSong(Song):
         if url:
             self.url = url
             self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
+            LOG.debug(u'[虾]开始初始化歌曲[%s]'% self.song_id)
             #get the song json data
             try:
                 jsong = self.xm.read_link(url_song % self.song_id).json()['data']['trackList'][0]
@@ -80,6 +81,7 @@ class XiamiSong(Song):
 
             #set filename, abs_path etc.
             self.post_set()
+            LOG.debug(u'[虾]初始化歌曲成功[%s]'% self.song_id)
         elif song_json:
             self.init_by_json(song_json)
         
@@ -115,7 +117,7 @@ class Album(object):
         self.xm = xm_obj
         self.url = url 
         self.album_id = re.search(r'(?<=/album/)\d+', self.url).group(0)
-        LOG.debug(u'开始初始化专辑[%s]'% self.album_id)
+        LOG.debug(u'[虾]开始初始化专辑[%s]'% self.album_id)
         self.year = None
         self.track=None
         self.songs = [] # list of Song
@@ -145,14 +147,14 @@ class Album(object):
 
         d = path.dirname(self.songs[-1].abs_path)
         #creating the dir
-        LOG.debug(u'创建专辑目录[%s]' % d)
+        LOG.debug(u'[虾]创建专辑目录[%s]' % d)
         util.create_dir(d)
 
         #download album logo images
-        LOG.debug(u'下载专辑[%s]封面'% self.album_name)
+        LOG.debug(u'[虾]下载专辑[%s]封面'% self.album_name)
         downloader.download_by_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
 
-        LOG.debug(u'保存专辑[%s]介绍'% self.album_name)
+        LOG.debug(u'[虾]保存专辑[%s]介绍'% self.album_name)
         if self.album_desc:
             self.album_desc = re.sub(r'&lt;\s*[bB][rR]\s*/&gt;','\n',self.album_desc)
             self.album_desc = re.sub(r'&lt;.*?&gt;','',self.album_desc)
@@ -182,6 +184,7 @@ class Favorite(object):
         user = ''
         total = 0
         cur = 1 #current processing link
+        LOG.debug(u'[虾]开始初始化用户收藏[%s]'% self.uid)
         while True:
             html = self.xm.read_link(url_fav%(self.uid,page)).text
             soup = BeautifulSoup(html)
@@ -213,6 +216,7 @@ class Favorite(object):
         if len(self.songs):
             #creating the dir
             util.create_dir(path.dirname(self.songs[-1].abs_path))
+        LOG.debug(u'[虾]初始化用户收藏完毕[%s]'% self.uid)
 
 class Collection(object):
     """ xiami song - collections made by user"""
@@ -225,6 +229,7 @@ class Collection(object):
         self.init_collection()
 
     def init_collection(self):
+        LOG.debug(u'[虾]开始初始化精选集[%s]'% self.collection_id)
         j = self.xm.read_link(url_collection % (self.collection_id) ).json()['data']['trackList']
         j_first_song = j[0]
         #read collection name
@@ -238,6 +243,7 @@ class Collection(object):
         if len(self.songs):
             #creating the dir
             util.create_dir(path.dirname(self.songs[-1].abs_path))
+        LOG.debug(u'[虾]初始化精选集完毕[%s]'% self.collection_id)
 
     def get_collection_name(self):
         if not self.url:
@@ -263,6 +269,7 @@ class TopSong(object):
         self.init_topsong()
 
     def init_topsong(self):
+        LOG.debug(u'[虾]初始化艺人TopSong[%s]'% self.artist_id)
         j = self.xm.read_link(url_artist_top_song % (self.artist_id)).json()['data']['trackList']
         for jsong in j:
             song = XiamiSong(self.xm, song_json=jsong)
@@ -280,6 +287,7 @@ class TopSong(object):
             self.artist_name = self.songs[-1].artist_name
             #creating the dir
             util.create_dir(path.dirname(self.songs[-1].abs_path))
+        LOG.debug(u'[虾]初始化艺人TopSong完毕[%s]'% self.artist_id)
 
 checkin_headers = {
     'User-Agent': AGENT,

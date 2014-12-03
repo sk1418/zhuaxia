@@ -43,8 +43,10 @@ class NeteaseSong(Song):
             self.url = url
             self.song_id = re.search(r'(?<=/song\?id=)\d+', url).group(0)
 
+            LOG.debug(u'[易]开始初始化歌曲[%s]'% self.song_id)
             j = self.m163.read_link(url_song % (self.song_id,self.song_id)).json()['songs'][0]
             self.init_by_json(j)
+            LOG.debug(u'[易]初始化歌曲完毕[%s]'% self.song_id)
             #set filename, abs_path etc.
             self.post_set()
 
@@ -88,6 +90,7 @@ class NeteaseAlbum(object):
         self.track=None
         self.songs = [] # list of Song
         self.init_album()
+        LOG.debug(u'[易]初始化专辑完毕[%s]'% self.album_id)
 
     def init_album(self):
         #album json
@@ -107,11 +110,11 @@ class NeteaseAlbum(object):
 
         d = path.dirname(self.songs[-1].abs_path)
         #creating the dir
-        LOG.debug(u'创建专辑目录[%s]' % d)
+        LOG.debug(u'[易]创建专辑目录[%s]' % d)
         util.create_dir(d)
 
         #download album logo images
-        LOG.debug(u'下载专辑[%s]封面'% self.album_name)
+        LOG.debug(u'[易]下载专辑[%s]封面'% self.album_name)
         downloader.download_by_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
 
 class NeteasePlayList(object):

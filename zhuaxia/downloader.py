@@ -104,6 +104,9 @@ def download_by_url(url,filepath,show_progress=False):
     return 0
 
 def download(song):
+    """
+    download a single song 
+    """
     global done, progress
 
     #if file not in progress, add
@@ -115,6 +118,7 @@ def download(song):
         return
     mp3_file = song.abs_path
 
+    #do the actual downloading
     download_by_url(song.dl_link, mp3_file, show_progress=True)
 
     write_mp3_meta(song)
@@ -124,6 +128,11 @@ def download(song):
     del progress[song.filename]
 
 def fill_done2show(filename):
+    """
+    fill the given filename into global list 'done2show'
+    Depends on the config.SHOW_DONE_NUMBER, the eldest entry will be
+    poped out from the list.
+    """
     global done2show
     if len(done2show) == config.SHOW_DONE_NUMBER:
         done2show.pop()
@@ -132,9 +141,11 @@ def fill_done2show(filename):
 def start_download(songs):
     global total, progress
     total = len(songs)
+    LOG.debug('init thread pool (%d) for downloading'% config.THREAD_POOL_SIZE)
     pool = ThreadPool(config.THREAD_POOL_SIZE)
-
     downloader = Downloader(songs, pool)
+
+    LOG.debug('Start downloading' )
     downloader.start()
 
     while done < total:
