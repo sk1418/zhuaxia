@@ -71,7 +71,7 @@ class XiamiSong(Song):
             try:
                 jsong = self.xm.read_link(url_song % self.song_id).json()['data']['trackList'][0]
             except Exception, err:
-                LOG.error('[虾]Song cannot be parsed/downloaded: [%s]'%url)
+                LOG.error(u'[虾]Song cannot be parsed/downloaded: [%s]'%url)
                 raise
                 
 
@@ -196,6 +196,7 @@ class Favorite(object):
             links = [link.get('href') for link in soup.find_all(href=re.compile(r'xiami.com/song/\d+')) if link]
             if links:
                 for link in links:
+                    LOG.debug(u'[虾]解析歌曲链接[%s]' % link)
                     if self.verbose:
                         sys.stdout.write(log.hl('[%d/%s] parsing song ........ '%(cur, total), 'green'))
                     try:
@@ -204,6 +205,7 @@ class Favorite(object):
                         if self.verbose:
                             sys.stdout.write(log.hl('DONE\n', 'green'))
                     except:
+                        sys.stdout.write(log.hl('FAILED\n', 'error'))
                         continue
                     #rewrite filename, make it different
                     song.group_dir = user
@@ -355,7 +357,7 @@ class Xiami(object):
 
     def read_link(self, link):
         headers = {'User-Agent':AGENT}
-        headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
+        #headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
         proxies = None
         if config.XIAMI_PROXY_HTTP:
             proxies = { 'http':config.XIAMI_PROXY_HTTP}
