@@ -122,7 +122,14 @@ class XiamiSong(Song):
             LOG.debug(u'[虾]开始初始化歌曲[%s]'% self.song_id)
             #get the song json data
             try:
-                jsong = self.xm.read_link(url_song % self.song_id).json()['data']['trackList'][0]
+                resp =  self.xm.read_link(url_song % self.song_id)
+                if re.search(r'cookie="sec=',resp.text):
+                    cookies={'sec':re.search(r'(?<=cookie="sec=)[^;]*',resp.text).group(0),
+                            'max-age':'600','path':'/'}
+                    print self.xm.read_link(url_song % self.song_id,cookies=cookies).text
+                else:
+                    jsong = resp.json()['data']['trackList'][0]
+                    #jsong = self.xm.read_link(url_song % self.song_id).json()['data']['trackList'][0]
             except Exception, err:
                 LOG.error(u'[虾]Song cannot be parsed/downloaded: [%s]'%url)
                 LOG.info(self.xm.read_link(url_song % self.song_id).text)
@@ -257,7 +264,7 @@ class Favorite(object):
                     try:
                         cur += 1
                         song = XiamiSong(self.xm, url=link)
-                        time.sleep(2)
+                        #time.sleep(2)
                         if self.verbose:
                             sys.stdout.write(log.hl('DONE\n', 'green'))
                     except:
@@ -411,10 +418,9 @@ class Xiami(object):
             self.is_hq = False
             return False
 
-    def read_link(self, link):
-        sess = requests.Session()
-        sess.verify = False
-        sess.cookies.set_policy(BlockAll())
+    def read_link(self, link, cookies=None):
+        #sess = requests.Session()
+        #sess.cookies.set_policy(BlockAll())
         headers = {'User-Agent':random.choice(Agents)}
         #headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
         proxies = None
@@ -423,7 +429,11 @@ class Xiami(object):
 
         if self.skip_login:
             #return requests.get(link, headers=headers, proxies=proxies)
-            return sess.get(link, headers=headers, proxies=proxies)
+            if cookies:
+                print cookies
+                return requests.get(link, headers=headers, proxies=proxies, cookies=cookies)
+            else:
+                return requests.get(link, headers=headers, proxies=proxies)
         else:
             return self.session.get(link,headers=headers, proxies=proxies)
 
