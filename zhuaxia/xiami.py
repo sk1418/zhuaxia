@@ -49,7 +49,8 @@ url_collection= xm_type_dict['collection'].join(url_parts)
 url_fav = "http://www.xiami.com/space/lib-song/u/%s/page/%s"
 
 #agent string for http request header
-AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
+#AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
+AGENT='Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0'
 #AGNET= 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53'
 
 class XiamiSong(Song):
@@ -72,6 +73,7 @@ class XiamiSong(Song):
                 jsong = self.xm.read_link(url_song % self.song_id).json()['data']['trackList'][0]
             except Exception, err:
                 LOG.error(u'[虾]Song cannot be parsed/downloaded: [%s]'%url)
+                LOG.info(self.xm.read_link(url_song % self.song_id).text)
                 raise
                 
 
@@ -199,9 +201,11 @@ class Favorite(object):
                     LOG.debug(u'[虾]解析歌曲链接[%s]' % link)
                     if self.verbose:
                         sys.stdout.write(log.hl('[%d/%s] parsing song ........ '%(cur, total), 'green'))
+                        sys.stdout.flush()
                     try:
                         cur += 1
                         song = XiamiSong(self.xm, url=link)
+                        #time.sleep(1)
                         if self.verbose:
                             sys.stdout.write(log.hl('DONE\n', 'green'))
                     except:
@@ -356,6 +360,8 @@ class Xiami(object):
             return False
 
     def read_link(self, link):
+        #sess = requests.Session()
+        #sess.cookies.set_policy(BlockAll())
         headers = {'User-Agent':AGENT}
         #headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
         proxies = None
@@ -363,7 +369,13 @@ class Xiami(object):
             proxies = { 'http':config.XIAMI_PROXY_HTTP}
 
         if self.skip_login:
-            return requests.get(link, headers=headers, proxies=proxies)
+            #test only
+            cookies={
+                     '_unsign_token':'19e434c9d3db941adfaa1c85e7b22f2c', '_xiamitoken':'b105a2e7d73b60ae5d0d53ee8e6afe62' 
+                     ,'sec':'547fa6f7ee0ffd299596fe8c38b78ab70cf0c9f4','max-age':'600','path':'/'
+                    }
+            return requests.get(link, headers=headers, proxies=proxies, cookies=cookies)
+            #sess.get(link, headers=headers, proxies=proxies)
         else:
             return self.session.get(link,headers=headers, proxies=proxies)
 
@@ -392,3 +404,8 @@ class Xiami(object):
 
         return urllib.unquote(durl).replace('^', '0')
 
+import cookielib as cookiejar
+class BlockAll(cookiejar.CookiePolicy):
+    return_ok = set_ok = domain_return_ok = path_return_ok = lambda self, *args, **kwargs: False
+    netscape = True
+    rfc2965 = hide_cookie2 = False
