@@ -1,8 +1,13 @@
 # -*- coding:utf-8 -*-
 import random
 import requests
+import log
+import re
+from bs4 import BeautifulSoup
 
-PROXY_POOL_URL = 'http://pachong.org/area/short/name/cn.html'
+LOG = log.get_logger("zxLogger")
+
+PROXY_POOL_URL = 'http://proxy-list.org/english/search.php?search=CN&country=CN&type=any&port=any&ssl=any&p=%d'
 
 def get_AGENT():
     """ randome choose a UserAgent string"""
@@ -61,10 +66,33 @@ def get_AGENT():
        ]  
     return random.choice(Agents)
 
-
 class ProxyPool(Object):
     """
-    read proxies servers from http://pachong.org/area/short/name/cn.html
+    read proxies servers list from websites
+    and generate proxy from the lists
     """
     def __init__(self):
+        self.proxies = []
+        self.load_list()
+
+
+    def load_list(self):
+        """
+        read proxy list from website
+        """
+        LOG.debug('loading proxy list')
+        page = 1
+        while True:
+            html = requests.get(PROXY_POOL_URL%page).text
+            soup = BeautifulSoup(html)
+            tags = soup.find_all('li',class_='proxy',
+                    text=re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+'))
+            if not tags:
+                break
+
+            self.proxies.extend([x.string for x in tags])
+            page += 1
+        LOG.debug('proxy list loaded, total %d proxies'%len(self.proxies))
+
+    def get_proxy(self):
         pass
