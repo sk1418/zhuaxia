@@ -1,6 +1,13 @@
 # -*- coding:utf-8 -*-
-Agents = [
-    'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53',
+import random
+import requests
+
+PROXY_POOL_URL = 'http://pachong.org/area/short/name/cn.html'
+
+def get_AGENT():
+    """ randome choose a UserAgent string"""
+    
+    Agents = [ 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53',
     'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36',
     'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36',
@@ -52,3 +59,12 @@ Agents = [
     'Opera/9.80 (Windows NT 6.1; WOW64; U; pt) Presto/2.10.229 Version/11.62',
     'Opera/9.80 (Windows NT 6.0; U; pl) Presto/2.10.229 Version/11.62'
        ]  
+    return random.choice(Agents)
+
+
+class ProxyPool(Object):
+    """
+    read proxies servers from http://pachong.org/area/short/name/cn.html
+    """
+    def __init__(self):
+        pass

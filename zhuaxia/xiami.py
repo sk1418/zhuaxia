@@ -9,7 +9,7 @@ import sys
 import downloader
 from obj import Song
 from bs4 import BeautifulSoup
-import random
+
 LOG = log.get_logger("zxLogger")
 
 #----------------------------------------------
@@ -35,7 +35,6 @@ url_fav = "http://www.xiami.com/space/lib-song/u/%s/page/%s"
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
-#AGNET= 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53'
 class XiamiSong(Song):
     """
     xiami Song class, if song_json was given, 
