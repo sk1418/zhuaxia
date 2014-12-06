@@ -66,7 +66,7 @@ def get_AGENT():
        ]  
     return random.choice(Agents)
 
-class ProxyPool(Object):
+class ProxyPool(object):
     """
     read proxies servers list from websites
     and generate proxy from the lists
@@ -74,6 +74,7 @@ class ProxyPool(Object):
     def __init__(self):
         self.proxies = []
         self.load_list()
+        self.it_proxy = iter(self.proxies)
 
 
     def load_list(self):
@@ -82,6 +83,8 @@ class ProxyPool(Object):
         """
         LOG.debug('loading proxy list')
         page = 1
+        #empty list
+        self.proxies = []
         while True:
             html = requests.get(PROXY_POOL_URL%page).text
             soup = BeautifulSoup(html)
@@ -94,5 +97,23 @@ class ProxyPool(Object):
             page += 1
         LOG.debug('proxy list loaded, total %d proxies'%len(self.proxies))
 
+    def add_proxy(self, proxy):
+        self.proxies.append(proxy)
+
+    def del_proxy(self, proxy):
+        self.proxies.remove(proxy)
+
     def get_proxy(self):
-        pass
+        """
+        cycly generate the proxy server string
+        """
+        try:
+            proxy = next(self.it_proxy)
+            LOG.debug('fetched proxy : %s' % proxy)
+            return proxy
+        except StopIteration:
+            LOG.debug('.... re-iterating proxies')
+            self.it_proxy = iter(self.proxies)
+            proxy = next(self.it_proxy)
+            LOG.debug('fetched proxy : %s' % proxy)
+            return proxy

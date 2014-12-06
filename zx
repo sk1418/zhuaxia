@@ -70,9 +70,11 @@ if __name__ == '__main__':
         hq = False
         infile = ''
         inUrl = ''
+        needProxyPool=False
+
         if len(sys.argv)<2: raise getopt.GetoptError("parameters are missing...")
 
-        opts, args = getopt.getopt(sys.argv[1:],":f:Hhv")
+        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvp")
         for o, a in opts:
             if o == '-h':
                 usage()
@@ -84,6 +86,9 @@ if __name__ == '__main__':
                 sys.exit(0)
             elif o == '-f':
                 infile = a
+            elif o == '-p':
+                needProxyPool = True
+
 
         if not infile:
             if not len(args):
@@ -95,9 +100,9 @@ if __name__ == '__main__':
         LOG.debug( "inurl:"+inUrl)
 
         if infile:
-            commander.shall_I_begin(infile, is_file=True, is_hq=hq)
+            commander.shall_I_begin(infile, is_file=True, is_hq=hq, need_proxy_pool=needProxyPool)
         else:
-            commander.shall_I_begin(inUrl, is_hq=hq)
+            commander.shall_I_begin(inUrl, is_hq=hq, need_proxy_pool = needProxyPool)
                 
     except getopt.GetoptError as e:
         LOG.error(str(e))

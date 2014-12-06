@@ -169,12 +169,33 @@ class NeteaseTopSong(object):
 
 class Netease(object):
 
-    def __init__(self, is_hq=False):
+    """
+    netease object
+    is_hq : if download HQ mp3. default False
+    proxies: proxy pool
+    """
+    def __init__(self, is_hq=False, proxies = None):
         self.is_hq = is_hq
+        self.proxies = proxies
+        self.need_proxy_pool = self.proxies != None
 
 
     def read_link(self, link):
-        return requests.get(link, headers=HEADERS)
+        
+        if self.need_proxy_pool:
+            requests_proxy = {'http':self.proxies.get_proxy()}
+
+        retVal = None
+        while True:
+            try:
+                retVal =  requests.get(link, headers=HEADERS)
+                break 
+            except requests.exceptions.ConnectionError:
+                LOG.debug('invalid proxy detected, removing from pool')
+                self.proxies.del_proxy(requests_proxy['http'])
+                requests_proxy['http'] = self.proxies.get_proxy()
+
+        return retVal
 
     def encrypt_dfsId(self,dfsId):
         byte1 = bytearray('3go8&$8*3*3h0k(2)2')

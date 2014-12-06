@@ -2,7 +2,7 @@
 import time
 import re
 import requests
-import log, config, util
+import log, config, util, proxypool
 import urllib
 from os import path
 import sys
@@ -35,6 +35,8 @@ url_fav = "http://www.xiami.com/space/lib-song/u/%s/page/%s"
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
+
+
 class XiamiSong(Song):
     """
     xiami Song class, if song_json was given, 
@@ -42,7 +44,7 @@ class XiamiSong(Song):
     abs_path, filename, etc.
     """
 
-    def __init__(self,xiami_obj,url=None,song_json=None):
+    def __init__(self,xiami_obj,url=None,song_json=None, use_proxy_pool=False):
         self.song_type=1
         self.xm = xiami_obj
         self.group_dir = None
@@ -50,6 +52,7 @@ class XiamiSong(Song):
             self.url = url
             self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
             LOG.debug(u'[虾]开始初始化歌曲[%s]'% self.song_id)
+
             #get the song json data
             try:
                 jsong = self.xm.read_link(url_song % self.song_id).json()['data']['trackList'][0]
@@ -291,7 +294,7 @@ checkin_headers = {
 
 class Xiami(object):
 
-    def __init__(self, email, password, is_hq=False):
+    def __init__(self, email, password, is_hq=False, proxies=None):
         self.token = None
         self.uid = ''
         self.user_name = ''
@@ -300,6 +303,9 @@ class Xiami(object):
         self.skip_login = False
         self.session = None
         self.is_hq = is_hq
+        self.proxies = proxies
+        self.need_proxy_pool = self.proxies != None
+
         #if either email or password is empty skip login
         if not email or not password or not is_hq:
             self.skip_login = True
@@ -344,14 +350,28 @@ class Xiami(object):
     def read_link(self, link):
         headers = {'User-Agent':AGENT}
         #headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
-        proxies = None
-        if config.XIAMI_PROXY_HTTP:
-            proxies = { 'http':config.XIAMI_PROXY_HTTP}
 
-        if self.skip_login:
-            return requests.get(link, headers=headers, proxies=proxies)
-        else:
-            return self.session.get(link,headers=headers, proxies=proxies)
+        requests_proxy = None
+        if config.XIAMI_PROXY_HTTP:
+            requests_proxy = { 'http':config.XIAMI_PROXY_HTTP}
+
+        if self.need_proxy_pool:
+            requests_proxy = {'http':self.proxies.get_proxy()}
+
+        retVal = None
+        while True:
+            try:
+                if self.skip_login:
+                    retVal =  requests.get(link, headers=headers, proxies=requests_proxy)
+                else:
+                    retVal =  self.session.get(link,headers=headers, proxies=requests_proxy)
+                break 
+            except requests.exceptions.ConnectionError:
+                LOG.debug('invalid proxy detected, removing from pool')
+                self.proxies.del_proxy(requests_proxy['http'])
+                requests_proxy['http'] = self.proxies.get_proxy()
+
+        return retVal
 
 
     def get_hq_link(self, song_id):

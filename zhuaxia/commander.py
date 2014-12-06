@@ -9,6 +9,7 @@ from threadpool import ThreadPool
 from time import sleep
 from os import path
 from threadpool import Terminate_Watcher
+from proxypool import ProxyPool
 
 LOG = log.get_logger("zxLogger")
 
@@ -24,16 +25,24 @@ border = log.hl(u'%s'% ('='*90), 'cyan')
 pat_xm = r'^https?://[^/.]*\.xiami\.com/'
 pat_163 = r'^https?://music\.163\.com/'
 
-def shall_I_begin(in_str, is_file=False, is_hq=False):
+#proxypool
+ppool = None
+
+def shall_I_begin(in_str, is_file=False, is_hq=False, need_proxy_pool = False):
     #start terminate_watcher
     Terminate_Watcher()
+    global ppool
+    if need_proxy_pool:
+        LOG.info(u'初始化proxy pool')
+        ppool = ProxyPool()
+        LOG.info(u'proxy pool:[%d] 初始完毕'%len(ppool.proxies))
 
     #xiami obj
     xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,\
             config.XIAMI_LOGIN_PASSWORD, \
-            is_hq)
+            is_hq,proxies=ppool)
     #netease obj
-    m163 = netease.Netease(is_hq)
+    m163 = netease.Netease(is_hq, proxies=ppool)
 
     if is_file:
         from_file(xiami_obj, m163,in_str)
