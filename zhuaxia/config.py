@@ -5,7 +5,7 @@ import ConfigParser
 import log, util
 import traceback
 
-VERSION     = '2.3.0'                #software version
+VERSION     = '2.4.0'                #software version
 #the separator of tmux command output
 PKG_PATH    = path.dirname(__file__)
 APP_PATH    = path.join(PKG_PATH,"../")

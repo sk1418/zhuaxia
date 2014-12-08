@@ -29,7 +29,7 @@
 
 ### Todos
 
-- [ ] [虾]针对新的用户收藏的歌曲解析方法，http的请求比以前多了很多次，用时较多，尝试利用多线程来解析
+- [x] [虾]针对新的用户收藏的歌曲解析方法，http的请求比以前多了很多次，频繁请求会被虾ban 10分钟，加入实验性-p选项用proxy pool来解析和下载。此选项也用于[易]
 
 xiami还屏蔽海外ip的访问，这给修复和测试又带来难度。我会尽快解决剩下的问题。到目前为止，网易部分下载还正常。(从虾米屏蔽海外ip我就用网易了)
 
@@ -89,25 +89,32 @@ Archlinux 用户, zhuaxia可以从AUR中获取
 
 - 使用：
 
-			
-		[CONFIG FILE:]   
-			$HOME/.zhuaxia/zhuaxia.conf
 
-		[OPTION] 
-			-H    
-				:首选HQ质量(320kbps), 
+		zhuaxia (抓虾) -- 抓取[虾米音乐]和[网易云音乐]的 mp3 音乐
 
+		[CONFIG FILE:]   $HOME/.zhuaxia/zhuaxia.conf
+
+		[OPTIONS] 
+			-H : 首选HQ质量(320kbps), 
 				> 虾米音乐 <
 					- 配置文件中需给出正确登录信箱和密码, 登录用户需拥有VIP身份
 					- 用户需在xiami vip设置页面设置默认高音质
 					- 此选项对不满足上两项情况无效，仍下载128kbps资源
 				> 网易音乐 <
-					无需特殊要求,直接下载高音质资源
+					-无需特殊要求,直接下载高音质资源
+
+			-p : (实验性选项)使用代理池下载
+				在下载/解析量大的情况下，目标服务器会对禁止频繁的请求，所以zhuaxia可以自动获取
+				代理来解析和下载资源。因为获取的代理速度/可靠性不一，下载可能会缓慢或不稳定。
+
+			-h ：显示帮助
+			-f ：从文件下载
+			-v ：显示版本信息
 
 		[USAGE] 
 
 			zx [OPTION] <URL>
-				: 下载指定URL资源, 自动识别链接, 支持
+				: 下载指定URL资源, 抓虾自动识别链接, 支持
 					- [虾] 歌曲，专辑，精选集，用户收藏,艺人TopN
 					- [易] 歌曲，专辑，歌单，艺人TopN
 				例子： 
@@ -123,17 +130,6 @@ Archlinux 用户, zhuaxia可以从AUR中获取
 					http://www.xiami.com/album/32449
 
 				  $ zx -f /tmp/foo.txt
-
-			zx -h ：显示帮助
-
-			zx -v ：显示版本信息
-
-
-- 例子
-
-			zx -H -f "tmp/in.txt"
-			zx  "http://music.163.com/song?id=123456"
-			zx -H "http://www.xiami.com/album/51786"
 
 ### Proxy setting
 
