@@ -80,7 +80,7 @@ def print_progress():
 
     sys.stdout.flush()
 
-def download_by_url(url,filepath,show_progress=False):
+def download_by_url(url,filepath,show_progress=False, proxy=None):
     """ 
     basic downloading function, download url and save to 
     file path
@@ -90,7 +90,8 @@ def download_by_url(url,filepath,show_progress=False):
         return
 
     fname = path.basename(filepath)
-    r = requests.get(url, stream=True)
+    r = requests.get(url, stream=True, proxies=proxy)
+
     if r.status_code == 200:
         total_length = int(r.headers.get('content-length'))
         done_length = 0
@@ -119,7 +120,11 @@ def download(song):
     mp3_file = song.abs_path
 
     #do the actual downloading
-    download_by_url(song.dl_link, mp3_file, show_progress=True)
+    if song.handler.need_proxy_pool:
+        download_by_url(song.dl_link, mp3_file, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
+    else:
+        download_by_url(song.dl_link, mp3_file, show_progress=True)
+
 
     write_mp3_meta(song)
     done += 1

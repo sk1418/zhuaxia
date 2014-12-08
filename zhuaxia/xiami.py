@@ -7,7 +7,7 @@ import urllib
 from os import path
 import sys
 import downloader
-from obj import Song
+from obj import Song, Handler
 from bs4 import BeautifulSoup
 
 LOG = log.get_logger("zxLogger")
@@ -46,7 +46,7 @@ class XiamiSong(Song):
 
     def __init__(self,xiami_obj,url=None,song_json=None, use_proxy_pool=False):
         self.song_type=1
-        self.xm = xiami_obj
+        self.handler = xiami_obj
         self.group_dir = None
         if url:
             self.url = url
@@ -55,10 +55,10 @@ class XiamiSong(Song):
 
             #get the song json data
             try:
-                jsong = self.xm.read_link(url_song % self.song_id).json()['data']['trackList'][0]
+                jsong = self.handler.read_link(url_song % self.song_id).json()['data']['trackList'][0]
             except Exception, err:
                 LOG.error(u'[虾]Song cannot be parsed/downloaded: [%s]'%url)
-                LOG.debug(self.xm.read_link(url_song % self.song_id).text)
+                LOG.debug(self.handler.read_link(url_song % self.song_id).text)
                 raise
                 
 
@@ -73,9 +73,9 @@ class XiamiSong(Song):
             self.init_by_json(song_json)
         
         #if is_hq, get the hq location to overwrite the dl_link
-        if self.xm.is_hq:
+        if self.handler.is_hq:
             try:
-                self.dl_link = self.xm.get_hq_link(self.song_id)
+                self.dl_link = self.handler.get_hq_link(self.song_id)
             except:
                 #if user was not VIP, don't change the dl_link
                 pass
@@ -89,7 +89,7 @@ class XiamiSong(Song):
         self.song_name = util.decode_html(song_json['title'])
         location = song_json['location']
         #decode download link
-        self.dl_link = self.xm.decode_xiami_link(location)
+        self.dl_link = self.handler.decode_xiami_link(location)
         # lyrics link
         self.lyrics_link = song_json['lyric_url']
         # artist_name
@@ -101,7 +101,7 @@ class XiamiSong(Song):
 class Album(object):
     """The xiami album object"""
     def __init__(self, xm_obj, url):
-        self.xm = xm_obj
+        self.handler = xm_obj
         self.url = url 
         self.album_id = re.search(r'(?<=/album/)\d+', self.url).group(0)
         LOG.debug(u'[虾]开始初始化专辑[%s]'% self.album_id)
@@ -111,7 +111,7 @@ class Album(object):
         self.init_album()
 
     def init_album(self):
-        j = self.xm.read_link(url_album % self.album_id).json()['data']['trackList']
+        j = self.handler.read_link(url_album % self.album_id).json()['data']['trackList']
         j_first_song = j[0]
         #name
         self.album_name = util.decode_html(j_first_song['album_name'])
@@ -121,13 +121,13 @@ class Album(object):
         self.artist_name = j_first_song['artist']
 
         #description
-        html = self.xm.read_link(self.url).text
+        html = self.handler.read_link(self.url).text
         soup = BeautifulSoup(html)
         self.album_desc = soup.find('span', property="v:summary").text
 
         #handle songs
         for jsong in j:
-            song = XiamiSong(self.xm, song_json=jsong)
+            song = XiamiSong(self.handler, song_json=jsong)
             song.group_dir = self.artist_name + u'_' + self.album_name
             song.post_set()
             self.songs.append(song)
@@ -158,7 +158,7 @@ class Favorite(object):
     def __init__(self,xm_obj, url, verbose):
         self.verbose = verbose
         self.url = url
-        self.xm = xm_obj
+        self.handler = xm_obj
         #user id in url
         self.uid = re.search(r'(?<=/lib-song/u/)\d+', self.url).group(0)
         self.songs = []
@@ -173,7 +173,7 @@ class Favorite(object):
         cur = 1 #current processing link
         LOG.debug(u'[虾]开始初始化用户收藏[%s]'% self.uid)
         while True:
-            html = self.xm.read_link(url_fav%(self.uid,page)).text
+            html = self.handler.read_link(url_fav%(self.uid,page)).text
             soup = BeautifulSoup(html)
             if not user:
                 user = soup.title.string
@@ -189,7 +189,7 @@ class Favorite(object):
                         sys.stdout.flush()
                     try:
                         cur += 1
-                        song = XiamiSong(self.xm, url=link)
+                        song = XiamiSong(self.handler, url=link)
                         #time.sleep(2)
                         if self.verbose:
                             sys.stdout.write(log.hl('DONE\n', 'green'))
@@ -213,7 +213,7 @@ class Collection(object):
     """ xiami song - collections made by user"""
     def __init__(self,xm_obj, url):
         self.url = url
-        self.xm = xm_obj
+        self.handler = xm_obj
         #user id in url
         self.collection_id = re.search(r'(?<=/collect/)\d+', self.url).group(0)
         self.songs = []
@@ -221,12 +221,12 @@ class Collection(object):
 
     def init_collection(self):
         LOG.debug(u'[虾]开始初始化精选集[%s]'% self.collection_id)
-        j = self.xm.read_link(url_collection % (self.collection_id) ).json()['data']['trackList']
+        j = self.handler.read_link(url_collection % (self.collection_id) ).json()['data']['trackList']
         j_first_song = j[0]
         #read collection name
         self.collection_name = self.get_collection_name()
         for jsong in j:
-            song = XiamiSong(self.xm, song_json=jsong)
+            song = XiamiSong(self.handler, song_json=jsong)
             #rewrite filename, make it different
             song.group_dir = self.collection_name
             song.post_set()
@@ -240,7 +240,7 @@ class Collection(object):
         if not self.url:
             return 'collection' + self.collection_id
         else:
-            html = self.xm.read_link(self.url).text
+            html = self.handler.read_link(self.url).text
             soup = BeautifulSoup(html)
             title = soup.title.string
             if title:
@@ -252,7 +252,7 @@ class TopSong(object):
     """download top songs of given artist"""
     def __init__(self, xm_obj, url):
         self.url = url
-        self.xm = xm_obj
+        self.handler = xm_obj
         #artist id
         self.artist_id = re.search(r'(?<=/artist/top/id/)\d+', self.url).group(0)
         self.artist_name = ""
@@ -261,9 +261,9 @@ class TopSong(object):
 
     def init_topsong(self):
         LOG.debug(u'[虾]初始化艺人TopSong[%s]'% self.artist_id)
-        j = self.xm.read_link(url_artist_top_song % (self.artist_id)).json()['data']['trackList']
+        j = self.handler.read_link(url_artist_top_song % (self.artist_id)).json()['data']['trackList']
         for jsong in j:
-            song = XiamiSong(self.xm, song_json=jsong)
+            song = XiamiSong(self.handler, song_json=jsong)
             if not self.artist_name:
                 self.artist_name = song.artist_name
             song.group_dir = self.artist_name + '_TopSongs'
@@ -292,7 +292,7 @@ checkin_headers = {
 }
 
 
-class Xiami(object):
+class Xiami(Handler):
 
     def __init__(self, email, password, is_hq=False, proxies=None):
         self.token = None
@@ -303,8 +303,9 @@ class Xiami(object):
         self.skip_login = False
         self.session = None
         self.is_hq = is_hq
-        self.proxies = proxies
-        self.need_proxy_pool = self.proxies != None
+        Handler.__init__(self,proxies)
+        #self.proxies = proxies
+        #self.need_proxy_pool = self.proxies != None
 
         #if either email or password is empty skip login
         if not email or not password or not is_hq:
@@ -359,17 +360,28 @@ class Xiami(object):
             requests_proxy = {'http':self.proxies.get_proxy()}
 
         retVal = None
-        while True:
-            try:
-                if self.skip_login:
-                    retVal =  requests.get(link, headers=headers, proxies=requests_proxy)
-                else:
-                    retVal =  self.session.get(link,headers=headers, proxies=requests_proxy)
-                break 
-            except requests.exceptions.ConnectionError:
-                LOG.debug('invalid proxy detected, removing from pool')
-                self.proxies.del_proxy(requests_proxy['http'])
-                requests_proxy['http'] = self.proxies.get_proxy()
+        if self.need_proxy_pool:
+            while True:
+                try:
+                    if self.skip_login:
+                        retVal =  requests.get(link, headers=headers, proxies=requests_proxy)
+                    else:
+                        retVal =  self.session.get(link,headers=headers, proxies=requests_proxy)
+                    break 
+                except requests.exceptions.ConnectionError:
+                    LOG.debug('invalid proxy detected, removing from pool')
+                    self.proxies.del_proxy(requests_proxy['http'])
+                    if self.proxies:
+                        requests_proxy['http'] = self.proxies.get_proxy()
+                    else:
+                        LOG.debug('proxy pool is empty')
+                        raise
+                        break
+        else:
+            if self.skip_login:
+                retVal =  requests.get(link, headers=headers, proxies=requests_proxy)
+            else:
+                retVal =  self.session.get(link,headers=headers, proxies=requests_proxy)
 
         return retVal
 
