@@ -9,6 +9,14 @@ LOG = log.get_logger("zxLogger")
 
 Song_Type={0:'unknown',1:u"虾米", 2:"网易"}
 
+class Handler(object):
+    """
+    handler class encapsulate xiami or netease object
+    """
+    def __init__(self, proxies = None):
+        self.proxies = proxies
+        self.need_proxy_pool = self.proxies != None
+
 class Song(object):
     """
     General Song class, if song_json was given, 

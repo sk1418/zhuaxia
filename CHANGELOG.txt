@@ -1,3 +1,11 @@
+2014-12-08 Version 2.4.0
+=========================
+- [feature] (Experimental) add -p option, auto fetching proxies (proxy pool) to avoid to be banned by servers. 
+
+2014-12-01 Version 2.3.0
+=========================
+- [bugfix] apply xiami new "API" to fix the xiami mp3 downloading (user favorite, album's desc)
+
 2014-11-29 Version 2.2.0
 =========================
 - [bugfix] apply xiami new "API" to fix the xiami mp3 downloading (song, album, collection, artist_top)
