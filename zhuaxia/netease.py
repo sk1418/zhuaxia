@@ -68,9 +68,15 @@ class NeteaseSong(Song):
         dfsId = ''
         if self.handler.is_hq and js['hMusic']:
             dfsId = js['hMusic']['dfsId']
-        else:
+        elif js['mMusic']:
             dfsId = js['mMusic']['dfsId']
-        self.dl_link = url_mp3 % (self.handler.encrypt_dfsId(dfsId), dfsId)
+        elif js['lMusic']:
+            LOG.warning(u'歌曲(%s) 无法获取128kbps资源,尝试获取低质量资源'%self.song_name)
+            dfsId = js['lMusic']['dfsId']
+        if dfsId:
+            self.dl_link = url_mp3 % (self.handler.encrypt_dfsId(dfsId), dfsId)
+        else:
+            LOG.warning(u'歌曲(%s) 无法获取下载链接'%self.song_name)
 
         #used only for album/collection etc. create a dir to group all songs
         #if it is needed, it should be set by the caller
