@@ -1,3 +1,7 @@
+2015-07-22 Version 2.4.1
+=========================
+- [bugfix] some 163 songs have no 128kbps link, fall back to 96kbps in this case
+
 2014-12-08 Version 2.4.0
 =========================
 - [feature] (Experimental) add -p option, auto fetching proxies (proxy pool) to avoid to be banned by servers. 
