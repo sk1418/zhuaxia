@@ -5,7 +5,7 @@ import ConfigParser
 import log, util
 import traceback
 
-VERSION     = '2.4.0'                #software version
+VERSION     = '2.5.1'                #software version
 #the separator of tmux command output
 PKG_PATH    = path.dirname(__file__)
 APP_PATH    = path.join(PKG_PATH,"../")
@@ -15,6 +15,7 @@ CONF_FILE   = path.join(USER_PATH, "zhuaxia.conf")
 
 
 ######user config####
+LANG                 = 'CN'
 XIAMI_PROXY_HTTP     = None
 XIAMI_LOGIN_EMAIL    = None
 XIAMI_LOGIN_PASSWORD = None
@@ -35,7 +36,8 @@ var_dict = {
         'log.level.console'       : ('LOG_LVL_CONSOLE'     , 's'),
         'thread.pool.size'        : ('THREAD_POOL_SIZE'    , 'n'),
         'show.done.number'        : ('SHOW_DONE_NUMBER'    , 'n'),
-        'download.artist.topsong' : ('DOWNLOAD_TOP_SONG'   , 'n')
+        'download.artist.topsong' : ('DOWNLOAD_TOP_SONG'   , 'n'),
+        'lang' : ('LANG'   , 's')
         }
 
 def load_single_config(conf_parser, conf_key):
