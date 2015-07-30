@@ -18,7 +18,7 @@ logger_name = 'zxLogger'
 config.load_config()
 
 #after init config, loading message
-if config.LANG == 'CN'.upper():
+if config.LANG.upper() == 'CN':
     import zhuaxia.i18n.msg_cn as msg
 else:
     import zhuaxia.i18n.msg_en as msg
