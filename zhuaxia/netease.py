@@ -8,6 +8,11 @@ from os import path
 import downloader
 from obj import Song, Handler
 
+if config.LANG.upper() == 'CN':
+    import i18n.msg_cn as msg
+else:
+    import i18n.msg_en as msg
+
 LOG = log.get_logger("zxLogger")
 
 #163 music api url
@@ -43,10 +48,10 @@ class NeteaseSong(Song):
             self.url = url
             self.song_id = re.search(r'(?<=/song\?id=)\d+', url).group(0)
 
-            LOG.debug(u'[易]开始初始化歌曲[%s]'% self.song_id)
+            LOG.debug(msg.head_163 + msg.fmt_init_song % self.song_id)
             j = self.handler.read_link(url_song % (self.song_id,self.song_id)).json()['songs'][0]
             self.init_by_json(j)
-            LOG.debug(u'[易]初始化歌曲完毕[%s]'% self.song_id)
+            LOG.debug(msg.head_163 + msg.fmt_init_song_ok % self.song_id)
             #set filename, abs_path etc.
             self.post_set()
 
@@ -71,12 +76,12 @@ class NeteaseSong(Song):
         elif js['mMusic']:
             dfsId = js['mMusic']['dfsId']
         elif js['lMusic']:
-            LOG.warning(u'歌曲(%s) 无法获取128kbps资源,尝试获取低质量资源'%self.song_name)
+            LOG.warning(msg.head_163 + msg.fmt_quality_fallback %self.song_name)
             dfsId = js['lMusic']['dfsId']
         if dfsId:
             self.dl_link = url_mp3 % (self.handler.encrypt_dfsId(dfsId), dfsId)
         else:
-            LOG.warning(u'歌曲(%s) 无法获取下载链接'%self.song_name)
+            LOG.warning(msg.head_163 + msg.fmt_err_song_parse %self.song_name)
 
         #used only for album/collection etc. create a dir to group all songs
         #if it is needed, it should be set by the caller
@@ -91,12 +96,11 @@ class NeteaseAlbum(object):
         self.handler=m163
         self.url = url 
         self.album_id = re.search(r'(?<=/album\?id=)\d+', self.url).group(0)
-        LOG.debug(u'[易]开始初始化专辑[%s]'% self.album_id)
+        LOG.debug(msg.head_163 + msg.fmt_init_album % self.album_id)
         self.year = None
         self.track=None
         self.songs = [] # list of Song
         self.init_album()
-        LOG.debug(u'[易]初始化专辑完毕[%s]'% self.album_id)
 
     def init_album(self):
         #album json
@@ -116,11 +120,11 @@ class NeteaseAlbum(object):
 
         d = path.dirname(self.songs[-1].abs_path)
         #creating the dir
-        LOG.debug(u'[易]创建专辑目录[%s]' % d)
+        LOG.debug(msg.head_163 + msg.fmt_create_album_dir % d)
         util.create_dir(d)
 
         #download album logo images
-        LOG.debug(u'[易]下载专辑[%s]封面'% self.album_name)
+        LOG.debug(msg.head_163 + msg.fmt_save_album_desc % self.album_name)
         downloader.download_by_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
 
 class NeteasePlayList(object):

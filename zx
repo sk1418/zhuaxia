@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-import sys,getopt
 import zhuaxia.config as config
+
+#load config at very beginning
+config.load_config()
+
+import sys,getopt
 import zhuaxia.util as util
 import logging
 import zhuaxia.log as log
@@ -13,9 +17,6 @@ import zhuaxia.commander as commander
 
 # logger name
 logger_name = 'zxLogger'
-
-#load config
-config.load_config()
 
 #after init config, loading message
 if config.LANG.upper() == 'CN':
