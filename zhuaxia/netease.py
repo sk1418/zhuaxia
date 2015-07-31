@@ -124,7 +124,7 @@ class NeteaseAlbum(object):
         util.create_dir(d)
 
         #download album logo images
-        LOG.debug(msg.head_163 + msg.fmt_save_album_desc % self.album_name)
+        LOG.debug(msg.head_163 + msg.fmt_dl_album_cover % self.album_name)
         downloader.download_by_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
 
 class NeteasePlayList(object):
