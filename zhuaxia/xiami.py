@@ -12,7 +12,6 @@ from bs4 import BeautifulSoup
 
 LOG = log.get_logger("zxLogger")
 
-print config.LANG
 if config.LANG.upper() == 'CN':
     import i18n.msg_cn as msg
 else:

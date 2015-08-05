@@ -11,6 +11,11 @@ from threading import Thread
 
 LOG = log.get_logger('zxLogger')
 
+if config.LANG.upper() == 'CN':
+    import i18n.msg_cn as msg
+else:
+    import i18n.msg_en as msg
+
 #total number of jobs
 total=0
 #the number of finished jobs
@@ -34,7 +39,7 @@ def print_progress():
     sep = log.hl(u' %s\n'% ('='*width), 'cyan')
     sys.stdout.write(u'\x1b[2J\x1b[H') #clear screen
     sys.stdout.write(line)
-    header = u' 保存目录:[%s] | 线程池:[%d]\n'% (config.DOWNLOAD_DIR, config.THREAD_POOL_SIZE)
+    header = msg.fmt_dl_header % (config.DOWNLOAD_DIR, config.THREAD_POOL_SIZE)
     #header = util.ljust(header, width)
     sys.stdout.write(log.hl(u' %s'%header,'warning'))
     sys.stdout.write(line)
@@ -58,7 +63,7 @@ def print_progress():
     total_percent = float(sum_percent+done)/total
     
     #global progress
-    g_text = u'总进度[%d/%d]:'% (done, total)
+    g_text = msg.fmt_dl_progress % (done, total)
     g_bar = util.ljust('#' * int(total_percent* bar_count), bar_count)
     g_progress =  fmt_progress % \
                 (util.rjust(g_text,(width - bar_count -10)), g_bar, 100*total_percent) # the -10 is for the xx.x% and [ and ]
@@ -72,7 +77,7 @@ def print_progress():
 
     if len(done2show):
         sys.stdout.write(line)
-        sys.stdout.write(log.hl(u'  最近%d个完成任务:\n'% config.SHOW_DONE_NUMBER,'warning'))
+        sys.stdout.write(log.hl(msg.fmt_dl_last_finished % config.SHOW_DONE_NUMBER,'warning'))
         sys.stdout.write(line)
         #display finished jobs
         for d in done2show:
