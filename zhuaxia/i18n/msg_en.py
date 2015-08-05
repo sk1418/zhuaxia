@@ -21,7 +21,7 @@ fmt_init_collect                 = u'start init collection [%s]'
 fmt_init_collect_ok              = u'collection initialized [%s]'
 fmt_init_artist                  = u'start init artist TopSong [%s]'
 fmt_init_artist_ok               = u' artist TopSong initialized [%s]'
-dl_128kbps_xm                    = u'[xia] downloading without login. quality: 128kbps'
+dl_128kbps_xm                    = u' downloading without login. quality: 128kbps'
 fmt_login_ok_xm                  = u'[Login] user: %s (id:%s) login successful'
 login_xm                         = u'[xia] login...'
 login_err_xm                     = u' login failed, skip login, using 128kbps quality.'
@@ -79,15 +79,15 @@ help_info                        = u""" %(cyan)s
                 - [xm] song, album, favorite, collection, artist TopN
                 - [163]song, album, list, artist topN
             example:
-              zx "http://www.xiami.com/space/lib-song/u/25531126"
-zx "http://music.163.com/song?id = 27552647"
+                zx "http://www.xiami.com/space/lib-song/u/25531126"
+                zx "http://music.163.com/song?id = 27552647"
 
         %(bold)szx [OPTION] -f <file>%(clear)s
             : download from url file. one url per line. The urls could be 163 and xm mixed. Example:
               $ cat /tmp/foo.txt
-http://music.163.com/artist?id   = 5345
+                http://music.163.com/artist?id=5345
                 http://www.xiami.com/song/1772130322
-http://music.163.com/album?id    = 2635059
+                http://music.163.com/album?id=2635059
                 http://www.xiami.com/album/32449
 
               $ zx -f /tmp/foo.txt
