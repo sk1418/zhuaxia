@@ -33,8 +33,8 @@ zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resource
 ##Features
 
 - automatically recognize and parse URLs, so far it supports:
-	- [xia] 歌曲，专辑，精选集，用户收藏[todo], 歌手热门
-	- [163] 歌曲，专辑，歌单，歌手热门
+	- [xia] Song, Album, Collections, User Favorites, Artist TopN
+	- [163] Song, Album, Playlist, Artist TopN
 - artist Top N(configurable) Songs.([xia]max:20), default Top10. Configuration property: `download.artist.topsong` artist page url is needed
 - download mixed urls in file. URLs can be mixed by [xia] and [163], also they can be different resource types (`-f` option)
 - when download from file, multi-threading parsing the urls with a configurable thread pool
@@ -68,40 +68,40 @@ other users:
 
 - Usage:
 
-
-		zhuaxia (抓虾) -- 抓取[虾米音乐]和[网易云音乐]的 mp3 音乐
+		zhuaxia -- download mp3 music from [xiami.com] and [music.163.com]
 
 		[CONFIG FILE:]   $HOME/.zhuaxia/zhuaxia.conf
 
-		[OPTIONS] 
-			-H : 首选HQ质量(320kbps), 
-				> 虾米音乐 <
-					- 配置文件中需给出正确登录信箱和密码, 登录用户需拥有VIP身份
-					- 用户需在xiami vip设置页面设置默认高音质
-					- 此选项对不满足上两项情况无效，仍下载128kbps资源
-				> 网易音乐 <
-					-无需特殊要求,直接下载高音质资源
+		[OPTIONS]
+			-H : prefer High Quality(320kbps),
+				> xiami <
+					- xiami vip user email/password should be set in config
+					- user should set HQ on xiami vip setting page
+					- if any above requirements was not satisfied, 128kbps will be taken
+				> 163 <
+					- no special requirement
 
-			-p : (实验性选项)使用代理池下载
-				在下载/解析量大的情况下，目标服务器会对禁止频繁的请求，所以zhuaxia可以自动获取
-				代理来解析和下载资源。因为获取的代理速度/可靠性不一，下载可能会缓慢或不稳定。
+			-p : auto choose proxy from proxy pool (experimental option)
+				when frequency of request to target host is high enough, host could ban the client
+				for some time. zhuaxia will auto take proxy from pool. However this may make
+				downloading slow or unstable.
 
-			-h ：显示帮助
-			-f ：从文件下载
-			-v ：显示版本信息
+			-h ：show help
+			-f ：download from url file
+			-v ：show version information
 
-		[USAGE] 
+		[USAGE]
 
 			zx [OPTION] <URL>
-				: 下载指定URL资源, 抓虾自动识别链接, 支持
-					- [xia] 歌曲，专辑，精选集，用户收藏,艺人TopN
-					- [163] 歌曲，专辑，歌单，艺人TopN
-				例子： 
-				  zx "http://www.xiami.com/space/lib-song/u/25531126"
-				  zx "http://music.163.com/song?id=27552647"
+				: auto recognize and download the given url resource, supports:
+					- [xm] song, album, favorite, collection, artist TopN
+					- [163]song, album, list, artist topN
+				example:
+					zx "http://www.xiami.com/space/lib-song/u/25531126"
+					zx "http://music.163.com/song?id = 27552647"
 
-			zx [OPTION] -f <file> 
-				: 多个URL在一个文件中，每个URL一行。 URLs可以是混合[xia]和[163]的不同类型音乐资源。例子：
+			zx [OPTION] -f <file>
+				: download from url file. one url per line. The urls could be 163 and xm mixed. Example:
 				  $ cat /tmp/foo.txt
 					http://music.163.com/artist?id=5345
 					http://www.xiami.com/song/1772130322
@@ -110,27 +110,31 @@ other users:
 
 				  $ zx -f /tmp/foo.txt
 
+
 ### Proxy setting
 
-**海外IP下载xiami资源**
+**Download Xiami resources outside China**
 
-xiami.com屏蔽了海外ip的http请求。在配置文件中添加（如果不存在的话）`xiami.proxy.http=ip:port` 可以让zhuaxia通过代理来解析xiami资源。
-例如：
+xiami.com blocks http Requests from IP addresses outside China. In configuration file adding property (if it doesn't exist): `xiami.proxy.http=ip:port` can let zhuaxia download xiami resources via proxy.
+
+For example:
 
 	xiami.proxy.http=127.0.0.1:8080
 
-这里`ip:port`构成的http代理是国内的代理服务器。 如果你的机器已经是国内的ip，请注释或删除这个选项。获取国内代理的简单方法：到http://proxy-list.org/ 搜索China的代理就好。
+The `ip:port` is http proxy in China, so that we can send request with Chinese IP. If your machine has already an IP in China. You don't need this option. You can remove or comment this property out.
+
+**Tip**: finding a China proxy: Go to http://proxy-list.org/ then search country "China"
 
 ## Screenshots
 
-- downloading (gif animation)
-![progress](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/progress.gif)
+- parsing and multi-thread downloading (gif animation)
+![progress](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/en_progress.gif)
 
-- parse input file
-![file view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/fileParse.gif)
+- multi-thread parsing input file (gif animation)
+![file view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/en_fileParse.gif)
 
 - parse url
-![url view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/urlParse.png)
+![url view](https://raw.github.com/sk1418/sharedResources/master/zhuaxia/en_urlParse.png)
 
 ## Changelog
 
