@@ -13,6 +13,7 @@ import zhuaxia.threadpool as threadpool
 import zhuaxia.xiami as xm
 import zhuaxia.downloader as downloader
 import zhuaxia.commander as commander
+import zxver
 
 
 # logger name
@@ -32,7 +33,7 @@ def usage():
 
 def version():
     """print version"""
-    print msg.ver_text + config.VERSION
+    print msg.ver_text + zxver.version
 
 if __name__ == '__main__':
     log.setup_log(logger_name, config.LOG_LVL_CONSOLE, config.LOG_LVL_FILE)
