@@ -13,7 +13,7 @@ import zhuaxia.threadpool as threadpool
 import zhuaxia.xiami as xm
 import zhuaxia.downloader as downloader
 import zhuaxia.commander as commander
-import zxver
+import zhuaxia.zxver as zxver
 
 
 # logger name

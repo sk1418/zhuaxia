@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 import glob
-import zxver
+import zhuaxia.zxver as zxver
 setup(
     name = 'zhuaxia',
     version = zxver.version,
