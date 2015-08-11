@@ -44,6 +44,7 @@ zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resource
 - mp3 renaming, mp3 meta data updating, auto-download album cover image. Album description(only[xia])...
 - [xia]configuration property `xiami.proxy.http=ip:port` for xiami resource downloading via China proxy. Details："Usage -> [download xiami resource outside China](#proxy-setting)"
 - `-p` option (experimental function)，using a proxypool to solve the problem of "ip was banned if requests to a server were too often.
+- Chinese (default) or English CLI, add `lang=en` in config file to change CLI into English. 
 
 
 ##Installation
