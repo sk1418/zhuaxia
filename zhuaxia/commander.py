@@ -11,15 +11,21 @@ from os import path
 from threadpool import Terminate_Watcher
 from proxypool import ProxyPool
 
+#after init config, loading message
+if config.LANG.upper() == 'CN':
+    import i18n.msg_cn as msgTxt
+else:
+    import i18n.msg_en as msgTxt
+
 LOG = log.get_logger("zxLogger")
 
 dl_songs = []
 total = 0
 done = 0
 
-fmt_parsing = u'解析: "%s" ..... [%s] %s' 
-fmt_has_song_nm = u'包含%d首歌曲.' 
-fmt_single_song = u'[曲目] %s'
+fmt_parsing = msgTxt.fmt_parsing
+fmt_has_song_nm = msgTxt.fmt_has_song_nm
+fmt_single_song = msgTxt.fmt_single_song
 border = log.hl(u'%s'% ('='*90), 'cyan')
 
 pat_xm = r'^https?://[^/.]*\.xiami\.com/'
@@ -33,9 +39,9 @@ def shall_I_begin(in_str, is_file=False, is_hq=False, need_proxy_pool = False):
     Terminate_Watcher()
     global ppool
     if need_proxy_pool:
-        LOG.info(u'初始化proxy pool')
+        LOG.info(msgTxt.init_proxypool)
         ppool = ProxyPool()
-        LOG.info(u'proxy pool:[%d] 初始完毕'%len(ppool.proxies))
+        LOG.info(msgTxt.fmt_init_proxypool_done %len(ppool.proxies))
 
     #xiami obj
     xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,\
@@ -53,11 +59,11 @@ def shall_I_begin(in_str, is_file=False, is_hq=False, need_proxy_pool = False):
 
     print border
     if len(dl_songs):
-        LOG.info(u' 下载任务总数: %d \n 3秒后开始下载' % len(dl_songs))
+        LOG.info(msgTxt.fmt_total_dl_nm % len(dl_songs))
         sleep(3)
         downloader.start_download(dl_songs)
     else:
-        LOG.warning(u' 没有可下载任务,自动退出.')
+        LOG.warning(msgTxt.no_dl_task)
 
 
 def from_url_163(m163, url, verbose=True):
@@ -68,12 +74,12 @@ def from_url_163(m163, url, verbose=True):
     if '/song?id=' in url:
         song =netease.NeteaseSong(m163,url=url)
         dl_songs.append(song)
-        msg = fmt_parsing % (m163_url_abbr(url),u'曲目',  song.song_name)
+        msg = fmt_parsing % (m163_url_abbr(url),msgTxt.song,  song.song_name)
 
     elif '/album?id=' in url:
         album = netease.NeteaseAlbum(m163, url)
         dl_songs.extend(album.songs)
-        msgs = [fmt_parsing % (m163_url_abbr(url),u'专辑',  album.artist_name+u' => '+album.album_name)]
+        msgs = [fmt_parsing % (m163_url_abbr(url),msgTxt.album,  album.artist_name+u' => '+album.album_name)]
         if verbose:
             for s in album.songs:
                 msgs.append(fmt_single_song %s.song_name)
@@ -85,7 +91,7 @@ def from_url_163(m163, url, verbose=True):
     elif '/playlist?id=' in url:
         playlist = netease.NeteasePlayList(m163, url)
         dl_songs.extend(playlist.songs)
-        msgs = [ fmt_parsing % (m163_url_abbr(url),u'歌单',playlist.playlist_name)]
+        msgs = [ fmt_parsing % (m163_url_abbr(url), msgTxt.playlist, playlist.playlist_name)]
         if verbose:
             for s in playlist.songs:
                 msgs.append( fmt_single_song % s.song_name)
@@ -97,7 +103,7 @@ def from_url_163(m163, url, verbose=True):
     elif '/artist?id=' in url:
         topsong= netease.NeteaseTopSong(m163, url)
         dl_songs.extend(topsong.songs)
-        msgs = [fmt_parsing % (m163_url_abbr(url), u'艺人热门歌曲',topsong.artist_name)]
+        msgs = [fmt_parsing % (m163_url_abbr(url), msgTxt.artistTop ,topsong.artist_name)]
         if verbose:
             for s in topsong.songs:
                 msgs.append(fmt_single_song %s.song_name)
@@ -112,7 +118,7 @@ def from_url_163(m163, url, verbose=True):
     pre = ('[%d/%d] ' % (done, total)) if not verbose else ''
     if not msg:
         #unknown url
-        LOG.error(u'%s [易]不能识别的url [%s].' % (pre,url))
+        LOG.error(msgTxt.fmt_163_unknow_url% (pre,url))
     else:
         LOG.info(u'%s%s'% (pre,msg))
 
@@ -125,7 +131,7 @@ def from_url_xm(xm_obj, url, verbose=True):
     if '/collect/' in url:
         collect = xm.Collection(xm_obj, url)
         dl_songs.extend(collect.songs)
-        msgs = [ fmt_parsing % (xiami_url_abbr(url),u'精选集',collect.collection_name)]
+        msgs = [ fmt_parsing % (xiami_url_abbr(url), msgTxt.collection ,collect.collection_name)]
         if verbose:
             for s in collect.songs:
                 msgs.append( fmt_single_song % s.song_name)
@@ -137,11 +143,11 @@ def from_url_xm(xm_obj, url, verbose=True):
     elif '/song/' in url:
         song = xm.XiamiSong(xm_obj, url=url)
         dl_songs.append(song)
-        msg = fmt_parsing % (xiami_url_abbr(url),u'曲目',  song.song_name)
+        msg = fmt_parsing % (xiami_url_abbr(url),msgTxt.song,  song.song_name)
     elif '/album/' in url:
         album = xm.Album(xm_obj, url)
         dl_songs.extend(album.songs)
-        msgs = [fmt_parsing % (xiami_url_abbr(url),u'专辑',  album.artist_name+u' => '+album.album_name)]
+        msgs = [fmt_parsing % (xiami_url_abbr(url),msgTxt.album,  album.artist_name+u' => '+album.album_name)]
         if verbose:
             for s in album.songs:
                 msgs.append(fmt_single_song %s.song_name)
@@ -152,11 +158,11 @@ def from_url_xm(xm_obj, url, verbose=True):
 
     elif '/lib-song/u/' in url:
         if verbose:
-            LOG.warning(u'[虾]如用户收藏较多，解析歌曲需要较长时间，请耐心等待')
+            LOG.warning(msgTxt.warning_many_collections)
 
         fav = xm.Favorite(xm_obj, url, verbose)
         dl_songs.extend(fav.songs)
-        msgs = [fmt_parsing % (xiami_url_abbr(url), u'用户收藏','')]
+        msgs = [fmt_parsing % (xiami_url_abbr(url), msgTxt.Favorite ,'')]
         if verbose:
             for s in fav.songs:
                 msgs.append(fmt_single_song %s.song_name)
@@ -167,7 +173,7 @@ def from_url_xm(xm_obj, url, verbose=True):
     elif re.search(r'/artist/top/id/\d+', url):
         topsong=xm.TopSong(xm_obj, url)
         dl_songs.extend(topsong.songs)
-        msgs = [fmt_parsing % (xiami_url_abbr(url), u'艺人热门歌曲',topsong.artist_name)]
+        msgs = [fmt_parsing % (xiami_url_abbr(url), msgTxt.artistTop,topsong.artist_name)]
         if verbose:
             for s in topsong.songs:
                 msgs.append(fmt_single_song %s.song_name)
@@ -182,7 +188,7 @@ def from_url_xm(xm_obj, url, verbose=True):
     pre = ('[%d/%d] ' % (done, total)) if not verbose else ''
     if not msg:
         #unknown url
-        LOG.error(u'%s [虾]不能识别的url [%s].' % (pre,url))
+        LOG.error(msgTxt.fmt_xm_unknown_url % (pre,url))
     else:
         LOG.info(u'%s%s'% (pre,msg))
 
@@ -196,7 +202,7 @@ def from_file(xm_obj,m163, infile):
     global total, done
     total = len(urls)
     print border
-    LOG.info(u' 文件包含链接总数: %d' % total)
+    LOG.info(msgTxt.fmt_links_in_file % total)
     print border
     pool = ThreadPool(config.THREAD_POOL_SIZE)
     for link in [u for u in urls if u]:
@@ -206,12 +212,12 @@ def from_file(xm_obj,m163, infile):
         elif re.match(pat_163, link):
             pool.add_task(from_url_163, m163,link, verbose=False)
         else:
-            LOG.warning(u' 略过不能识别的url [%s].' % link)
+            LOG.warning(msgTxt.fmt_skip_unknown_url % link)
 
     pool.wait_completion()
 
 def xiami_url_abbr(url):
-    return re.sub(pat_xm,u'[虾] ',url)
+    return re.sub(pat_xm,msgTxt.short_xm,url)
 
 def m163_url_abbr(url):
-    return re.sub(pat_163,u'[易] ',url)
+    return re.sub(pat_163,msgTxt.short_163,url)

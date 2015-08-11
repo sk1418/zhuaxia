@@ -1,3 +1,6 @@
+2015-08-06 Version 2.5.0
+=========================
+- [feature] add english translation (output, readme...)
 2015-07-22 Version 2.4.1
 =========================
 - [bugfix] some 163 songs have no 128kbps link, fall back to 96kbps in this case

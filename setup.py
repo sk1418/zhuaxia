@@ -1,8 +1,9 @@
 from setuptools import setup, find_packages
 import glob
+import zxver
 setup(
     name = 'zhuaxia',
-    version = '2.4.1',
+    version = zxver.version,
     install_requires=[ 'requests','mutagen','beautifulsoup4' ],
     packages = find_packages(),
     package_data={'zhuaxia':['conf/*.conf']},
