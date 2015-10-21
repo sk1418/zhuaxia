@@ -126,7 +126,7 @@ class Album(object):
 
         #description
         html = self.handler.read_link(self.url).text
-        soup = BeautifulSoup(html)
+        soup = BeautifulSoup(html,'lxml')
         self.album_desc = soup.find('span', property="v:summary").text
 
         #handle songs
@@ -178,7 +178,7 @@ class Favorite(object):
         LOG.debug(msg.head_xm + msg.fmt_init_fav % self.uid)
         while True:
             html = self.handler.read_link(url_fav%(self.uid,page)).text
-            soup = BeautifulSoup(html)
+            soup = BeautifulSoup(html,'lxml')
             if not user:
                 user = soup.title.string
             if not total:
@@ -245,7 +245,7 @@ class Collection(object):
             return 'collection' + self.collection_id
         else:
             html = self.handler.read_link(self.url).text
-            soup = BeautifulSoup(html)
+            soup = BeautifulSoup(html,'lxml')
             title = soup.title.string
             if title:
                 return re.sub(r'_[^_]*$', '', title)
