@@ -170,7 +170,7 @@ def from_url_xm(xm_obj, url, verbose=True):
         else:
             msgs.append( fmt_has_song_nm % len(fav.songs))
             msg = u' => '.join(msgs)
-    elif re.search(r'/artist/top/id/\d+', url):
+    elif re.search(r'/artist/', url):
         topsong=xm.TopSong(xm_obj, url)
         dl_songs.extend(topsong.songs)
         msgs = [fmt_parsing % (xiami_url_abbr(url), msgTxt.artistTop,topsong.artist_name)]

@@ -126,7 +126,7 @@ class Album(object):
 
         #description
         html = self.handler.read_link(self.url).text
-        soup = BeautifulSoup(html,'lxml')
+        soup = BeautifulSoup(html,'html.parser')
         self.album_desc = soup.find('span', property="v:summary").text
 
         #handle songs
@@ -178,7 +178,7 @@ class Favorite(object):
         LOG.debug(msg.head_xm + msg.fmt_init_fav % self.uid)
         while True:
             html = self.handler.read_link(url_fav%(self.uid,page)).text
-            soup = BeautifulSoup(html,'lxml')
+            soup = BeautifulSoup(html,'html.parser')
             if not user:
                 user = soup.title.string
             if not total:
@@ -245,7 +245,7 @@ class Collection(object):
             return 'collection' + self.collection_id
         else:
             html = self.handler.read_link(self.url).text
-            soup = BeautifulSoup(html,'lxml')
+            soup = BeautifulSoup(html,'html.parser')
             title = soup.title.string
             if title:
                 return re.sub(r'_[^_]*$', '', title)
@@ -258,7 +258,17 @@ class TopSong(object):
         self.url = url
         self.handler = xm_obj
         #artist id
-        self.artist_id = re.search(r'(?<=/artist/top/id/)\d+', self.url).group(0)
+        id_regexs=(
+                r'(?<=/artist/top/id/)\d+',
+                r'(?<=/artist/top-)\d+',
+                r'(?<=/artist/)\d+'
+                )
+        for id_regex in id_regexs:
+            matched = re.search(id_regex, self.url)
+            if matched:
+                self.artist_id = matched.group(0)
+                break
+
         self.artist_name = ""
         self.songs = []
         self.init_topsong()
