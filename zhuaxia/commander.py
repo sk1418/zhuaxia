@@ -34,25 +34,34 @@ pat_163 = r'^https?://music\.163\.com/'
 #proxypool
 ppool = None
 
+#xiami object. declare it here because we want to init it only if it is required
+xiami_obj = None
+
+def __init_xiami_obj(is_hq):
+    #if ppool is required, it should have been initialized in shall_i_begin()
+    global xiami_obj,ppool
+    if not xiami_obj:
+        xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,\
+            config.XIAMI_LOGIN_PASSWORD, \
+            is_hq,proxies=ppool)
+
+
 def shall_I_begin(in_str, is_file=False, is_hq=False, need_proxy_pool = False):
     #start terminate_watcher
     Terminate_Watcher()
-    global ppool
+    global ppool, xiami_obj
     if need_proxy_pool:
         LOG.info(msgTxt.init_proxypool)
         ppool = ProxyPool()
         LOG.info(msgTxt.fmt_init_proxypool_done %len(ppool.proxies))
 
-    #xiami obj
-    xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,\
-            config.XIAMI_LOGIN_PASSWORD, \
-            is_hq,proxies=ppool)
     #netease obj
     m163 = netease.Netease(is_hq, proxies=ppool)
 
     if is_file:
-        from_file(xiami_obj, m163,in_str)
+        from_file(is_hq, m163,in_str)
     elif re.match(pat_xm, in_str):
+        __init_xiami_obj(is_hq)
         from_url_xm(xiami_obj, in_str)
     elif re.match(pat_163, in_str):
         from_url_163(m163, in_str)
@@ -192,14 +201,14 @@ def from_url_xm(xm_obj, url, verbose=True):
     else:
         LOG.info(u'%s%s'% (pre,msg))
 
-def from_file(xm_obj,m163, infile):
+def from_file(is_hq,m163, infile):
     """ download objects (songs, albums...) from an input file.  """
 
     urls = []
     with open(infile) as f:
         urls = f.readlines() 
 
-    global total, done
+    global total, done, xiami_obj
     total = len(urls)
     print border
     LOG.info(msgTxt.fmt_links_in_file % total)
@@ -208,7 +217,8 @@ def from_file(xm_obj,m163, infile):
     for link in [u for u in urls if u]:
         link = link.rstrip('\n')
         if re.match(pat_xm, link):
-            pool.add_task(from_url_xm, xm_obj,link, verbose=False)
+            __init_xiami_obj(is_hq)
+            pool.add_task(from_url_xm, xiami_obj,link, verbose=False)
         elif re.match(pat_163, link):
             pool.add_task(from_url_163, m163,link, verbose=False)
         else:
