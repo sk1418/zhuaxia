@@ -2,6 +2,7 @@
 =========================
 - [feature] [issue #16] remove the hardcoded max 30 for artist TopN downloading
 - [bugfix] [issue #16] make beautifulsoup don't print warning
+- [bugfix] [issue #16] change xiami artist topN parsing for the modification of xiami website's link pattern
 2015-08-06 Version 2.5.0
 =========================
 - [feature] add english translation (output, readme...)

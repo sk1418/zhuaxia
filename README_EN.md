@@ -35,7 +35,7 @@ zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resource
 - automatically recognize and parse URLs, so far it supports:
 	- [xia] Song, Album, Collections, User Favorites, Artist TopN
 	- [163] Song, Album, Playlist, Artist TopN
-- artist Top N(configurable) Songs.(if value <=0, download all top songs of the artist), default Top10. Configuration property: `download.artist.topsong` artist page url is needed
+- artist Top N(configurable) Songs.(if value <=0, download all top songs of the artist. [xia]only songs on the first page will be downloaded), default Top10. Configuration property: `download.artist.topsong` artist page url is needed
 - download mixed urls in file. URLs can be mixed by [xia] and [163], also they can be different resource types (`-f` option)
 - when download from file, multi-threading parsing the urls with a configurable thread pool
 - multi-threading download with configurable thread pool.
