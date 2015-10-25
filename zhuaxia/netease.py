@@ -22,6 +22,7 @@ url_album="http://music.163.com/api/album/%s/"
 url_song="http://music.163.com/api/song/detail/?id=%s&ids=[%s]"
 url_playlist="http://music.163.com/api/playlist/detail?id=%s"
 url_artist_top_song = "http://music.163.com/api/artist/%s"
+url_lyric = "http://music.163.com/api/song/lyric?id=%s&lv=1"
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
