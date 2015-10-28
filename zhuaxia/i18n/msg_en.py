@@ -72,6 +72,7 @@ help_info                        = u""" %(cyan)s
             downloading slow or unstable.
 
         %(bold)s-h%(clear)s ：show help
+        %(bold)s-l%(clear)s ：download lyric (lrc format)
         %(bold)s-f%(clear)s ：download from url file
         %(bold)s-v%(clear)s ：show version information
 

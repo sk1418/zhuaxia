@@ -1,3 +1,9 @@
+2015-10-28  Version 2.5.1
+=========================
+- [feature] [issue #17] add -l option, supports lyrics downloading
+- [bugfix] [issue #9] name file(mp3 + lyric) in pattern: artistName_songName.mp3/lrc
+- [bugfix] beautifulsoup4 warning when with -p (proxypool)
+
 2015-10-22  Version 2.5.1
 =========================
 - [feature] [issue #16] remove the hardcoded max 30 for artist TopN downloading

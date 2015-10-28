@@ -87,7 +87,7 @@ class ProxyPool(object):
         self.proxies = []
         while True:
             html = requests.get(PROXY_POOL_URL%page).text
-            soup = BeautifulSoup(html)
+            soup = BeautifulSoup(html, 'html.parser')
             tags = soup.find_all('li',class_='proxy',
                     text=re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+'))
             if not tags:

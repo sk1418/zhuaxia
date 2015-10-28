@@ -72,6 +72,7 @@ help_info                        = u""" %(cyan)s
             代理来解析和下载资源。因为获取的代理速度/可靠性不一，下载可能会缓慢或不稳定。
 
         %(bold)s-h%(clear)s ：显示帮助
+        %(bold)s-l%(clear)s ：下载歌曲的lrc格式歌词
         %(bold)s-f%(clear)s ：从文件下载
         %(bold)s-v%(clear)s ：显示版本信息
 
@@ -83,15 +84,14 @@ help_info                        = u""" %(cyan)s
                 - [易] 歌曲，专辑，歌单，艺人TopN
             例子：
               zx "http://www.xiami.com/space/lib-song/u/25531126"
-zx "http://music.163.com/song?id = 27552647"
+              zx "http://music.163.com/song?id=27552647"
 
         %(bold)szx [OPTION] -f <file>%(clear)s
             : 多个URL在一个文件中，每个URL一行。 URLs可以是混合[虾]和[易]的不同类型音乐资源。例子：
-              $ cat /tmp/foo.txt
-http://music.163.com/artist?id   = 5345
+              >$ cat /tmp/foo.txt
+                http://music.163.com/artist?id=5345
                 http://www.xiami.com/song/1772130322
-http://music.163.com/album?id    = 2635059
+                http://music.163.com/album?id=2635059
                 http://www.xiami.com/album/32449
-
-              $ zx -f /tmp/foo.txt
+              >$ zx -f /tmp/foo.txt
         """
