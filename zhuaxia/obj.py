@@ -54,12 +54,9 @@ class Song(object):
     def post_set(self):
         """ set type_txt, filename, abs_path """
         if self.song_name:
-            self.filename = self.song_name + u'.mp3'
-            self.lyric_filename = self.song_name + u'.lrc'
-
-            if not self.group_dir:
-                self.filename = (self.artist_name + u"_" if self.artist_name  else "" ) + self.filename
-                self.lyric_filename = (self.artist_name + u"_" if self.artist_name  else "" ) + self.lyric_filename
+            artist_part = (self.artist_name + u"_") if self.artist_name  else ""
+            self.filename = artist_part + self.song_name + u'.mp3'
+            self.lyric_filename = artist_part + self.song_name  + u'.lrc'
 
             #replace slash if there is
             self.filename = self.filename.replace('/','_')
