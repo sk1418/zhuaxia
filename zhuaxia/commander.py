@@ -37,13 +37,13 @@ ppool = None
 #xiami object. declare it here because we want to init it only if it is required
 xiami_obj = None
 
-def __init_xiami_obj(is_hq):
+def __init_xiami_obj(is_hq,dl_lyric):
     #if ppool is required, it should have been initialized in shall_i_begin()
     global xiami_obj,ppool
     if not xiami_obj:
         xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,\
             config.XIAMI_LOGIN_PASSWORD, \
-            is_hq,proxies=ppool)
+            is_hq,proxies=ppool, dl_lyric = dl_lyric)
 
 
 def shall_I_begin(in_str, is_file=False, is_hq=False, dl_lyric=False, need_proxy_pool = False):
@@ -59,12 +59,12 @@ def shall_I_begin(in_str, is_file=False, is_hq=False, dl_lyric=False, need_proxy
     m163 = netease.Netease(is_hq, proxies=ppool)
 
     if is_file:
-        from_file(is_hq, m163,in_str, dl_lyric)
+        from_file(is_hq, m163, dl_lyric,in_str)
     elif re.match(pat_xm, in_str):
         __init_xiami_obj(is_hq)
-        from_url_xm(xiami_obj, in_str, dl_lyric)
+        from_url_xm(xiami_obj, in_str)
     elif re.match(pat_163, in_str):
-        from_url_163(m163, in_str, dl_lyric)
+        from_url_163(m163, in_str)
 
     print border
     if len(dl_songs):
@@ -201,7 +201,7 @@ def from_url_xm(xm_obj, url, verbose=True):
     else:
         LOG.info(u'%s%s'% (pre,msg))
 
-def from_file(is_hq,m163, infile):
+def from_file(is_hq,m163,dl_lyric, infile):
     """ download objects (songs, albums...) from an input file.  """
 
     urls = []
@@ -217,7 +217,7 @@ def from_file(is_hq,m163, infile):
     for link in [u for u in urls if u]:
         link = link.rstrip('\n')
         if re.match(pat_xm, link):
-            __init_xiami_obj(is_hq)
+            __init_xiami_obj(is_hq, dl_lyric)
             pool.add_task(from_url_xm, xiami_obj,link, verbose=False)
         elif re.match(pat_163, link):
             pool.add_task(from_url_163, m163,link, verbose=False)
