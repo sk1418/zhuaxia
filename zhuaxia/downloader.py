@@ -83,6 +83,7 @@ def print_progress():
         for d in done2show:
             sys.stdout.write(log.hl(u' √ %s\n'% d,'cyan'))
 
+    sys.stdout.write(line)
     sys.stdout.flush()
 
 def download_by_url(url,filepath,show_progress=False, proxy=None):
@@ -109,7 +110,7 @@ def download_by_url(url,filepath,show_progress=False, proxy=None):
                     progress[fname] = percent
     return 0
 
-def download(song):
+def download_single_song(song):
     """
     download a single song 
     """
@@ -129,19 +130,6 @@ def download(song):
         download_by_url(song.dl_link, mp3_file, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
     else:
         download_by_url(song.dl_link, mp3_file, show_progress=True)
-
-    #download / write lyric to file
-    if song.handler.dl_lyric and song.lyric_abs_path:
-        if song.lyric_text :
-            import codecs
-            with codecs.open(song.lyric_abs_path, 'w', 'utf-8') as f:
-               f.write(song.lyric_text)
-        elif song.handler.need_proxy_pool:
-            if song.lyric_link:
-                download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
-        else:
-            if song.lyric_link:
-                download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True)
 
 
     write_mp3_meta(song)
@@ -175,8 +163,42 @@ def start_download(songs):
         time.sleep(1)
         print_progress()
 
+    #handling lyrics downloading
+    download_lyrics(songs)
 
+    print log.hl(msg.fmt_all_finished, 'warning')
 
+def download_lyrics(songs):
+    """download / write lyric to file if it is needed"""
+
+    url_lyric_163 = "http://music.163.com/api/song/lyric?id=%s&lv=1"
+    
+    if songs[0].handler.dl_lyric:
+        percent_bar_factor = 0.4
+        width = util.get_terminal_size()[1] -5
+        bar_count = (int(width*percent_bar_factor)-2/10) # number of percent bar
+        line = log.hl(u' %s'% ('+'*width), 'cyan')
+        print log.hl(msg.fmt_dl_lyric_start, 'warning')
+        print line
+
+    for song in songs:
+        if song.lyric_abs_path:
+            print log.hl(u' %s '% song.lyric_filename,'cyan'),  #the ending comma is for hide the newline
+            if song.song_type == 1: #xiami
+                if song.handler.need_proxy_pool:
+                    if song.lyric_link:
+                        download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
+                else:
+                    if song.lyric_link:
+                        download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True)
+            else: #163
+                lyric_link = url_lyric_163 % song.song_id
+                song.lyric_text = song.handler.read_link(lyric_link).json()['lrc']['lyric']
+                import codecs
+                with codecs.open(song.lyric_abs_path, 'w', 'utf-8') as f:
+                    f.write(song.lyric_text)
+            print log.hl(u' √','cyan')
+    print line
 
 class Downloader(Thread):
     def __init__(self, songs, pool):
@@ -187,7 +209,7 @@ class Downloader(Thread):
     def run(self):
         global progress
         for song in self.songs:
-            self.pool.add_task(download, song)
+            self.pool.add_task(download_single_song, song)
         self.pool.wait_completion()
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 

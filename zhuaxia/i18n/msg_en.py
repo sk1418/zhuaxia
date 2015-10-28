@@ -2,6 +2,9 @@
 head_xm                          = u'[xia]'
 head_163                         = u'[163]'
 
+fmt_all_finished                 = u' All jobs are finished.'
+fmt_dl_lyric_start               = u' Start downloading lyrics...'
+
 fmt_dl_header                    = u' Save to :[%s] | Threads Pool:[%d]\n'
 fmt_dl_progress                  = u'Progress [%d/%d]:'
 fmt_dl_last_finished             = u'  Latest %d finished task:\n'

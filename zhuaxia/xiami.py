@@ -49,7 +49,7 @@ class XiamiSong(Song):
     """
 
     def __init__(self,xiami_obj,url=None,song_json=None, use_proxy_pool=False):
-        self.lyric_text = None
+        self.lyric_text = ''
         self.song_type=1
         self.handler = xiami_obj
         self.group_dir = None
@@ -369,9 +369,6 @@ class Xiami(Handler):
         #headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
 
         requests_proxy = None
-        if config.XIAMI_PROXY_HTTP:
-            requests_proxy = { 'http':config.XIAMI_PROXY_HTTP}
-
         if self.need_proxy_pool:
             requests_proxy = {'http':self.proxies.get_proxy()}
 

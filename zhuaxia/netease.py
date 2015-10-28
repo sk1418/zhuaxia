@@ -97,10 +97,10 @@ class NeteaseSong(Song):
 
     def load_lyric(self):
         """ download the lyric for song_id """
-
-        lyric_link = url_lyric % self.song_id
-        #TODO need check the json structure
-        self.lyric_text = self.handler.read_link(lyric_link).json()['lrc']['lyric']
+        pass
+        #lyric_link = url_lyric % self.song_id
+        ##TODO need check the json structure
+        #self.lyric_text = self.handler.read_link(lyric_link).json()['lrc']['lyric']
 
 
 class NeteaseAlbum(object):
@@ -209,6 +209,8 @@ class Netease(Handler):
     def read_link(self, link):
         
         retVal = None
+        if config.XIAMI_PROXY_HTTP:
+            requests_proxy = { 'http':config.XIAMI_PROXY_HTTP}
         if self.need_proxy_pool:
             requests_proxy = {'http':self.proxies.get_proxy()}
 
