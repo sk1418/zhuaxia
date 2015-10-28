@@ -44,6 +44,7 @@ class NeteaseSong(Song):
         self.song_type=2
         self.handler = m163
         self.group_dir = None
+        self.lyric_text = ''
 
         if url:
             self.url = url
@@ -59,10 +60,16 @@ class NeteaseSong(Song):
         elif song_json:
             self.init_by_json(song_json)
 
+        # check the lyric flag
+        if self.handler.dl_lyric:
+            load_lyric()
 
     def init_by_json(self,js):
+        #song_id
+        self.song_id = js['id']
         #name
         self.song_name = util.decode_html(js['name'])
+        
 
         # artist_name
         self.artist_name = js['artists'][0]['name']
@@ -87,6 +94,14 @@ class NeteaseSong(Song):
         #used only for album/collection etc. create a dir to group all songs
         #if it is needed, it should be set by the caller
         self.group_dir = None
+
+    def load_lyric(self):
+        """ download the lyric for song_id """
+
+        lyric_link = url_lyric % self.song_id
+        #TODO need check the json structure
+        lyric_json = self.handler.read_link(lyric_link).json()['lv'][0]
+
 
 class NeteaseAlbum(object):
     """The netease album object"""
@@ -185,12 +200,10 @@ class Netease(Handler):
     is_hq : if download HQ mp3. default False
     proxies: proxy pool
     """
-    def __init__(self, is_hq=False, proxies = None):
+    def __init__(self, is_hq=False, proxies = None, dl_lyric = False):
         Handler.__init__(self,proxies)
         self.is_hq = is_hq
-        #self.proxies = proxies
-        #self.need_proxy_pool = self.proxies != None
-
+        self.dl_lyric = dl_lyric
 
     def read_link(self, link):
         

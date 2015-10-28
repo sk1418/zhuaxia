@@ -308,7 +308,7 @@ checkin_headers = {
 
 class Xiami(Handler):
 
-    def __init__(self, email, password, is_hq=False, proxies=None):
+    def __init__(self, email, password, is_hq=False, proxies=None, dl_lyric = False):
         self.token = None
         self.uid = ''
         self.user_name = ''
@@ -317,6 +317,7 @@ class Xiami(Handler):
         self.skip_login = False
         self.session = None
         self.is_hq = is_hq
+        self.dl_lyric = dl_lyric
         Handler.__init__(self,proxies)
         #self.proxies = proxies
         #self.need_proxy_pool = self.proxies != None

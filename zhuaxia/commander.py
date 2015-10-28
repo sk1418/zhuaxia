@@ -46,7 +46,7 @@ def __init_xiami_obj(is_hq):
             is_hq,proxies=ppool)
 
 
-def shall_I_begin(in_str, is_file=False, is_hq=False, need_proxy_pool = False):
+def shall_I_begin(in_str, is_file=False, is_hq=False, dl_lyric=False, need_proxy_pool = False):
     #start terminate_watcher
     Terminate_Watcher()
     global ppool, xiami_obj
@@ -59,12 +59,12 @@ def shall_I_begin(in_str, is_file=False, is_hq=False, need_proxy_pool = False):
     m163 = netease.Netease(is_hq, proxies=ppool)
 
     if is_file:
-        from_file(is_hq, m163,in_str)
+        from_file(is_hq, m163,in_str, dl_lyric)
     elif re.match(pat_xm, in_str):
         __init_xiami_obj(is_hq)
-        from_url_xm(xiami_obj, in_str)
+        from_url_xm(xiami_obj, in_str, dl_lyric)
     elif re.match(pat_163, in_str):
-        from_url_163(m163, in_str)
+        from_url_163(m163, in_str, dl_lyric)
 
     print border
     if len(dl_songs):

@@ -44,10 +44,11 @@ if __name__ == '__main__':
         infile = ''
         inUrl = ''
         needProxyPool=False
+        dl_lyric=False
 
         if len(sys.argv)<2: raise getopt.GetoptError("parameters are missing...")
 
-        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvp")
+        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvpl")
         for o, a in opts:
             if o == '-h':
                 usage()
@@ -63,6 +64,8 @@ if __name__ == '__main__':
                 LOG.warning(msg.experimental)
                 LOG.warning(msg.proxypool)
                 needProxyPool = True
+            elif o == '-l':
+                dl_lyric = True
 
 
         if not infile:
@@ -70,14 +73,16 @@ if __name__ == '__main__':
                 raise getopt.GetoptError("input file or xiami url is needed")
             else:
                 inUrl = args[0]
-        LOG.debug("hq:"+str(hq))
+        LOG.debug( "hq:"+str(hq))
         LOG.debug( "infile:"+infile)
         LOG.debug( "inurl:"+inUrl)
+        LOG.debug( "needProxyPool:"+needProxyPool)
+        LOG.debug( "dl_lyric:"+dl_lyric)
 
         if infile:
-            commander.shall_I_begin(infile, is_file=True, is_hq=hq, need_proxy_pool=needProxyPool)
+            commander.shall_I_begin(infile, is_file=True, is_hq=hq,dl_lyric=dl_lyric, need_proxy_pool=needProxyPool)
         else:
-            commander.shall_I_begin(inUrl, is_hq=hq, need_proxy_pool = needProxyPool)
+            commander.shall_I_begin(inUrl, is_hq=hq, dl_lyric=dl_lyric,need_proxy_pool = needProxyPool)
                 
     except getopt.GetoptError as e:
         LOG.error(str(e))
