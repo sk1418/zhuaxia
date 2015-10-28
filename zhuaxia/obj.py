@@ -33,7 +33,10 @@ class Song(object):
         self.dl_link = ''
 
         # lyrics link
-        self.lyrics_link = ''
+        self.lyric_link = ''
+        self.lyric_text = ''
+        self.lyric_filename = ''
+        self.lyric_abs_path = ''
         # artist_name
         self.artist_name = ''
         # album  name
@@ -51,16 +54,23 @@ class Song(object):
         """ set type_txt, filename, abs_path """
         if self.song_name:
             self.filename = self.song_name + u'.mp3'
+            self.lyric_filename = self.song_name + u'.lrc'
+
             if not self.group_dir:
                 self.filename = (self.artist_name + u"_" if self.artist_name  else "" ) + self.filename
+                self.lyric_filename = (self.artist_name + u"_" if self.artist_name  else "" ) + self.lyric_filename
 
             #replace slash if there is
             self.filename = self.filename.replace('/','_')
+            self.lyric_filename = self.lyric_filename.replace('/','_')
             
             if self.group_dir:
                 self.abs_path = path.join(config.DOWNLOAD_DIR, self.group_dir, self.filename)
+                self.lyric_abs_path = path.join(config.DOWNLOAD_DIR, self.group_dir, self.lyric_filename)
             else:
+                # abs path for mp3 and lyric
                 self.abs_path = path.join(config.DOWNLOAD_DIR,self.filename)
+                self.lyric_abs_path = path.join(config.DOWNLOAD_DIR,self.lyric_filename)
 
 
 

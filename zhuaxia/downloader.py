@@ -130,6 +130,11 @@ def download(song):
     else:
         download_by_url(song.dl_link, mp3_file, show_progress=True)
 
+    #download / write lyric to file
+    if song.lyric_text and song.lyric_abs_path:
+        import codecs
+        with codecs.open(song.lyric_abs_path, 'w', 'utf-8') as f:
+           f.write(song.lyric_text)
 
     write_mp3_meta(song)
     done += 1

@@ -56,7 +56,7 @@ def shall_I_begin(in_str, is_file=False, is_hq=False, dl_lyric=False, need_proxy
         LOG.info(msgTxt.fmt_init_proxypool_done %len(ppool.proxies))
 
     #netease obj
-    m163 = netease.Netease(is_hq, proxies=ppool)
+    m163 = netease.Netease(is_hq, dl_lyric, proxies=ppool)
 
     if is_file:
         from_file(is_hq, m163, dl_lyric,in_str)

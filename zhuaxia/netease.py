@@ -40,7 +40,7 @@ class NeteaseSong(Song):
     url example: http://music.163.com/song?id=209235
     """
 
-    def __init__(self,m163,url=None,song_json=None):
+    def __init__(self,m163,url=None, song_json=None):
         self.song_type=2
         self.handler = m163
         self.group_dir = None
@@ -62,7 +62,7 @@ class NeteaseSong(Song):
 
         # check the lyric flag
         if self.handler.dl_lyric:
-            load_lyric()
+            self.load_lyric()
 
     def init_by_json(self,js):
         #song_id
@@ -100,7 +100,7 @@ class NeteaseSong(Song):
 
         lyric_link = url_lyric % self.song_id
         #TODO need check the json structure
-        lyric_json = self.handler.read_link(lyric_link).json()['lv'][0]
+        self.lyric_text = self.handler.read_link(lyric_link).json()['lrc']['lyric']
 
 
 class NeteaseAlbum(object):
@@ -198,9 +198,10 @@ class Netease(Handler):
     """
     netease object
     is_hq : if download HQ mp3. default False
+    dl_lyric: if lyric should be download as well
     proxies: proxy pool
     """
-    def __init__(self, is_hq=False, proxies = None, dl_lyric = False):
+    def __init__(self, is_hq=False, dl_lyric= False, proxies = None ):
         Handler.__init__(self,proxies)
         self.is_hq = is_hq
         self.dl_lyric = dl_lyric
