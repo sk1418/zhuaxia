@@ -49,6 +49,7 @@ class XiamiSong(Song):
     """
 
     def __init__(self,xiami_obj,url=None,song_json=None, use_proxy_pool=False):
+        self.lyric_text = None
         self.song_type=1
         self.handler = xiami_obj
         self.group_dir = None
@@ -94,8 +95,8 @@ class XiamiSong(Song):
         location = song_json['location']
         #decode download link
         self.dl_link = self.handler.decode_xiami_link(location)
-        # lyrics link
-        self.lyrics_link = song_json['lyric_url']
+        # set lyrics link if dl_lyric flag is true
+        self.lyric_link = song_json['lyric_url'] if self.handler.dl_lyric else ''
         # artist_name
         self.artist_name = song_json['artist']
         # album id, name

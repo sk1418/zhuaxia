@@ -32,11 +32,12 @@ class Song(object):
         self.song_name=''
         self.dl_link = ''
 
-        # lyrics link
+        # lyrics link,text,filename, path etc.
         self.lyric_link = ''
         self.lyric_text = ''
         self.lyric_filename = ''
         self.lyric_abs_path = ''
+
         # artist_name
         self.artist_name = ''
         # album  name
@@ -71,6 +72,3 @@ class Song(object):
                 # abs path for mp3 and lyric
                 self.abs_path = path.join(config.DOWNLOAD_DIR,self.filename)
                 self.lyric_abs_path = path.join(config.DOWNLOAD_DIR,self.lyric_filename)
-
-
-

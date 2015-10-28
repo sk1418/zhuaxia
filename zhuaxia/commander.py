@@ -61,7 +61,7 @@ def shall_I_begin(in_str, is_file=False, is_hq=False, dl_lyric=False, need_proxy
     if is_file:
         from_file(is_hq, m163, dl_lyric,in_str)
     elif re.match(pat_xm, in_str):
-        __init_xiami_obj(is_hq)
+        __init_xiami_obj(is_hq, dl_lyric)
         from_url_xm(xiami_obj, in_str)
     elif re.match(pat_163, in_str):
         from_url_163(m163, in_str)

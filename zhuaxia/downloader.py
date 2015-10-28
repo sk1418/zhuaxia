@@ -131,10 +131,18 @@ def download(song):
         download_by_url(song.dl_link, mp3_file, show_progress=True)
 
     #download / write lyric to file
-    if song.lyric_text and song.lyric_abs_path:
-        import codecs
-        with codecs.open(song.lyric_abs_path, 'w', 'utf-8') as f:
-           f.write(song.lyric_text)
+    if song.handler.dl_lyric and song.lyric_abs_path:
+        if song.lyric_text :
+            import codecs
+            with codecs.open(song.lyric_abs_path, 'w', 'utf-8') as f:
+               f.write(song.lyric_text)
+        elif song.handler.need_proxy_pool:
+            if song.lyric_link:
+                download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
+        else:
+            if song.lyric_link:
+                download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True)
+
 
     write_mp3_meta(song)
     done += 1
