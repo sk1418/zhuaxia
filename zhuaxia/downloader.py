@@ -173,11 +173,12 @@ def download_lyrics(songs):
 
     url_lyric_163 = "http://music.163.com/api/song/lyric?id=%s&lv=1"
     
+    percent_bar_factor = 0.4
+    width = util.get_terminal_size()[1] -5
+    bar_count = (int(width*percent_bar_factor)-2/10) # number of percent bar
+    line = log.hl(u' %s'% ('+'*width), 'cyan')
+
     if songs[0].handler.dl_lyric:
-        percent_bar_factor = 0.4
-        width = util.get_terminal_size()[1] -5
-        bar_count = (int(width*percent_bar_factor)-2/10) # number of percent bar
-        line = log.hl(u' %s'% ('+'*width), 'cyan')
         print log.hl(msg.fmt_dl_lyric_start, 'warning')
         print line
 
