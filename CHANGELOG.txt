@@ -1,4 +1,4 @@
-2015-10-28  Version 2.5.1
+2015-10-28  Version 2.6.0
 =========================
 - [feature] [issue #17] add -l option, supports lyrics downloading
 - [bugfix] [issue #9] name file(mp3 + lyric) in pattern: artistName_songName.mp3/lrc
