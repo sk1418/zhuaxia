@@ -9,7 +9,7 @@
 - [功能](#features)
 - [安装](#installation)
 - [使用](#usage)
-	- [海外IP使用xiami代理支持](#proxy-setting)
+	- [海外IP代理支持](#proxy-setting)
 - [Screenshots](#screenshots)
 - [Change logs](#changelog)
 
@@ -41,7 +41,7 @@ zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾
 - [易]支持下载高音质(320kbps) mp3 (`-H` 选项)
 - 进度显示 (色彩高亮，终端宽度改变自动适应，总进度，下载线程进度...)
 - mp3文件重命名, 更新mp3 meta信息，自动下载专辑封面, 专辑文本介绍(仅[虾])...等等
-- [虾]配置项`xiami.proxy.http=ip:port` 来设置国内的代理服务进行xiami连接的解析。详见："Usage -> 海外IP下载xiami资源" 一节
+- [虾]配置项`china.proxy.http=ip:port` 来设置国内的代理服务进行解析和下载。详见："Usage -> 海外IP下载资源" 一节
 - 加入实验性`-p`选项，尝试解决频繁请求被服务器ban的问题
 - 中英文命令行界面. 配置项 `lang=en|cn` 默认中文(`cn`)
 - 下载歌曲的歌词，保存为同名`lrc`文件 (`-l`选项)
@@ -117,14 +117,16 @@ Archlinux 用户, zhuaxia可以从AUR中获取
 
 ### Proxy setting
 
-**海外IP下载xiami资源**
+**海外IP下载资源**
 
-xiami.com屏蔽了海外ip的http请求。在配置文件中添加（如果不存在的话）`xiami.proxy.http=ip:port` 可以让zhuaxia通过代理来解析xiami资源。
+xiami.com 和music.163都屏蔽了海外ip的资源下载请求。在配置文件中添加（如果不存在的话）`china.proxy.http=ip:port`, (以前叫`xiami.proxy.http`) 可以让zhuaxia通过代理来解析和下载资源。
 例如：
 
-	xiami.proxy.http=127.0.0.1:8080
+	china.proxy.http=127.0.0.1:8080
 
 这里`ip:port`构成的http代理是国内的代理服务器。 如果你的机器已经是国内的ip，请注释或删除这个选项。获取国内代理的简单方法：到http://proxy-list.org/ 搜索China的代理就好。
+
+**为兼容用户已存在的配置文件,老的`xiami.proxy.http` 选项还可使用,代理将对xiami,163同时生效. 但建议修改配置文件使用新的名字. 新旧两个proxy选项不能同时使用.**
 
 ## Screenshots
 
