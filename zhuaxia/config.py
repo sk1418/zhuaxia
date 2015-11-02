@@ -15,7 +15,7 @@ CONF_FILE   = path.join(USER_PATH, "zhuaxia.conf")
 
 ######user config####
 LANG                 = 'CN'
-XIAMI_PROXY_HTTP     = None
+CHINA_PROXY_HTTP     = None
 XIAMI_LOGIN_EMAIL    = None
 XIAMI_LOGIN_PASSWORD = None
 LOG_LVL_FILE         = 'INFO'
@@ -29,7 +29,7 @@ DOWNLOAD_TOP_SONG    = 10
 
 #a variable name dict for dynamic assignment
 var_dict = {
-        'xiami.proxy.http'        : ('XIAMI_PROXY_HTTP'    , 's'),
+        'china.proxy.http'        : ('CHINA_PROXY_HTTP'    , 's'),
         'xiami.auth.email'        : ('XIAMI_LOGIN_EMAIL'   , 's'),
         'xiami.auth.password'     : ('XIAMI_LOGIN_PASSWORD', 's'),
         'download.dir'            : ('DOWNLOAD_DIR'        , 'p'),
@@ -57,7 +57,7 @@ def load_single_config(conf_parser, conf_key):
                 util.create_dir(v)
             globals()[gkey] = v
     except:
-        if conf_key != 'xiami.proxy.http':
+        if conf_key != 'china.proxy.http':
             log.warn(config_warn_msg % (conf_key, str(globals()[var_dict[conf_key][0]])))
 
 def load_config():

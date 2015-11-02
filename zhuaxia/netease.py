@@ -209,8 +209,8 @@ class Netease(Handler):
     def read_link(self, link):
         
         retVal = None
-        if config.XIAMI_PROXY_HTTP:
-            requests_proxy = { 'http':config.XIAMI_PROXY_HTTP}
+        if config.CHINA_PROXY_HTTP:
+            requests_proxy = { 'http':config.CHINA_PROXY_HTTP}
         if self.need_proxy_pool:
             requests_proxy = {'http':self.proxies.get_proxy()}
 

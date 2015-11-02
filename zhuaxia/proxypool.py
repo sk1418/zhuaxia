@@ -92,10 +92,11 @@ class ProxyPool(object):
                     text=re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+'))
             if not tags:
                 break
-
+            #TODO only take the proxy speed > 150kb
             self.proxies.extend([x.string for x in tags])
             page += 1
-        LOG.debug('proxy list loaded, total %d proxies'%len(self.proxies))
+        LOG.debug('proxy list parsed, total %d proxies'%len(self.proxies))
+
 
     def add_proxy(self, proxy):
         self.proxies.append(proxy)
