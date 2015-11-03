@@ -50,8 +50,7 @@ favorite                         = u'用户收藏'
 warning_many_collections         = u'[虾]如用户收藏较多，解析歌曲需要较长时间，请耐心等待'
 fmt_links_in_file                = u' 文件包含链接总数: %d'
 
-experimental                     = u'-p 选项为实验性选项：'
-proxypool                        = u'为防止频繁请求被禁止，自动获取代理服务器池解析/下载。因代理服务器速度不同，下载可能会慢或不稳定。'
+experimental                     = u'-p 选项为实验性选项. 自动获取代理服务器池解析/下载。因代理服务器稳定性未知，下载可能会慢或不稳定。'
 ver_text                         = u'zhuaxia (抓虾) '
 help_info                        = u""" %(cyan)s
     zhuaxia (抓虾) -- 抓取[虾米音乐]和[网易云音乐]的 mp3 音乐%(clear)s

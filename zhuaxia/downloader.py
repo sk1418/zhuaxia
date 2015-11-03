@@ -126,10 +126,7 @@ def download_single_song(song):
     mp3_file = song.abs_path
 
     #do the actual downloading
-    if song.handler.need_proxy_pool:
-        download_by_url(song.dl_link, mp3_file, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
-    else:
-        download_by_url(song.dl_link, mp3_file, show_progress=True)
+    download_by_url(song.dl_link, mp3_file, show_progress=True, proxy= get_proxy(song))
 
 
     write_mp3_meta(song)
@@ -186,12 +183,8 @@ def download_lyrics(songs):
         if song.lyric_abs_path:
             print log.hl(u' %s '% song.lyric_filename,'cyan'),  #the ending comma is for hide the newline
             if song.song_type == 1: #xiami
-                if song.handler.need_proxy_pool:
-                    if song.lyric_link:
-                        download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
-                else:
-                    if song.lyric_link:
-                        download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True)
+                if song.lyric_link:
+                    download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True, proxy=get_proxy(song))
             else: #163
                 lyric_link = url_lyric_163 % song.song_id
                 song.lyric_text = song.handler.read_link(lyric_link).json()['lrc']['lyric']
@@ -212,6 +205,14 @@ class Downloader(Thread):
         for song in self.songs:
             self.pool.add_task(download_single_song, song)
         self.pool.wait_completion()
+
+def get_proxy(song):
+    proxy = None
+    if song.handler.need_proxy_pool:
+        proxy = {'http':song.handler.proxies.get_proxy()}
+    elif config.CHINA_PROXY_HTTP:
+        proxy={'http': config.CHINA_PROXY_HTTP}
+    return proxy
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 # write mp3 meta data to downloaded mp3 files

@@ -49,8 +49,7 @@ favorite                         = u'user favorite'
 warning_many_collections         = u'[xia] parsing can take some time if user favorite has many songs. Please stand by.'
 fmt_links_in_file                = u' file contains urls: %d'
 
-experimental                     = u'-p is an experimental option: '
-proxypool                        = u'auto fetching proxy from proxy pool. Since zhuaxia does not check the speed of proxy, downloading could be slow or unstable.'
+experimental                     = u'-p is an experimental option. Auto fetching proxy from proxy pool. Downloading could be slow or unstable due to the unknown proxy status.'
 ver_text                         = u'zhuaxia '
 help_info                        = u""" %(cyan)s
     zhuaxia -- download mp3 music from [xiami.com] and [music.163.com]%(clear)s

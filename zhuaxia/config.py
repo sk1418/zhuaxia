@@ -58,7 +58,7 @@ def load_single_config(conf_parser, conf_key):
                 util.create_dir(v)
             globals()[gkey] = v
     except:
-        if conf_key.find('proxy.http'):
+        if not conf_key.find('proxy.http'):
             log.warn(config_warn_msg % (conf_key, str(globals()[var_dict[conf_key][0]])))
 
 def load_config():

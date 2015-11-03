@@ -87,13 +87,19 @@ class ProxyPool(object):
         self.proxies = []
         while True:
             html = requests.get(PROXY_POOL_URL%page).text
-            soup = BeautifulSoup(html, 'html.parser')
-            tags = soup.find_all('li',class_='proxy',
-                    text=re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+'))
-            if not tags:
+            table = BeautifulSoup(html, 'html.parser').find(id="proxy-table")
+            proxy_tags = table.find_all('li',class_='proxy', text=re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+'))
+            speed_tags = table.find_all('li',class_='speed', text=re.compile((r'[0-9.]k.*|-')))
+            if not proxy_tags:
                 break
             #TODO only take the proxy speed > 150kb
-            self.proxies.extend([x.string for x in tags])
+            for speed_tag in speed_tags:
+                speed = re.sub(r'kb.*','',speed_tag.string.strip())
+                if re.match(r'[0-9.]+',speed):
+                    if float(speed) > 150:
+                        proxy_tag = proxy_tags[speed_tags.index(speed_tag)]
+                        LOG.debug( 'pick proxy: %s, speed %fkb'% (proxy_tag.string, float(speed)))
+                        self.proxies.append(proxy_tag.string)
             page += 1
         LOG.debug('proxy list parsed, total %d proxies'%len(self.proxies))
 

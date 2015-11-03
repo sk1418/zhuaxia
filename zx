@@ -62,7 +62,6 @@ if __name__ == '__main__':
                 infile = a
             elif o == '-p':
                 LOG.warning(msg.experimental)
-                LOG.warning(msg.proxypool)
                 needProxyPool = True
             elif o == '-l':
                 dl_lyric = True
