@@ -74,8 +74,8 @@ class NeteaseSong(Song):
         self.album_id = js['album']['id']
 
         # download link
-        if self.magic:
-            self.dl_link = get_magic_dl_link()
+        if self.handler.magic:
+            self.dl_link = self.get_magic_dl_link()
         else:
             dfsId = ''
             if self.handler.is_hq and js['hMusic']:
@@ -99,7 +99,9 @@ class NeteaseSong(Song):
         magic_link = url_163 + '/eapi/song/enhance/download/url?br=%s&id=%s_0'
         song_url_link = magic_link % ('128000', self.song_id)
 
-        ret_json =  requests.post(song_url_link, headers=HEADERS)
+        ret_json =  requests.post(song_url_link, headers=HEADERS, data={"params":"foo"})
+        print ret_json
+        print ret_json.text
         #TODO  parse the json get mp3 dl_link
 
         pass
