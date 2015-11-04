@@ -208,6 +208,8 @@ class Downloader(Thread):
 
 def get_proxy(song):
     proxy = None
+    if song.handler.magic:
+        return proxy
     if song.handler.need_proxy_pool:
         proxy = {'http':song.handler.proxies.get_proxy()}
     elif config.CHINA_PROXY_HTTP:

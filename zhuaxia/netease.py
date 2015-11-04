@@ -60,10 +60,6 @@ class NeteaseSong(Song):
         elif song_json:
             self.init_by_json(song_json)
 
-        # check the lyric flag
-        if self.handler.dl_lyric:
-            self.load_lyric()
-
     def init_by_json(self,js):
         #song_id
         self.song_id = js['id']
@@ -78,29 +74,35 @@ class NeteaseSong(Song):
         self.album_id = js['album']['id']
 
         # download link
-        dfsId = ''
-        if self.handler.is_hq and js['hMusic']:
-            dfsId = js['hMusic']['dfsId']
-        elif js['mMusic']:
-            dfsId = js['mMusic']['dfsId']
-        elif js['lMusic']:
-            LOG.warning(msg.head_163 + msg.fmt_quality_fallback %self.song_name)
-            dfsId = js['lMusic']['dfsId']
-        if dfsId:
-            self.dl_link = url_mp3 % (self.handler.encrypt_dfsId(dfsId), dfsId)
+        if self.magic:
+            self.dl_link = get_magic_dl_link()
         else:
-            LOG.warning(msg.head_163 + msg.fmt_err_song_parse %self.song_name)
+            dfsId = ''
+            if self.handler.is_hq and js['hMusic']:
+                dfsId = js['hMusic']['dfsId']
+            elif js['mMusic']:
+                dfsId = js['mMusic']['dfsId']
+            elif js['lMusic']:
+                LOG.warning(msg.head_163 + msg.fmt_quality_fallback %self.song_name)
+                dfsId = js['lMusic']['dfsId']
+            if dfsId:
+                self.dl_link = url_mp3 % (self.handler.encrypt_dfsId(dfsId), dfsId)
+            else:
+                LOG.warning(msg.head_163 + msg.fmt_err_song_parse %self.song_name)
 
         #used only for album/collection etc. create a dir to group all songs
         #if it is needed, it should be set by the caller
         self.group_dir = None
 
-    def load_lyric(self):
-        """ download the lyric for song_id """
+    def get_magic_dl_link(self):
+        """ get download link with 'magic' """
+        magic_link = url_163 + '/eapi/song/enhance/download/url?br=%s&id=%s_0'
+        song_url_link = magic_link % ('128000', self.song_id)
+
+        ret_json =  requests.post(song_url_link, headers=HEADERS)
+        #TODO  parse the json get mp3 dl_link
+
         pass
-        #lyric_link = url_lyric % self.song_id
-        ##TODO need check the json structure
-        #self.lyric_text = self.handler.read_link(lyric_link).json()['lrc']['lyric']
 
 
 class NeteaseAlbum(object):
@@ -201,34 +203,38 @@ class Netease(Handler):
     dl_lyric: if lyric should be download as well
     proxies: proxy pool
     """
-    def __init__(self, is_hq=False, dl_lyric= False, proxies = None ):
+    def __init__(self, is_hq=False, dl_lyric= False, proxies = None , magic = False):
         Handler.__init__(self,proxies)
         self.is_hq = is_hq
         self.dl_lyric = dl_lyric
+        self.magic = magic
 
     def read_link(self, link):
         
         retVal = None
-        if config.CHINA_PROXY_HTTP:
-            requests_proxy = { 'http':config.CHINA_PROXY_HTTP}
-        if self.need_proxy_pool:
-            requests_proxy = {'http':self.proxies.get_proxy()}
-
-            while True:
-                try:
-                    retVal =  requests.get(link, headers=HEADERS, proxies=requests_proxy)
-                    break 
-                except requests.exceptions.ConnectionError:
-                    LOG.debug('invalid proxy detected, removing from pool')
-                    self.proxies.del_proxy(requests_proxy['http'])
-                    if self.proxies:
-                        requests_proxy['http'] = self.proxies.get_proxy()
-                    else:
-                        LOG.debug('proxy pool is empty')
-                        raise
-                        break
-        else:
+        #here bypass all proxies if Magic true
+        if self.magic:
             retVal =  requests.get(link, headers=HEADERS)
+        else:
+            if config.CHINA_PROXY_HTTP:
+                requests_proxy = { 'http':config.CHINA_PROXY_HTTP}
+            if self.need_proxy_pool:
+                requests_proxy = {'http':self.proxies.get_proxy()}
+                while True:
+                    try:
+                        retVal =  requests.get(link, headers=HEADERS, proxies=requests_proxy)
+                        break 
+                    except requests.exceptions.ConnectionError:
+                        LOG.debug('invalid proxy detected, removing from pool')
+                        self.proxies.del_proxy(requests_proxy['http'])
+                        if self.proxies:
+                            requests_proxy['http'] = self.proxies.get_proxy()
+                        else:
+                            LOG.debug('proxy pool is empty')
+                            raise
+                            break
+            else:
+                retVal =  requests.get(link, headers=HEADERS)
         return retVal
 
     def encrypt_dfsId(self,dfsId):
