@@ -92,6 +92,7 @@ class ProxyPool(object):
             speed_tags = table.find_all('li',class_='speed', text=re.compile((r'[0-9.]k.*|-')))
             if not proxy_tags:
                 break
+            #TODO only take the proxy speed > 150kb
             for speed_tag in speed_tags:
                 speed = re.sub(r'kb.*','',speed_tag.string.strip())
                 if re.match(r'[0-9.]+',speed):

@@ -46,7 +46,7 @@ def __init_xiami_obj(is_hq,dl_lyric):
             is_hq,proxies=ppool, dl_lyric = dl_lyric)
 
 
-def shall_I_begin(in_str, is_file=False, is_hq=False, dl_lyric=False, need_proxy_pool = False, magic=False):
+def shall_I_begin(in_str, is_file=False, is_hq=False, dl_lyric=False, need_proxy_pool = False):
     #start terminate_watcher
     Terminate_Watcher()
     global ppool, xiami_obj
@@ -56,7 +56,7 @@ def shall_I_begin(in_str, is_file=False, is_hq=False, dl_lyric=False, need_proxy
         LOG.info(msgTxt.fmt_init_proxypool_done %len(ppool.proxies))
 
     #netease obj
-    m163 = netease.Netease(is_hq, dl_lyric, proxies=ppool, magic)
+    m163 = netease.Netease(is_hq, dl_lyric, proxies=ppool)
 
     if is_file:
         from_file(is_hq, m163, dl_lyric,in_str)

@@ -45,11 +45,10 @@ if __name__ == '__main__':
         inUrl = ''
         needProxyPool=False
         dl_lyric=False
-        magic = False
 
         if len(sys.argv)<2: raise getopt.GetoptError("parameters are missing...")
 
-        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvpl",['hidden'])
+        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvpl")
         for o, a in opts:
             if o == '-h':
                 usage()
@@ -66,20 +65,11 @@ if __name__ == '__main__':
                 needProxyPool = True
             elif o == '-l':
                 dl_lyric = True
-            elif o == '--magic':
-                # here is a "hidden" option, this will disable all proxies settings.
-                # **Only** for netease resource, find the mp3 real url in another way, which
-                # doesn't need the China proxy but will  do one more http (POST) request,
-                # and the quality of the song would be 128kbps
-                # The special way won't work for xiami songs
-
-                magic = True
-
 
 
         if not infile:
             if not len(args):
-                raise getopt.GetoptError("input file or resource url is needed")
+                raise getopt.GetoptError("input file or xiami url is needed")
             else:
                 inUrl = args[0]
         LOG.debug( "hq:"+str(hq))
@@ -89,9 +79,9 @@ if __name__ == '__main__':
         LOG.debug( "dl_lyric:"+str(dl_lyric))
 
         if infile:
-            commander.shall_I_begin(infile, is_file=True, is_hq=hq,dl_lyric=dl_lyric, need_proxy_pool=needProxyPool, magic=magic)
+            commander.shall_I_begin(infile, is_file=True, is_hq=hq,dl_lyric=dl_lyric, need_proxy_pool=needProxyPool)
         else:
-            commander.shall_I_begin(inUrl, is_hq=hq, dl_lyric=dl_lyric,need_proxy_pool = needProxyPool,magic=magic)
+            commander.shall_I_begin(inUrl, is_hq=hq, dl_lyric=dl_lyric,need_proxy_pool = needProxyPool)
                 
     except getopt.GetoptError as e:
         LOG.error(str(e))

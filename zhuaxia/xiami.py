@@ -310,7 +310,6 @@ checkin_headers = {
 class Xiami(Handler):
 
     def __init__(self, email, password, is_hq=False, proxies=None, dl_lyric = False):
-        self.magic = False # magic won't affect xiami downloading
         self.token = None
         self.uid = ''
         self.user_name = ''
