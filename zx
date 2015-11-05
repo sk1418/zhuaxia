@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
         if len(sys.argv)<2: raise getopt.GetoptError("parameters are missing...")
 
-        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvpl",['magic'])
+        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvpl",['hidden'])
         for o, a in opts:
             if o == '-h':
                 usage()
