@@ -60,10 +60,6 @@ class NeteaseSong(Song):
         elif song_json:
             self.init_by_json(song_json)
 
-        # check the lyric flag
-        if self.handler.dl_lyric:
-            self.load_lyric()
-
     def init_by_json(self,js):
         #song_id
         self.song_id = js['id']
@@ -94,14 +90,6 @@ class NeteaseSong(Song):
         #used only for album/collection etc. create a dir to group all songs
         #if it is needed, it should be set by the caller
         self.group_dir = None
-
-    def load_lyric(self):
-        """ download the lyric for song_id """
-        pass
-        #lyric_link = url_lyric % self.song_id
-        ##TODO need check the json structure
-        #self.lyric_text = self.handler.read_link(lyric_link).json()['lrc']['lyric']
-
 
 class NeteaseAlbum(object):
     """The netease album object"""
