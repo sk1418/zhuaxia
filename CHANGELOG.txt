@@ -1,3 +1,9 @@
+2015-11-11  Version 2.6.1
+=========================
+- [bugfix] fix the mistake, lyric download was default
+- [bugfix] check the lyric json, if not available, print err msg stop downloading
+- [workaround] 163 mp3 downloading for oversea IP
+
 2015-10-28  Version 2.6.0
 =========================
 - [feature] [issue #17] add -l option, supports lyrics downloading

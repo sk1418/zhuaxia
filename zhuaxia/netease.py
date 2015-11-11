@@ -17,7 +17,7 @@ LOG = log.get_logger("zxLogger")
 
 #163 music api url
 url_163="http://music.163.com"
-url_mp3="http://m1.music.126.net/%s/%s.mp3"
+url_mp3="http://m5.music.126.net/%s/%s.mp3"
 url_album="http://music.163.com/api/album/%s/"
 url_song="http://music.163.com/api/song/detail/?id=%s&ids=[%s]"
 url_playlist="http://music.163.com/api/playlist/detail?id=%s"
@@ -60,6 +60,7 @@ class NeteaseSong(Song):
         elif song_json:
             self.init_by_json(song_json)
 
+
     def init_by_json(self,js):
         #song_id
         self.song_id = js['id']
@@ -90,6 +91,7 @@ class NeteaseSong(Song):
         #used only for album/collection etc. create a dir to group all songs
         #if it is needed, it should be set by the caller
         self.group_dir = None
+
 
 class NeteaseAlbum(object):
     """The netease album object"""
