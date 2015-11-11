@@ -43,7 +43,7 @@ def __init_xiami_obj(is_hq,dl_lyric):
     if not xiami_obj:
         xiami_obj = xm.Xiami(config.XIAMI_LOGIN_EMAIL,\
             config.XIAMI_LOGIN_PASSWORD, \
-            is_hq,proxies=ppool, dl_lyric = dl_lyric)
+            is_hq=is_hq,proxies=ppool, dl_lyric = dl_lyric)
 
 
 def shall_I_begin(in_str, is_file=False, is_hq=False, dl_lyric=False, need_proxy_pool = False):
@@ -56,7 +56,7 @@ def shall_I_begin(in_str, is_file=False, is_hq=False, dl_lyric=False, need_proxy
         LOG.info(msgTxt.fmt_init_proxypool_done %len(ppool.proxies))
 
     #netease obj
-    m163 = netease.Netease(is_hq, dl_lyric, proxies=ppool)
+    m163 = netease.Netease(is_hq=is_hq, dl_lyric=dl_lyric, proxies=ppool)
 
     if is_file:
         from_file(is_hq, m163, dl_lyric,in_str)

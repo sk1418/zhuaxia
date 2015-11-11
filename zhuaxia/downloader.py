@@ -163,7 +163,7 @@ def start_download(songs):
         time.sleep(1)
         print_progress()
 
-    #handling lyrics downloading
+    # handling lyrics downloading
     download_lyrics(songs)
 
     print log.hl(msg.fmt_all_finished, 'warning')
@@ -178,28 +178,33 @@ def download_lyrics(songs):
     bar_count = (int(width*percent_bar_factor)-2/10) # number of percent bar
     line = log.hl(u' %s'% ('+'*width), 'cyan')
 
-    if songs[0].handler.dl_lyric:
+    if songs[0].handler.dl_lyric == True:
         print log.hl(msg.fmt_dl_lyric_start, 'warning')
         print line
 
-    for song in songs:
-        if song.lyric_abs_path:
-            print log.hl(u' %s '% song.lyric_filename,'cyan'),  #the ending comma is for hide the newline
-            if song.song_type == 1: #xiami
-                if song.handler.need_proxy_pool:
-                    if song.lyric_link:
-                        download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
-                else:
-                    if song.lyric_link:
-                        download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True)
-            else: #163
-                lyric_link = url_lyric_163 % song.song_id
-                song.lyric_text = song.handler.read_link(lyric_link).json()['lrc']['lyric']
-                import codecs
-                with codecs.open(song.lyric_abs_path, 'w', 'utf-8') as f:
-                    f.write(song.lyric_text)
-            print log.hl(u' √','cyan')
-    print line
+        for song in songs:
+            if song.lyric_abs_path:
+                print log.hl(u' %s '% song.lyric_filename,'cyan'),  #the ending comma is for hide the newline
+                if song.song_type == 1: #xiami
+                    if song.handler.need_proxy_pool:
+                        if song.lyric_link:
+                            download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
+                    else:
+                        if song.lyric_link:
+                            download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True)
+                    print log.hl(u' √','cyan')
+                else: #163
+                    lyric_link = url_lyric_163 % song.song_id
+                    lyric_json = song.handler.read_link(lyric_link).json()
+                    if not lyric_json or not lyric_json.has_key('lrc')  or  not lyric_json['lrc'].has_key('lyric'):
+                        print log.hl(u' ✘ Not Found','red')
+                        continue
+                    # song.lyric_text = song.handler.read_link(lyric_link).json()['lrc']['lyric']
+                    import codecs
+                    with codecs.open(song.lyric_abs_path, 'w', 'utf-8') as f:
+                        f.write(song.lyric_text)
+                    print log.hl(u' √','cyan')
+        print line
 
 class Downloader(Thread):
     def __init__(self, songs, pool):
