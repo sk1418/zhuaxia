@@ -17,7 +17,7 @@ LOG = log.get_logger("zxLogger")
 
 #163 music api url
 url_163="http://music.163.com"
-url_mp3="http://m1.music.126.net/%s/%s.mp3"
+url_mp3="http://m5.music.126.net/%s/%s.mp3"
 url_album="http://music.163.com/api/album/%s/"
 url_song="http://music.163.com/api/song/detail/?id=%s&ids=[%s]"
 url_playlist="http://music.163.com/api/playlist/detail?id=%s"
