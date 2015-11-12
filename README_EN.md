@@ -118,7 +118,9 @@ other users:
 
 **Download Xiami resources outside China**
 
-Both xiami.com and music.163(Netease) block http Requests from IP addresses outside China. In configuration file adding property (if it doesn't exist): `china.proxy.http=ip:port` (before it was called `xiami.proxy.http`) can let zhuaxia download resources via proxy.
+Both xiami.com and music.163(Netease) block http Requests from IP addresses outside China. For 163 resources, zhuaxia uses a url that so far (2015-11-12) still working for oversea IP direct downloading. However this won't last long. For stable usage, please read the below section about the proxy option.
+
+In configuration file adding property (if it doesn't exist): `china.proxy.http=ip:port` (before it was called `xiami.proxy.http`) can let zhuaxia download resources via proxy.
 
 For example:
 

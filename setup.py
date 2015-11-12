@@ -16,8 +16,8 @@ setup(
     platforms=['POSIX'],
     keywords='xiami mp3 download',
     url='https://github.com/sk1418/zhuaxia',
-    description='a cli tool to download mp3 from xiami.com',
+    description='a cli tool to download mp3 from xiami.com and music.163',
     long_description="""
-        a cli tool to download mp3 from xiami.com
+        a cli tool to download mp3 from xiami.com and music.163  
     """,
 )

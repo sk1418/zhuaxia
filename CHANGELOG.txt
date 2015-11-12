@@ -1,3 +1,7 @@
+2015-11-12  Version 2.7.0
+=========================
+- [#18] rename the proxy config item name. apply it also on the netease
+
 2015-11-11  Version 2.6.1
 =========================
 - [bugfix] fix the mistake, lyric download was default

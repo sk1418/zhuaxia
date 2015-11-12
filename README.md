@@ -119,7 +119,9 @@ Archlinux 用户, zhuaxia可以从AUR中获取
 
 **海外IP下载资源**
 
-xiami.com 和music.163都屏蔽了海外ip的资源下载请求。在配置文件中添加（如果不存在的话）`china.proxy.http=ip:port`, (以前叫`xiami.proxy.http`) 可以让zhuaxia通过代理来解析和下载资源。
+xiami.com 和music.163都屏蔽了海外ip的资源下载请求。针对163的资源, zhuaxia 目前使用了一个还没检查IP的链接, 截止目前(2015-11-12), 扔可以直接下载.但是不保证长效。彻底解决xiami和163的海外下载问题，请看下面的选项：
+
+在配置文件中添加（如果不存在的话）`china.proxy.http=ip:port`, (以前叫`xiami.proxy.http`) 可以让zhuaxia通过代理来解析和下载资源。
 例如：
 
 	china.proxy.http=127.0.0.1:8080
@@ -127,6 +129,8 @@ xiami.com 和music.163都屏蔽了海外ip的资源下载请求。在配置文�
 这里`ip:port`构成的http代理是国内的代理服务器。 如果你的机器已经是国内的ip，请注释或删除这个选项。获取国内代理的简单方法：到http://proxy-list.org/ 搜索China的代理就好。
 
 **为兼容用户已存在的配置文件,老的`xiami.proxy.http` 选项还可使用,代理将对xiami,163同时生效. 但建议修改配置文件使用新的名字. 新旧两个proxy选项不能同时使用.**
+
+
 
 ## Screenshots
 
