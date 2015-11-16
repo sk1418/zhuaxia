@@ -187,14 +187,12 @@ class Netease(Handler):
 
     """
     netease object
-    is_hq : if download HQ mp3. default False
-    dl_lyric: if lyric should be download as well
-    proxies: proxy pool
+    option is the user given options and other data @see __init__
     """
-    def __init__(self, is_hq=False, dl_lyric= False, proxies = None ):
-        Handler.__init__(self,proxies)
-        self.is_hq = is_hq
-        self.dl_lyric = dl_lyric
+    def __init__(self, option):
+        Handler.__init__(self,option.proxies)
+        self.is_hq = option.is_hq
+        self.dl_lyric = option.dl_lyric
 
     def read_link(self, link):
         

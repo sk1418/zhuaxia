@@ -14,6 +14,7 @@ import zhuaxia.xiami as xm
 import zhuaxia.downloader as downloader
 import zhuaxia.commander as commander
 import zhuaxia.zxver as zxver
+import zhuaxia.option as user_option
 
 
 # logger name
@@ -41,7 +42,7 @@ if __name__ == '__main__':
     
     try:
         hq = False
-        infile = ''
+        inFile = ''
         inUrl = ''
         needProxyPool=False
         dl_lyric=False
@@ -59,7 +60,7 @@ if __name__ == '__main__':
                 version()
                 sys.exit(0)
             elif o == '-f':
-                infile = a
+                inFile = a
             elif o == '-p':
                 LOG.warning(msg.experimental)
                 needProxyPool = True
@@ -67,21 +68,24 @@ if __name__ == '__main__':
                 dl_lyric = True
 
 
-        if not infile:
+        if not inFile:
             if not len(args):
                 raise getopt.GetoptError("input file or xiami url is needed")
             else:
                 inUrl = args[0]
-        LOG.debug( "hq:"+str(hq))
-        LOG.debug( "infile:"+infile)
-        LOG.debug( "inurl:"+inUrl)
-        LOG.debug( "needProxyPool:"+ str(needProxyPool))
-        LOG.debug( "dl_lyric:"+str(dl_lyric))
 
-        if infile:
-            commander.shall_I_begin(infile, is_file=True, is_hq=hq,dl_lyric=dl_lyric, need_proxy_pool=needProxyPool)
-        else:
-            commander.shall_I_begin(inUrl, is_hq=hq, dl_lyric=dl_lyric,need_proxy_pool = needProxyPool)
+        #build the user option
+        option = user_option.Option()
+        option.is_hq = hq
+        option.need_proxy_pool = needProxyPool
+        option.dl_lyric = dl_lyric
+        option.inFile = inFile
+        option.inUrl = inUrl
+
+        #print debug
+        option.debug_me()
+
+        commander.shall_I_begin(option)
                 
     except getopt.GetoptError as e:
         LOG.error(str(e))
