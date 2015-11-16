@@ -48,7 +48,7 @@ class XiamiSong(Song):
     abs_path, filename, etc.
     """
 
-    def __init__(self,xiami_obj,url=None,song_json=None, use_proxy_pool=False):
+    def __init__(self,xiami_obj,url=None,song_json=None):
         self.lyric_text = ''
         self.song_type=1
         self.handler = xiami_obj
@@ -309,7 +309,7 @@ checkin_headers = {
 
 class Xiami(Handler):
 
-    def __init__(self, email, password, is_hq=False, proxies=None, dl_lyric = False):
+    def __init__(self, email, password, option):
         self.token = None
         self.uid = ''
         self.user_name = ''
@@ -317,14 +317,12 @@ class Xiami(Handler):
         self.password = password
         self.skip_login = False
         self.session = None
-        self.is_hq = is_hq
-        self.dl_lyric = dl_lyric
-        Handler.__init__(self,proxies)
-        #self.proxies = proxies
-        #self.need_proxy_pool = self.proxies != None
+        self.is_hq = option.is_hq
+        self.dl_lyric = option.dl_lyric
+        Handler.__init__(self,option.proxies)
 
         #if either email or password is empty skip login
-        if not email or not password or not is_hq:
+        if not email or not password or not self.is_hq:
             self.skip_login = True
             
         self.member_auth = ''
@@ -336,7 +334,7 @@ class Xiami(Handler):
             if self.login():
                 LOG.info( msg.head_xm + msg.fmt_login_ok_xm % (self.user_name.decode('utf-8'),self.uid) )
             else:
-                is_hq = False
+                self.is_hq = False
 
     def login(self):
         LOG.info( msg.head_xm + msg.login_xm)
