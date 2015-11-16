@@ -33,14 +33,20 @@ class Worker(Thread):
     def run(self):
         while True:
             func ,args, kargs = self.tasks.get()
-            try:
-                func(*args, **kargs)
-            except:
-                #LOG.error(str(e))
-                LOG.error(traceback.format_exc())
-
-            finally:
-                self.tasks.task_done()
+            chance = 5 #retry
+            while chance>0:
+                chance -= 1
+                try:
+                    return_code = func(*args, **kargs)
+                    if return_code != 0:
+                        LOG.debug("re-run task: %s" % args[0].filename)
+                        continue
+                    else:
+                        break
+                except:
+                    #LOG.error(str(e))
+                    LOG.error(traceback.format_exc())
+            self.tasks.task_done()
 
 class Terminate_Watcher:
     """this class solves two problems with multithreaded

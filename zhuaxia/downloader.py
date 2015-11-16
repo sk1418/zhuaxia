@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 from os import path
+import os
 import sys
 import requests
 import config, log, util
@@ -93,22 +94,28 @@ def download_by_url(url,filepath,show_progress=False, proxy=None):
     """
     if ( not filepath ) or (not url):
         LOG.err( 'Url or filepath is not valid, resouce cannot be downloaded.')
-        return
+        return 1
 
     fname = path.basename(filepath)
-    r = requests.get(url, stream=True, proxies=proxy)
 
-    if r.status_code == 200:
-        total_length = int(r.headers.get('content-length'))
-        done_length = 0
-        with open(filepath,'wb') as f:
-            for chunk in r.iter_content(1024):
-                done_length += len(chunk)
-                f.write(chunk)
-                if show_progress:
-                    percent = float(done_length) / float(total_length)
-                    progress[fname] = percent
-    return 0
+    try:
+        #get request timeout 30 s
+        r = requests.get(url, stream=True, timeout=30, proxies=proxy)
+        if r.status_code == 200:
+            total_length = int(r.headers.get('content-length'))
+            done_length = 0
+            with open(filepath,'wb') as f:
+                for chunk in r.iter_content(1024):
+                    done_length += len(chunk)
+                    f.write(chunk)
+                    if show_progress:
+                        percent = float(done_length) / float(total_length)
+                        progress[fname] = percent
+            return 0
+    except Exception, err:
+        LOG.debug("downloading song %s timeout, retry!" % filepath)
+        return 1
+    return 1
 
 def download_single_song(song):
     """
@@ -126,14 +133,15 @@ def download_single_song(song):
     mp3_file = song.abs_path
 
     #do the actual downloading
-    download_by_url(song.dl_link, mp3_file, show_progress=True, proxy= get_proxy(song))
+    dl_result = download_by_url(song.dl_link, mp3_file, show_progress=True, proxy= get_proxy(song))
 
-
-    write_mp3_meta(song)
-    done += 1
-    fill_done2show(song.filename)
+    if dl_result == 0:
+        write_mp3_meta(song)
+        done += 1
+        fill_done2show(song.filename)
     #remove from progress
     del progress[song.filename]
+    return dl_result
 
 def fill_done2show(filename):
     """
@@ -196,7 +204,7 @@ def download_lyrics(songs):
                     if not lyric_json or not lyric_json.has_key('lrc')  or  not lyric_json['lrc'].has_key('lyric'):
                         print log.hl(u' ✘ Not Found','red')
                         continue
-                    # song.lyric_text = song.handler.read_link(lyric_link).json()['lrc']['lyric']
+                    song.lyric_text = song.handler.read_link(lyric_link).json()['lrc']['lyric']
                     import codecs
                     with codecs.open(song.lyric_abs_path, 'w', 'utf-8') as f:
                         f.write(song.lyric_text)
