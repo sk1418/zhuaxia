@@ -1,3 +1,7 @@
+2015-11-17  Version 2.7.1
+=========================
+- [bugfix] uncomment the useful line..... get 163 lyric..
+
 2015-11-12  Version 2.7.0
 =========================
 - [#18] rename the proxy config item name. apply it also on the netease

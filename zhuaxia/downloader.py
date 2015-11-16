@@ -196,7 +196,7 @@ def download_lyrics(songs):
                     if not lyric_json or not lyric_json.has_key('lrc')  or  not lyric_json['lrc'].has_key('lyric'):
                         print log.hl(u' ✘ Not Found','red')
                         continue
-                    # song.lyric_text = song.handler.read_link(lyric_link).json()['lrc']['lyric']
+                    song.lyric_text = song.handler.read_link(lyric_link).json()['lrc']['lyric']
                     import codecs
                     with codecs.open(song.lyric_abs_path, 'w', 'utf-8') as f:
                         f.write(song.lyric_text)
