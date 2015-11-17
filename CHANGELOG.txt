@@ -1,6 +1,8 @@
 2015-11-17  Version 2.8.0
 =========================
 - [feature] [#21] add timeout (30s) for downloading, if timeout occured, re-download, max 5 retries
+- [feature] [#21] bring the failed task names to console output. more log msgs (debug level)
+- [enhancement] [#22] better way for passing arguments
 
 2015-11-17  Version 2.7.1
 =========================
