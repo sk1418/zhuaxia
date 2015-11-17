@@ -26,6 +26,8 @@ progress = {}
 #finsished job to be shown in progress
 done2show=[]
 
+#failed job to be shown in progress
+failed2show=[]
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 # output progress 
@@ -76,6 +78,7 @@ def print_progress():
     #output all downloads' progress bars
     sys.stdout.write(''.join(all_p))
 
+    # finished jobs
     if len(done2show):
         sys.stdout.write(line)
         sys.stdout.write(log.hl(msg.fmt_dl_last_finished % config.SHOW_DONE_NUMBER,'warning'))
@@ -84,6 +87,16 @@ def print_progress():
         for d in done2show:
             sys.stdout.write(log.hl(u' √ %s\n'% d,'cyan'))
 
+    #failed downloads
+    if len(failed2show):
+        sys.stdout.write(line)
+        sys.stdout.write(log.hl(msg.fmt_dl_failed_jobs,'error'))
+        sys.stdout.write(line)
+        #display failed jobs
+        for d in failed2show:
+            sys.stdout.write(log.hl(u' ✘ %s\n' % d,'red'))
+
+
     sys.stdout.write(line)
     sys.stdout.flush()
 
@@ -91,6 +104,7 @@ def download_by_url(url,filepath,show_progress=False, proxy=None):
     """ 
     basic downloading function, download url and save to 
     file path
+    http.get timeout: 30s
     """
     if ( not filepath ) or (not url):
         LOG.err( 'Url or filepath is not valid, resouce cannot be downloaded.')
@@ -99,10 +113,6 @@ def download_by_url(url,filepath,show_progress=False, proxy=None):
     fname = path.basename(filepath)
 
     try:
-        #remove file if already exists
-        if path.exists(filepath):
-            LOG.debug( 'File exists, remove before downloading: ' + filepath)
-            os.remove(filepath)
         #get request timeout 30 s
         r = requests.get(url, stream=True, timeout=30, proxies=proxy)
         if r.status_code == 200:
@@ -116,36 +126,65 @@ def download_by_url(url,filepath,show_progress=False, proxy=None):
                         percent = float(done_length) / float(total_length)
                         progress[fname] = percent
             return 0
+        else:
+            LOG.debug("[DL_URL] HTTP Status %d . Song: %s " % (r.status_code,fname))
+            return 1
     except Exception, err:
-        LOG.debug("downloading song %s timeout, retry!" % filepath)
+        LOG.debug("[DL_URL] downloading song %s timeout!" % fname)
         return 1
     return 1
 
 def download_single_song(song):
     """
     download a single song 
+    max retry 5 times
     """
     global done, progress
 
-    #if file not in progress, add
-    if song.filename not in progress:
-        progress[song.filename] = 0.0
 
     if ( not song.filename ) or (not song.dl_link):
         LOG.err( 'Song [id:%s] cannot be downloaded' % song.song_id)
         return
     mp3_file = song.abs_path
 
-    #do the actual downloading
-    dl_result = download_by_url(song.dl_link, mp3_file, show_progress=True, proxy= get_proxy(song))
+    retry = 5
+    dl_result = -1 # download return code
+    while retry > 0 :
+        retry -= 1
+        LOG.debug("[DL_Song] start downloading: %s retry: %d" % (mp3_file, 5-retry))
 
+        #if file not in progress, add
+        if song.filename not in progress:
+            progress[song.filename] = 0.0
+
+        #do the actual downloading
+        dl_result = download_by_url(song.dl_link, mp3_file, show_progress=True, proxy= get_proxy(song))
+
+        if dl_result == 0: #success
+            write_mp3_meta(song)
+            LOG.debug("[DL_Song] Finished: %s" % mp3_file)
+            break
+        else: # return code is not 0
+            
+            #remove from progress
+            del progress[song.filename]
+            if path.exists(song.abs_path):
+                #remove file if already exists
+                LOG.debug( '[DL_Song] remove incompleted file : ' + song.abs_path)
+                os.remove(song.abs_path)
+            # retry
+
+
+    done+=1 #no matter success of fail, the task was done
     if dl_result == 0:
-        write_mp3_meta(song)
-        done += 1
         fill_done2show(song.filename)
-    #remove from progress
-    del progress[song.filename]
-    return dl_result
+        #remove from progress
+        del progress[song.filename]
+    else:
+        # if it comes here, 5 retries run out
+        fill_failed2show(song.filename)
+
+
 
 def fill_done2show(filename):
     """
@@ -157,6 +196,14 @@ def fill_done2show(filename):
     if len(done2show) == config.SHOW_DONE_NUMBER:
         done2show.pop()
     done2show.insert(0, filename)
+
+def fill_failed2show(filename):
+    """
+    fill the given filename into global list 'failed2show'
+    """
+    global failed2show
+    failed2show.insert(0, filename)
+
 
 def start_download(songs):
     global total, progress

@@ -7,6 +7,7 @@ fmt_dl_lyric_start               = u' 开始下载歌词...'
 fmt_dl_header                    = u' 保存目录:[%s] | 线程池:[%d]\n'
 fmt_dl_progress                  = u'总进度[%d/%d]:'
 fmt_dl_last_finished             = u'  最近%d个完成任务:\n'
+fmt_dl_failed_jobs               = u'  失败的任务:\n'
 
 fmt_quality_fallback             = u'歌曲(%s) 无法获取128kbps资源,尝试获取低质量资源'
 

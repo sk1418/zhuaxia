@@ -8,6 +8,7 @@ fmt_dl_lyric_start               = u' Start downloading lyrics...'
 fmt_dl_header                    = u' Save to :[%s] | Threads Pool:[%d]\n'
 fmt_dl_progress                  = u'Progress [%d/%d]:'
 fmt_dl_last_finished             = u'  Latest %d finished task:\n'
+fmt_dl_failed_jobs               = u'  Failed downloading task:\n'
 
 fmt_quality_fallback             = u'cannot find 128kbps song (%s). Try to get lower quality resource'
 fmt_init_song                    = u'start init song [%s]'

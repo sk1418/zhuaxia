@@ -33,21 +33,11 @@ class Worker(Thread):
     def run(self):
         while True:
             func ,args, kargs = self.tasks.get()
-            chance = 5 #retry
-            while chance>0:
-                chance -= 1
-                LOG.debug("[ThreadPOOL] re-run task: %s retry: %s" % (args[0].filename, str(5-chance)))
-                try:
-                    return_code = func(*args, **kargs)
-                    LOG.debug("[ThreadPOOL] return code from worker's function: %d, file: %s" % (return_code,args[0].filename))
-                    if return_code != 0:
-                        LOG.debug("[ThreadPOOL] re-run task: %s" % args[0].filename)
-                        continue
-                    else:
-                        break
-                except:
-                    #LOG.error(str(e))
-                    LOG.error(traceback.format_exc())
+            try:
+                func(*args, **kargs)
+            except:
+                #LOG.error(str(e))
+                LOG.error(traceback.format_exc())
             self.tasks.task_done()
 
 class Terminate_Watcher:
