@@ -99,6 +99,10 @@ def download_by_url(url,filepath,show_progress=False, proxy=None):
     fname = path.basename(filepath)
 
     try:
+        #remove file if already exists
+        if path.exists(filepath):
+            LOG.debug( 'File exists, remove before downloading: ' + filepath)
+            os.remove(filepath)
         #get request timeout 30 s
         r = requests.get(url, stream=True, timeout=30, proxies=proxy)
         if r.status_code == 200:
