@@ -38,7 +38,8 @@ class Worker(Thread):
             except:
                 #LOG.error(str(e))
                 LOG.error(traceback.format_exc())
-            self.tasks.task_done()
+            finally:
+                self.tasks.task_done()
 
 class Terminate_Watcher:
     """this class solves two problems with multithreaded
