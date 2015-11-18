@@ -5,6 +5,7 @@ import sys
 import requests
 import config, log, util
 import datetime,time
+import traceback
 from threadpool import ThreadPool
 from Queue import Queue
 from mutagen.id3 import ID3,TRCK,TIT2,TALB,TPE1,APIC,TDRC,COMM,TPOS,USLT
@@ -131,8 +132,8 @@ def download_by_url(url,filepath,show_progress=False, proxy=None):
             return 1
     except Exception, err:
         LOG.debug("[DL_URL] downloading song %s timeout!" % fname)
+        LOG.debug(traceback.format_exc())
         return 1
-    return 1
 
 def download_single_song(song):
     """
