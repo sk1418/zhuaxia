@@ -10,6 +10,9 @@ from threadpool import ThreadPool
 from Queue import Queue
 from mutagen.id3 import ID3,TRCK,TIT2,TALB,TPE1,APIC,TDRC,COMM,TPOS,USLT
 from threading import Thread
+#see download_url_urllib doc
+import urllib2
+
 
 LOG = log.get_logger('zxLogger')
 
@@ -101,7 +104,54 @@ def print_progress():
     sys.stdout.write(line)
     sys.stdout.flush()
 
-def download_by_url(url,filepath,show_progress=False, proxy=None):
+def download_url_urllib(url,filepath,show_progress=False, proxy=None):
+    """ 
+    this function does the samething as the download_url(). The different is
+    this function uses the standard urllib2 to download files.
+    basic downloading function, download url and save to 
+    file path
+    http.get timeout: 30s
+
+    """
+
+    if ( not filepath ) or (not url):
+        LOG.err( 'Url or filepath is not valid, resouce cannot be downloaded.')
+        return 1
+
+    fname = path.basename(filepath)
+
+    try:
+        proxyServer = urllib2.ProxyHandler(proxy) if proxy else None
+        opener = urllib2.build_opener()
+        if proxyServer:
+            opener = urllib2.build_opener(proxyServer)
+            
+        urllib2.install_opener(opener)
+        r = urllib2.urlopen(url, timeout=30)
+        if r.getcode() == 200:
+            total_length = int(r.info().getheader('Content-Length').strip())
+            done_length = 0
+            chunk_size=1024
+            with open(filepath,'wb') as f:
+                while True:
+                    chunk = r.read(chunk_size)
+                    done_length += len(chunk)
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    if show_progress:
+                        percent = float(done_length) / float(total_length)
+                        progress[fname] = percent
+            return 0
+        else:
+            LOG.debug("[DL_URL] HTTP Status %d . Song: %s " % (r.status_code,fname))
+            return 1
+    except Exception, err:
+        LOG.debug("[DL_URL] downloading song %s timeout!" % fname)
+        LOG.debug(traceback.format_exc())
+        return 1
+
+def download_url(url,filepath,show_progress=False, proxy=None):
     """ 
     basic downloading function, download url and save to 
     file path
@@ -159,7 +209,7 @@ def download_single_song(song):
             progress[song.filename] = 0.0
 
         #do the actual downloading
-        dl_result = download_by_url(song.dl_link, mp3_file, show_progress=True, proxy= get_proxy(song))
+        dl_result = download_url_urllib(song.dl_link, mp3_file, show_progress=True, proxy= get_proxy(song))
 
         if dl_result == 0: #success
             write_mp3_meta(song)
@@ -245,10 +295,10 @@ def download_lyrics(songs):
                 if song.song_type == 1: #xiami
                     if song.handler.need_proxy_pool:
                         if song.lyric_link:
-                            download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
+                            download_url(song.lyric_link, song.lyric_abs_path, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
                     else:
                         if song.lyric_link:
-                            download_by_url(song.lyric_link, song.lyric_abs_path, show_progress=True)
+                            download_url(song.lyric_link, song.lyric_abs_path, show_progress=True)
                     print log.hl(u' √','cyan')
                 else: #163
                     lyric_link = url_lyric_163 % song.song_id
