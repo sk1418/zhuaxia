@@ -10,7 +10,9 @@ PKG_PATH    = path.dirname(__file__)
 APP_PATH    = path.join(PKG_PATH,"../")
 USER_PATH   = path.join(os.getenv("HOME") , ".zhuaxia")
 SAMPLE_CONF = path.join(PKG_PATH, 'conf','default.conf')
+SAMPLE_DB   = path.join(PKG_PATH, 'conf','default.history')
 CONF_FILE   = path.join(USER_PATH, "zhuaxia.conf")
+HIST_DB     = path.join(USER_PATH, "history.data")
 
 
 ######user config####
@@ -67,12 +69,22 @@ def load_config():
     if not path.exists(CONF_FILE):
         init_config()
 
+    if not path.exists(HIST_DB):
+        init_history_db()
+
     cf = ConfigParser.ConfigParser()
     cf.read(CONF_FILE);
 
     for k in var_dict:
         load_single_config(cf, k)
 
+
+def init_history_db():
+    """
+    create history db under home
+    """
+    #cp empty history db, the user path should have been created
+    shutil.copy(SAMPLE_DB,HIST_DB)
 
 def init_config():
     """

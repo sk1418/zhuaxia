@@ -7,7 +7,7 @@ LOG = log.get_logger("zxLogger")
 
 
 
-Song_Type={0:'unknown',1:u"虾米", 2:"网易"}
+Song_Type={0:'unknown',1:u"虾米", 2:u"网易"}
 
 class Handler(object):
     """
@@ -16,6 +16,24 @@ class Handler(object):
     def __init__(self, proxies = None):
         self.proxies = proxies
         self.need_proxy_pool = self.proxies != None
+
+class History(object):
+    """
+    download history entity
+    """
+    def __init__(self, song=None):
+        self.id = 0
+        self.song_id  = song.song_id if song else 0
+        self.song_name  =song.song_name if song else None
+        self.hq  = song.is_hq is if song else 0
+        self.source  = song.song_type if song else None
+        self.location  = song.abs_path if song else None
+        self.api_url  = song.dl_link if song else None
+        self.dl_time  = None
+
+    def __repr__(self):
+        #TODO
+        pass
 
 class Song(object):
     """
