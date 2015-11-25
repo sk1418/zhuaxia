@@ -33,6 +33,7 @@ done2show=[]
 #failed job to be shown in progress
 failed2show=[]
 
+
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 # output progress 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
@@ -228,6 +229,9 @@ def download_single_song(song):
 
     done+=1 #no matter success of fail, the task was done
     if dl_result == 0:
+        #set the success flag
+        song.success = True 
+
         fill_done2show(song.filename)
         #remove from progress
         del progress[song.filename]

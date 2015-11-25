@@ -22,14 +22,14 @@ class History(object):
     download history entity
     """
     def __init__(self, song=None):
-        self.id = 0
-        self.song_id  = song.song_id if song else 0
-        self.song_name  =song.song_name if song else None
-        self.hq  = song.is_hq is if song else 0
-        self.source  = song.song_type if song else None
+        self.id        = 0
+        self.song_id   = song.song_id if song else 0
+        self.song_name = song.song_name if song else None
+        self.hq        = song.is_hq if song else 0
+        self.source    = song.song_type if song else None
         self.location  = song.abs_path if song else None
-        self.api_url  = song.dl_link if song else None
-        self.dl_time  = None
+        self.api_url   = song.dl_link if song else None
+        self.dl_time   = None
 
     def __repr__(self):
         #TODO
@@ -49,6 +49,7 @@ class Song(object):
         self.song_id = ''
         self.song_name=''
         self.dl_link = ''
+        self.success=False #if the song is downloaded successfully
 
         # lyrics link,text,filename, path etc.
         self.lyric_link = ''

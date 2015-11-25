@@ -41,10 +41,11 @@ class NeteaseSong(Song):
     """
 
     def __init__(self,m163,url=None, song_json=None):
+        Song.__init__(self)
         self.song_type=2
         self.handler = m163
-        self.group_dir = None
-        self.lyric_text = ''
+        # self.group_dir = None
+        # self.lyric_text = ''
 
         if url:
             self.url = url

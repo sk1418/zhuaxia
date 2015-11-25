@@ -49,10 +49,11 @@ class XiamiSong(Song):
     """
 
     def __init__(self,xiami_obj,url=None,song_json=None):
-        self.lyric_text = ''
+        Song.__init__(self)
+        # self.lyric_text = ''
         self.song_type=1
         self.handler = xiami_obj
-        self.group_dir = None
+        # self.group_dir = None
         if url:
             self.url = url
             self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
