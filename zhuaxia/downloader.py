@@ -4,7 +4,8 @@ import os
 import sys
 import requests
 import config, log, util
-import datetime,time
+import time
+import hist_handler
 import traceback
 from threadpool import ThreadPool
 from Queue import Queue
@@ -277,6 +278,9 @@ def start_download(songs):
     # handling lyrics downloading
     download_lyrics(songs)
 
+    print log.hl(msg.fmt_insert_hist, 'warning')
+    hist_handler.insert_hist(songs)
+
     print log.hl(msg.fmt_all_finished, 'warning')
 
 def download_lyrics(songs):
@@ -338,9 +342,12 @@ def get_proxy(song):
     return proxy
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
-# write mp3 meta data to downloaded mp3 files
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 def write_mp3_meta(song):
+    """
+     write mp3 meta data to downloaded mp3 files
+     @song an Song instance
+     """
     id3 = ID3()
     id3.add(TIT2(encoding=3, text=song.song_name))
     id3.add(TALB(encoding=3, text=song.album_name))

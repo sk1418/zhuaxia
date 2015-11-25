@@ -6,6 +6,7 @@ CREATE TABLE History  (
         song_id INTEGER NOT NULL,
 		song_name TEXT NOT NULL,
 		hq INTEGER NOT NULL DEFAULT 0,
+		times INTEGER NOT NULL DEFAULT 1,
         source INTEGER NOT NULL, //1:xiami  2: netease
 		location TEXT NOT NULL,
 		api_url TEXT , // not used right now

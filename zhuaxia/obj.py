@@ -30,6 +30,7 @@ class History(object):
         self.location  = song.abs_path if song else None
         self.api_url   = song.dl_link if song else None
         self.dl_time   = None
+        self.times     = 1
 
     def __repr__(self):
         #TODO

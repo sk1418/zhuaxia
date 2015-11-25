@@ -2,6 +2,7 @@
 head_xm                          = u'[虾]'
 head_163                         = u'[易]'
 
+fmt_insert_hist                  = u' 为成功下载建立历史记录...'
 fmt_all_finished                 = u' 所有任务都已完成'
 fmt_dl_lyric_start               = u' 开始下载歌词...'
 fmt_dl_header                    = u' 保存目录:[%s] | 线程池:[%d]\n'
