@@ -132,7 +132,7 @@ class NeteaseAlbum(object):
 
         #download album logo images
         LOG.debug(msg.head_163 + msg.fmt_dl_album_cover % self.album_name)
-        downloader.download_by_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
+        downloader.download_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
 
 class NeteasePlayList(object):
     """The netease playlist object"""

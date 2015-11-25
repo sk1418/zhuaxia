@@ -145,7 +145,7 @@ class Album(object):
 
         #download album logo images
         LOG.debug(msg.head_xm + msg.fmt_dl_album_cover % self.album_name)
-        downloader.download_by_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
+        downloader.download_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
 
         LOG.debug(msg.head_xm + msg.fmt_save_album_desc % self.album_name)
         if self.album_desc:
