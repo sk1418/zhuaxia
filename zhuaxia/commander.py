@@ -80,8 +80,8 @@ def shall_I_begin(option):
     dl_num = len(dl_songs)
     skip_num = len(skip_songs)
     output_num = '%d' % dl_num if not skip_num else \
-                 "%d - %d = %d" %(dl_num + skip_num, skip_num, dl_num)
-    if len(total_songs):
+                 "%d-%d=%d" %(dl_num + skip_num, skip_num, dl_num)
+    if len(dl_songs):
         LOG.info(msgTxt.fmt_total_dl_nm % output_num)
         sleep(3)
         downloader.start_download(dl_songs, skip_songs)
