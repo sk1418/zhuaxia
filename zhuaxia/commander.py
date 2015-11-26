@@ -5,6 +5,7 @@ import config ,util ,logging ,log,downloader
 import xiami as xm
 import netease
 import re
+import hist_handler
 from threadpool import ThreadPool
 from time import sleep
 from os import path
@@ -19,7 +20,7 @@ else:
 
 LOG = log.get_logger("zxLogger")
 
-dl_songs = []
+total_songs = []
 total = 0
 done = 0
 
@@ -68,10 +69,22 @@ def shall_I_begin(option):
         from_url_163(m163, option.inUrl)
 
     print border
-    if len(dl_songs):
-        LOG.info(msgTxt.fmt_total_dl_nm % len(dl_songs))
+    #here do filtering for incremental download
+    skip_songs = [] #used by incremental_dl
+    dl_songs = []
+    if option.incremental_dl:
+        skip_songs = hist_handler.filter_songs(total_songs)
+        LOG.warning(msgTxt.fmt_skip_dl_nm % len(skip_songs))
+
+    dl_songs = [song for song in total_songs if song not in skip_songs]
+    dl_num = len(dl_songs)
+    skip_num = len(skip_songs)
+    output_num = '%d' % dl_num if not skip_num else \
+                 "%d - %d = %d" %(dl_num + skip_num, skip_num, dl_num)
+    if len(total_songs):
+        LOG.info(msgTxt.fmt_total_dl_nm % output_num)
         sleep(3)
-        downloader.start_download(dl_songs)
+        downloader.start_download(dl_songs, skip_songs)
     else:
         LOG.warning(msgTxt.no_dl_task)
 
@@ -83,12 +96,12 @@ def from_url_163(m163, url, verbose=True):
     msg = u''
     if '/song?id=' in url:
         song =netease.NeteaseSong(m163,url=url)
-        dl_songs.append(song)
+        total_songs.append(song)
         msg = fmt_parsing % (m163_url_abbr(url),msgTxt.song,  song.song_name)
 
     elif '/album?id=' in url:
         album = netease.NeteaseAlbum(m163, url)
-        dl_songs.extend(album.songs)
+        total_songs.extend(album.songs)
         msgs = [fmt_parsing % (m163_url_abbr(url),msgTxt.album,  album.artist_name+u' => '+album.album_name)]
         if verbose:
             for s in album.songs:
@@ -100,7 +113,7 @@ def from_url_163(m163, url, verbose=True):
 
     elif '/playlist?id=' in url:
         playlist = netease.NeteasePlayList(m163, url)
-        dl_songs.extend(playlist.songs)
+        total_songs.extend(playlist.songs)
         msgs = [ fmt_parsing % (m163_url_abbr(url), msgTxt.playlist, playlist.playlist_name)]
         if verbose:
             for s in playlist.songs:
@@ -112,7 +125,7 @@ def from_url_163(m163, url, verbose=True):
 
     elif '/artist?id=' in url:
         topsong= netease.NeteaseTopSong(m163, url)
-        dl_songs.extend(topsong.songs)
+        total_songs.extend(topsong.songs)
         msgs = [fmt_parsing % (m163_url_abbr(url), msgTxt.artistTop ,topsong.artist_name)]
         if verbose:
             for s in topsong.songs:
@@ -140,7 +153,7 @@ def from_url_xm(xm_obj, url, verbose=True):
     msg = u''
     if '/collect/' in url:
         collect = xm.Collection(xm_obj, url)
-        dl_songs.extend(collect.songs)
+        total_songs.extend(collect.songs)
         msgs = [ fmt_parsing % (xiami_url_abbr(url), msgTxt.collection ,collect.collection_name)]
         if verbose:
             for s in collect.songs:
@@ -152,11 +165,11 @@ def from_url_xm(xm_obj, url, verbose=True):
 
     elif '/song/' in url:
         song = xm.XiamiSong(xm_obj, url=url)
-        dl_songs.append(song)
+        total_songs.append(song)
         msg = fmt_parsing % (xiami_url_abbr(url),msgTxt.song,  song.song_name)
     elif '/album/' in url:
         album = xm.Album(xm_obj, url)
-        dl_songs.extend(album.songs)
+        total_songs.extend(album.songs)
         msgs = [fmt_parsing % (xiami_url_abbr(url),msgTxt.album,  album.artist_name+u' => '+album.album_name)]
         if verbose:
             for s in album.songs:
@@ -171,7 +184,7 @@ def from_url_xm(xm_obj, url, verbose=True):
             LOG.warning(msgTxt.warning_many_collections)
 
         fav = xm.Favorite(xm_obj, url, verbose)
-        dl_songs.extend(fav.songs)
+        total_songs.extend(fav.songs)
         msgs = [fmt_parsing % (xiami_url_abbr(url), msgTxt.Favorite ,'')]
         if verbose:
             for s in fav.songs:
@@ -182,7 +195,7 @@ def from_url_xm(xm_obj, url, verbose=True):
             msg = u' => '.join(msgs)
     elif re.search(r'/artist/', url):
         topsong=xm.TopSong(xm_obj, url)
-        dl_songs.extend(topsong.songs)
+        total_songs.extend(topsong.songs)
         msgs = [fmt_parsing % (xiami_url_abbr(url), msgTxt.artistTop,topsong.artist_name)]
         if verbose:
             for s in topsong.songs:

@@ -16,8 +16,6 @@ def __getConnection():
     conn = sqlite.connect(config.HIST_DB)
     return conn
 
-
-
 def insert_hist(songs):
     """
     insert histories entry if it is not yet exists (check unique constraint)
@@ -32,11 +30,18 @@ def insert_hist(songs):
                 dao.update_history(hist,song)
             else:
                 dao.insert_history(song)
-
-
     conn.commit()
     conn.close()
     
+def filter_songs(songs):
+    conn = __getConnection()
+    dao = HistDao(conn)
+    skipped = [song for song in songs if dao.get_history(song)]
+    songs = [song for song in songs if song not in skipped]
+    conn.close()
+    return skipped
+
+
 def empty_history():
     """
     remove all history data

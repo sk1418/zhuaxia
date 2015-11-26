@@ -1,5 +1,4 @@
 # -*- coding:utf-8 -*-
-import time
 import log
 LOG = log.get_logger("zxLogger")
 
@@ -14,6 +13,7 @@ class Option(object):
         self.dl_lyric = False
         self.inFile = ''
         self.inUrl = ''
+        self.incremental_dl= False
 
     def debug_me(self):
         LOG.debug( "hq:"+str(self.is_hq))
@@ -21,3 +21,4 @@ class Option(object):
         LOG.debug( "inUrl:"+self.inUrl)
         LOG.debug( "needProxyPool:"+ str(self.need_proxy_pool))
         LOG.debug( "dl_lyric:"+str(self.dl_lyric))
+        LOG.debug( "incremental_dl:"+str(self.incremental_dl))

@@ -41,15 +41,16 @@ if __name__ == '__main__':
     LOG = log.get_logger(logger_name)
     
     try:
-        hq = False
-        inFile = ''
-        inUrl = ''
-        needProxyPool=False
-        dl_lyric=False
+        hq             = False
+        inFile         = ''
+        inUrl          = ''
+        needProxyPool  = False
+        dl_lyric       = False
+        incremental_dl = False
 
         if len(sys.argv)<2: raise getopt.GetoptError("parameters are missing...")
 
-        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvpl")
+        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvpli")
         for o, a in opts:
             if o == '-h':
                 usage()
@@ -66,7 +67,8 @@ if __name__ == '__main__':
                 needProxyPool = True
             elif o == '-l':
                 dl_lyric = True
-
+            elif o == '-i':
+                incremental_dl = True
 
         if not inFile:
             if not len(args):
@@ -81,6 +83,7 @@ if __name__ == '__main__':
         option.dl_lyric = dl_lyric
         option.inFile = inFile
         option.inUrl = inUrl
+        option.incremental_dl = incremental_dl
 
         #print debug
         option.debug_me()
@@ -91,9 +94,3 @@ if __name__ == '__main__':
         LOG.error(str(e))
         usage()
         sys.exit(2)
-        
-
-
-    #test input file
-    #commander.shall_I_begin('/tmp/in.txt', True)
-    #commander.shall_I_begin('http://www.xiami.com/space/lib-song/u/25531126')

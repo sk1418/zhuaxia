@@ -261,7 +261,12 @@ def fill_failed2show(filename):
     failed2show.insert(0, filename)
 
 
-def start_download(songs):
+def start_download(songs, skip_songs):
+    """
+    start multi-threading downloading songs. and generate a summary file
+    songs: the list of songs need to be downloaded
+    skip_songs: the songs to skip, this list is used for generating the summary file only if incremental download is true. 
+    """
     global total, progress
     total = len(songs)
     LOG.debug('init thread pool (%d) for downloading'% config.THREAD_POOL_SIZE)
