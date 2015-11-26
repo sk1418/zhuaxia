@@ -37,7 +37,6 @@ def filter_songs(songs):
     conn = __getConnection()
     dao = HistDao(conn)
     skipped = [song for song in songs if dao.get_history(song)]
-    songs = [song for song in songs if song not in skipped]
     conn.close()
     return skipped
 
