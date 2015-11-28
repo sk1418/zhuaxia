@@ -34,11 +34,21 @@ def insert_hist(songs):
     conn.close()
     
 def filter_songs(songs):
+    """
+    the function do filtering on songs, if the song has a history entry 
+    put the song in skipped list, also put the found history entry in hist_list
+    finally return two lists
+    """
     conn = __getConnection()
     dao = HistDao(conn)
-    skipped = [song for song in songs if dao.get_history(song)]
+    skipped, hist_list =[], []
+    for song in songs:
+        hist = dao.get_history(song)
+        if hist:
+            skipped.append(song)
+            hist_list.append(hist)
     conn.close()
-    return skipped
+    return skipped,hist_list
 
 
 def empty_history():

@@ -21,6 +21,7 @@ else:
 LOG = log.get_logger("zxLogger")
 
 total_songs = []
+
 total = 0
 done = 0
 
@@ -70,21 +71,22 @@ def shall_I_begin(option):
 
     print border
     #here do filtering for incremental download
-    skip_songs = [] #used by incremental_dl
+    skipped_songs = [] #used by incremental_dl
+    skipped_hists = [] #used by incremental_dl
     dl_songs = []
     if option.incremental_dl:
-        skip_songs = hist_handler.filter_songs(total_songs)
-        LOG.warning(msgTxt.fmt_skip_dl_nm % len(skip_songs))
+        skipped_songs, skipped_hists = hist_handler.filter_songs(total_songs)
+        LOG.warning(msgTxt.fmt_skip_dl_nm % len(skipped_songs))
 
-    dl_songs = [song for song in total_songs if song not in skip_songs]
+    dl_songs = [song for song in total_songs if song not in skipped_songs]
     dl_num = len(dl_songs)
-    skip_num = len(skip_songs)
+    skip_num = len(skipped_songs)
     output_num = '%d' % dl_num if not skip_num else \
                  "%d-%d=%d" %(dl_num + skip_num, skip_num, dl_num)
     if len(dl_songs):
         LOG.info(msgTxt.fmt_total_dl_nm % output_num)
         sleep(3)
-        downloader.start_download(dl_songs, skip_songs)
+        downloader.start_download(dl_songs, skip_hists)
     else:
         LOG.warning(msgTxt.no_dl_task)
 

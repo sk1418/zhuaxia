@@ -31,14 +31,44 @@ progress = {}
 #finsished job to be shown in progress
 done2show=[]
 
-#failed job to be shown in progress
-failed2show=[]
+#success/failed song lists (song objects)
+success_list=[]
+failed_list=[]
 
 
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
-# output progress 
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+class Downloader(Thread):
+    def __init__(self, songs, pool):
+        Thread.__init__(self)
+        self.songs = songs
+        self.pool = pool
+
+    def run(self):
+        global progress
+        for song in self.songs:
+            self.pool.add_task(download_single_song, song)
+        self.pool.wait_completion()
+
+def get_proxy(song):
+    proxy = None
+    if song.handler.need_proxy_pool:
+        proxy = {'http':song.handler.proxies.get_proxy()}
+    elif config.CHINA_PROXY_HTTP:
+        proxy={'http': config.CHINA_PROXY_HTTP}
+    return proxy
+
+def write_mp3_meta(song):
+    """
+     write mp3 meta data to downloaded mp3 files
+     @song an Song instance
+     """
+    id3 = ID3()
+    id3.add(TIT2(encoding=3, text=song.song_name))
+    id3.add(TALB(encoding=3, text=song.album_name))
+    id3.add(TPE1(encoding=3, text=song.artist_name))
+    id3.save(song.abs_path)
+
 def print_progress():
+    """ print progress info """
     #the factor of width used for progress bar
     percent_bar_factor = 0.4
     width = util.get_terminal_size()[1] -5
@@ -94,13 +124,13 @@ def print_progress():
             sys.stdout.write(log.hl(u' √ %s\n'% d,'cyan'))
 
     #failed downloads
-    if len(failed2show):
+    if len(failed_list):
         sys.stdout.write(line)
         sys.stdout.write(log.hl(msg.fmt_dl_failed_jobs,'error'))
         sys.stdout.write(line)
         #display failed jobs
-        for d in failed2show:
-            sys.stdout.write(log.hl(u' ✘ %s\n' % d,'red'))
+        for failed_song in failed_list:
+            sys.stdout.write(log.hl(u' ✘ %s\n' % failed_song.filename,'red'))
 
 
     sys.stdout.write(line)
@@ -233,39 +263,40 @@ def download_single_song(song):
         #set the success flag
         song.success = True 
 
-        fill_done2show(song.filename)
+        fill_done2show(song)
         #remove from progress
         del progress[song.filename]
     else:
         # if it comes here, 5 retries run out
-        fill_failed2show(song.filename)
+        fill_failed_list(song)
 
 
-
-def fill_done2show(filename):
+def fill_done2show(song):
     """
     fill the given filename into global list 'done2show'
     Depends on the config.SHOW_DONE_NUMBER, the eldest entry will be
     poped out from the list.
     """
-    global done2show
+    global done2show, success_list
+    success_list.append(song)
     if len(done2show) == config.SHOW_DONE_NUMBER:
         done2show.pop()
-    done2show.insert(0, filename)
+    done2show.insert(0, song.filename)
 
-def fill_failed2show(filename):
+def fill_failed_list(song):
     """
-    fill the given filename into global list 'failed2show'
+    fill the given song into global list 'failed2show'
     """
-    global failed2show
-    failed2show.insert(0, filename)
+    global  failed_list
+    failed_list.insert(0,song)
 
 
-def start_download(songs, skip_songs):
+def start_download(songs, skipped_hist):
     """
     start multi-threading downloading songs. and generate a summary file
     songs: the list of songs need to be downloaded
-    skip_songs: the songs to skip, this list is used for generating the summary file only if incremental download is true. 
+
+    call the finish_hook function, pass skipped_hist
     """
     global total, progress
     total = len(songs)
@@ -285,8 +316,50 @@ def start_download(songs, skip_songs):
 
     print log.hl(msg.fmt_insert_hist, 'warning')
     hist_handler.insert_hist(songs)
-
     print log.hl(msg.fmt_all_finished, 'warning')
+    #call finish hook
+    finish_summary(skipped_hists)
+
+def finish_summary(skipped_hist):
+    """
+    build the summary after finishing all dl
+
+    skipped_hist: a History list, contains skipped songs, it is not empty only
+                  if incremental_dl is true
+    """
+    #build summary text:
+    text = []
+    if skipped_hist:
+        #TODO text template for incremental_dl header
+        for hist in skipped_hist:
+        #TODO text template for skipped hists
+            pass
+
+    if success_list:
+        #TODO text template for success header
+        for song in success_list:
+            #TODO text template for success songs
+            pass
+
+    if failed_list:
+        #TODO text template for failed header
+        for song in success_list:
+            #TODO text template for failed songs
+            pass
+
+    while True:
+        #TODO prompt template
+        sys.stdout.write("quit/view summary/save summary. Please input [q/v/s]")
+        choice = raw_input().lower
+        if choice == 'q':
+            exit 0
+        elif choice == 'v':
+            #TODO view summary
+        elif choice == 's':
+            #TODO save summary
+        else:
+            #TODO template
+            sys.stdout.write("Please input 'q', 'v' or 's' \n")
 
 def download_lyrics(songs):
     """download / write lyric to file if it is needed"""
@@ -326,35 +399,3 @@ def download_lyrics(songs):
                     print log.hl(u' √','cyan')
         print line
 
-class Downloader(Thread):
-    def __init__(self, songs, pool):
-        Thread.__init__(self)
-        self.songs = songs
-        self.pool = pool
-
-    def run(self):
-        global progress
-        for song in self.songs:
-            self.pool.add_task(download_single_song, song)
-        self.pool.wait_completion()
-
-def get_proxy(song):
-    proxy = None
-    if song.handler.need_proxy_pool:
-        proxy = {'http':song.handler.proxies.get_proxy()}
-    elif config.CHINA_PROXY_HTTP:
-        proxy={'http': config.CHINA_PROXY_HTTP}
-    return proxy
-
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
-def write_mp3_meta(song):
-    """
-     write mp3 meta data to downloaded mp3 files
-     @song an Song instance
-     """
-    id3 = ID3()
-    id3.add(TIT2(encoding=3, text=song.song_name))
-    id3.add(TALB(encoding=3, text=song.album_name))
-    id3.add(TPE1(encoding=3, text=song.artist_name))
-    id3.save(song.abs_path)
