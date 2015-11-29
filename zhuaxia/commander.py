@@ -73,6 +73,7 @@ def shall_I_begin(option):
     #here do filtering for incremental download
     skipped_songs = [] #used by incremental_dl
     skipped_hists = [] #used by incremental_dl
+
     dl_songs = []
     if option.incremental_dl:
         skipped_songs, skipped_hists = hist_handler.filter_songs(total_songs)
@@ -86,7 +87,12 @@ def shall_I_begin(option):
     if len(dl_songs):
         LOG.info(msgTxt.fmt_total_dl_nm % output_num)
         sleep(3)
-        downloader.start_download(dl_songs, skip_hists)
+        downloader.start_download(dl_songs, skipped_hists)
+        # test
+        # downloader.success_list.extend(dl_songs)
+        # downloader.failed_list.extend(dl_songs)
+        # downloader.finish_summary(skipped_hists)
+        # test
     else:
         LOG.warning(msgTxt.no_dl_task)
 

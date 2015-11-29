@@ -2,6 +2,17 @@
 head_xm                          = u'[xia]'
 head_163                         = u'[163]'
 
+#summary
+fmt_summary_skip_title           = u'Incremental downloading skipped mp3:'
+fmt_summary_skip_header          = u'Source\t  Last DL_Time  \tName\tLocation'
+fmt_summary_success_title        = u'Successful Downloadings'
+fmt_summary_success_header       = u'Name\tLocation'
+fmt_summary_failed_title         = u'Failed Downloadings:'
+fmt_summary_failed_header        = u'Name\tLocation'
+summary_prompt                   = u'(q)uit/(v)iew summary/(s)ave summary. Please input [q/v/s]:'
+summary_prompt_err               = u"Invalid input.\n" 
+summary_saved                    = u" summary was saved at: %s" 
+
 fmt_all_finished                 = u' All jobs are finished.'
 fmt_insert_hist                  = u' Recording history for successful downloads...'
 fmt_dl_lyric_start               = u' Start downloading lyrics...'

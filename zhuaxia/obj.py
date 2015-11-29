@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import re
 import time
 import log, config, util
 from os import path
@@ -31,6 +32,9 @@ class History(object):
         self.api_url   = song.dl_link if song else None
         self.dl_time   = None
         self.times     = 1
+
+    def last_dl_time_str(self):
+        return re.sub(':[^:]*$','',str(self.dl_time))
 
     def __repr__(self):
         #TODO

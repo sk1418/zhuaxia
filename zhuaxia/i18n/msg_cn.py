@@ -2,6 +2,17 @@
 head_xm                          = u'[虾]'
 head_163                         = u'[易]'
 
+#summary
+fmt_summary_skip_title           = u'增量下载忽略列表:'
+fmt_summary_skip_header          = u'来源\t  最后下载时间  \t歌曲名\t保存路径'
+fmt_summary_success_title        = u'成功下载列表:'
+fmt_summary_success_header       = u'歌曲名\t保存路径'
+fmt_summary_failed_title         = u'失败下载列表:'
+fmt_summary_failed_header        = u'歌曲名\t保存路径'
+summary_prompt                   = u'(q)退出/(v)查看下载报告/(s)保存下载报告. 请输入 [q/v/s]:'
+summary_prompt_err               = u" 无效输入\n" 
+summary_saved                    = u" 下载报告保存于: %s" 
+
 fmt_insert_hist                  = u' 为成功下载建立历史记录...'
 fmt_all_finished                 = u' 所有任务都已完成'
 fmt_dl_lyric_start               = u' 开始下载歌词...'

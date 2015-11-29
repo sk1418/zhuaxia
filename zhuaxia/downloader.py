@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 from os import path
 import os
+import datetime
 import sys
 import requests
 import config, log, util
@@ -13,6 +14,8 @@ from mutagen.id3 import ID3,TRCK,TIT2,TALB,TPE1,APIC,TDRC,COMM,TPOS,USLT
 from threading import Thread
 #see download_url_urllib doc
 import urllib2
+import pydoc
+import codecs
 
 
 LOG = log.get_logger('zxLogger')
@@ -291,7 +294,7 @@ def fill_failed_list(song):
     failed_list.insert(0,song)
 
 
-def start_download(songs, skipped_hist):
+def start_download(songs, skipped_hists):
     """
     start multi-threading downloading songs. and generate a summary file
     songs: the list of songs need to be downloaded
@@ -327,39 +330,43 @@ def finish_summary(skipped_hist):
     skipped_hist: a History list, contains skipped songs, it is not empty only
                   if incremental_dl is true
     """
+    border= "\n"+u">>"*40 + u"\n"
     #build summary text:
     text = []
     if skipped_hist:
-        #TODO text template for incremental_dl header
+        text.append( border+msg.fmt_summary_skip_title +border)
+        text.append( msg.fmt_summary_skip_header)
         for hist in skipped_hist:
-        #TODO text template for skipped hists
-            pass
+            text.append( "%s\t%s\t%s\t%s" % (msg.head_xm if hist.source ==1 else msg.head_163, hist.last_dl_time_str(), hist.song_name, hist.location))
 
     if success_list:
-        #TODO text template for success header
+        text.append( border+msg.fmt_summary_success_title +border)
+        text.append( msg.fmt_summary_success_header)
         for song in success_list:
-            #TODO text template for success songs
-            pass
+            text.append('%s\t%s'%(song.song_name, song.abs_path))
 
     if failed_list:
-        #TODO text template for failed header
-        for song in success_list:
-            #TODO text template for failed songs
-            pass
+        text.append( border+msg.fmt_summary_failed_title +border)
+        text.append( msg.fmt_summary_failed_header)
+        for song in failed_list:
+            text.append('%s\t%s'%(song.song_name, song.abs_path))
 
     while True:
-        #TODO prompt template
-        sys.stdout.write("quit/view summary/save summary. Please input [q/v/s]")
-        choice = raw_input().lower
+        sys.stdout.write(msg.summary_prompt)
+        choice = raw_input().lower()
         if choice == 'q':
-            exit 0
+            break
         elif choice == 'v':
-            #TODO view summary
+            pydoc.pager(u"\n".join(text))
+            break
         elif choice == 's':
-            #TODO save summary
+            summary = path.join(config.DOWNLOAD_DIR,'summary_'+str(datetime.datetime.today())+".txt")
+            with codecs.open(summary, 'w', 'utf-8') as f:
+                f.write("\n".join(text))
+            print log.hl(msg.summary_saved % summary ,'cyan')
+            break
         else:
-            #TODO template
-            sys.stdout.write("Please input 'q', 'v' or 's' \n")
+            sys.stdout.write(msg.summary_prompt_err)
 
 def download_lyrics(songs):
     """download / write lyric to file if it is needed"""
