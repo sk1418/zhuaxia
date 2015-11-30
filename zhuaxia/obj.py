@@ -7,6 +7,10 @@ from os import path
 LOG = log.get_logger("zxLogger")
 
 
+if config.LANG.upper() == 'CN':
+    import i18n.msg_cn as msg
+else:
+    import i18n.msg_en as msg
 
 Song_Type={0:'unknown',1:u"虾米", 2:u"网易"}
 
@@ -32,6 +36,14 @@ class History(object):
         self.api_url   = song.dl_link if song else None
         self.dl_time   = None
         self.times     = 1
+
+    def to_csv(self):
+        return u"%d;%s;%s;%s;%s;%s;%s;%s;%d" %\
+               (self.id,self.song_id,self.song_name,\
+                'H' if self.hq == 1 else 'L', \
+                msg.head_xm if self.source ==1 else msg.head_163, \
+                self.location, self.api_url, self.last_dl_time_str(), \
+                self.times)
 
     def last_dl_time_str(self):
         return re.sub(':[^:]*$','',str(self.dl_time))

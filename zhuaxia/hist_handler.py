@@ -4,8 +4,17 @@ import log
 import config
 import datetime
 import sqlite3 as sqlite
+import codecs
+from os import path
 
 LOG = log.get_logger("zxLogger")
+
+if config.LANG.upper() == 'CN':
+    import zhuaxia.i18n.msg_cn as msg
+else:
+    import zhuaxia.i18n.msg_en as msg
+
+
 SELECT_PART="""Select id, song_id, song_name, hq, source, location, api_url, dl_time, times FROM History """
 INSERT_STMT = """Insert into History (song_id, song_name, hq, source, location, api_url, dl_time )
     values(?,?,?,?,?,?,?)"""
@@ -15,6 +24,27 @@ INSERT_STMT = """Insert into History (song_id, song_name, hq, source, location, 
 def __getConnection():
     conn = sqlite.connect(config.HIST_DB)
     return conn
+
+def export_hists():
+    """
+    export all history data
+    """
+    print log.hl(msg.history_exporting ,'cyan')
+    conn = __getConnection()
+    dao = HistDao(conn)
+    hists = dao.get_all_histories()
+
+    filename = path.join(config.DOWNLOAD_DIR,'zhuaxia_history_'+str(datetime.datetime.today())+".csv")
+
+    with codecs.open(filename, 'w', 'utf-8') as f:
+        f.write( "id;song_id;song_name;quality;source;location;api_url;download_time;download_times\n")
+        for h in hists:
+            f.write(h.to_csv())
+            f.write("\n")
+
+    print log.hl(msg.history_exported % filename ,'cyan')
+    conn.close()
+    
 
 def insert_hist(songs):
     """
@@ -76,6 +106,14 @@ class HistDao(object):
         cur.close()
         return hist
     
+    def get_all_histories(self):
+        sql = SELECT_PART 
+        cur = self.conn.cursor()
+        cur.execute(sql)
+        all_hists = [ self.__row2hist(row) for row in cur.fetchall() ]
+        cur.close()
+        return all_hists
+
     def insert_history(self, song):
         sql = INSERT_STMT
         cur = self.conn.cursor()

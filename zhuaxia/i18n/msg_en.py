@@ -13,6 +13,9 @@ summary_prompt                   = u'(q)uit/(v)iew summary/(s)ave summary. Pleas
 summary_prompt_err               = u"Invalid input.\n" 
 summary_saved                    = u" summary was saved at: %s" 
 
+history_exporting                = u" Exporting download history (other options will be ignored)..." 
+history_exported                 = u" Zhuaxia download-history was exported to: %s" 
+
 fmt_all_finished                 = u' All jobs are finished.'
 fmt_insert_hist                  = u' Recording history for successful downloads...'
 fmt_dl_lyric_start               = u' Start downloading lyrics...'

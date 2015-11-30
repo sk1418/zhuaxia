@@ -15,7 +15,7 @@ import zhuaxia.downloader as downloader
 import zhuaxia.commander as commander
 import zhuaxia.zxver as zxver
 import zhuaxia.option as user_option
-
+import zhuaxia.hist_handler as hist_handler
 
 # logger name
 logger_name = 'zxLogger'
@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
         if len(sys.argv)<2: raise getopt.GetoptError("parameters are missing...")
 
-        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvpli")
+        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvplie")
         for o, a in opts:
             if o == '-h':
                 usage()
@@ -69,6 +69,10 @@ if __name__ == '__main__':
                 dl_lyric = True
             elif o == '-i':
                 incremental_dl = True
+            elif o == '-e': #export history data
+                hist_handler.export_hists()
+                sys.exit(0)
+                
 
         if not inFile:
             if not len(args):

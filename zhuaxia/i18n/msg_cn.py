@@ -13,6 +13,9 @@ summary_prompt                   = u'(q)退出/(v)查看下载报告/(s)保存�
 summary_prompt_err               = u" 无效输入\n" 
 summary_saved                    = u" 下载报告保存于: %s" 
 
+history_exporting                = u" 忽略其它选项, 正在导出下载历史记录..." 
+history_exported                 = u" 下载历史记录导出到: %s" 
+
 fmt_insert_hist                  = u' 为成功下载建立历史记录...'
 fmt_all_finished                 = u' 所有任务都已完成'
 fmt_dl_lyric_start               = u' 开始下载歌词...'
