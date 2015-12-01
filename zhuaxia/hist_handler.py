@@ -25,6 +25,22 @@ def __getConnection():
     conn = sqlite.connect(config.HIST_DB)
     return conn
 
+def get_history_count():
+    conn = __getConnection()
+    dao = HistDao(conn)
+    count = dao.get_history_count()
+    conn.close()
+    return count
+
+def empty_hists():
+    """empty history table"""
+    conn = __getConnection()
+    dao = HistDao(conn)
+    hists = dao.delete_all()
+    print log.hl(msg.history_cleared,'cyan')
+    conn.commit()
+    conn.close()
+
 def export_hists():
     """
     export all history data
@@ -105,6 +121,14 @@ class HistDao(object):
         hist = self.__row2hist( cur.fetchone())
         cur.close()
         return hist
+    
+    def get_history_count(self):
+        sql = "select count(*) from History"
+        cur = self.conn.cursor()
+        cur.execute(sql)
+        count = cur.fetchone()[0]
+        cur.close()
+        return count
     
     def get_all_histories(self):
         sql = SELECT_PART 

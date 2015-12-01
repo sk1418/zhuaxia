@@ -13,6 +13,9 @@ summary_prompt                   = u'(q)uit/(v)iew summary/(s)ave summary. Pleas
 summary_prompt_err               = u"Invalid input.\n" 
 summary_saved                    = u" summary was saved at: %s" 
 
+history_clear_confirm            = u" %d downloading histories found. Are you sure to remove all these histories? [y/n]" 
+history_clearing                 = u" Clear zhuaxia downloading hisotory (other options will be ignored)" 
+history_cleared                  = u" All zhuaxia download history has been cleared." 
 history_exporting                = u" Exporting download history (other options will be ignored)..." 
 history_exported                 = u" Zhuaxia download-history was exported to: %s" 
 

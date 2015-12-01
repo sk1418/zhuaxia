@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import zhuaxia.config as config
+import sys
 
 #load config at very beginning
 config.load_config()
@@ -36,6 +37,23 @@ def version():
     """print version"""
     print msg.ver_text + zxver.version
 
+def export_or_clear_hist(export_hist, empty_hist):
+    if export_hist and empty_hist : raise getopt.GetoptError("option -e and -d cannot be used together!")
+    if export_hist:
+        hist_handler.export_hists()
+        sys.exit(0)
+    elif empty_hist:
+        print log.hl(msg.history_clearing ,'cyan')
+        while True:
+            count = hist_handler.get_history_count()
+            sys.stdout.write(msg.history_clear_confirm % count)
+            choice = raw_input().lower()
+            if choice == 'n':
+                sys.exit(0)
+            elif choice == 'y':
+                hist_handler.empty_hists()
+                sys.exit(0)
+
 if __name__ == '__main__':
     log.setup_log(logger_name, config.LOG_LVL_CONSOLE, config.LOG_LVL_FILE)
     LOG = log.get_logger(logger_name)
@@ -47,10 +65,12 @@ if __name__ == '__main__':
         needProxyPool  = False
         dl_lyric       = False
         incremental_dl = False
+        export_hist    = False
+        empty_hist     = False
 
         if len(sys.argv)<2: raise getopt.GetoptError("parameters are missing...")
 
-        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvplie")
+        opts, args = getopt.getopt(sys.argv[1:],":f:Hhvplied")
         for o, a in opts:
             if o == '-h':
                 usage()
@@ -70,10 +90,14 @@ if __name__ == '__main__':
             elif o == '-i':
                 incremental_dl = True
             elif o == '-e': #export history data
-                hist_handler.export_hists()
-                sys.exit(0)
-                
+                export_hist = True
+            elif o == '-d': #empty history
+                empty_hist = True
+        
+        #handle the export and empty 
+        export_or_clear_hist(export_hist, empty_hist)
 
+        ## -f check file
         if not inFile:
             if not len(args):
                 raise getopt.GetoptError("input file or xiami url is needed")
@@ -92,9 +116,10 @@ if __name__ == '__main__':
         #print debug
         option.debug_me()
 
+        # ok, let's go!
         commander.shall_I_begin(option)
                 
     except getopt.GetoptError as e:
         LOG.error(str(e))
-        usage()
+        print log.hl("\nTo know how to use zhuaxia, run:\n\tzx -h\n",'cyan')
         sys.exit(2)

@@ -13,6 +13,9 @@ summary_prompt                   = u'(q)退出/(v)查看下载报告/(s)保存�
 summary_prompt_err               = u" 无效输入\n" 
 summary_saved                    = u" 下载报告保存于: %s" 
 
+history_clear_confirm            = u" 找到 %d 条下载记录, 确认要清空所有下载历史记录? [y/n]" 
+history_clearing                 = u" 忽略其它选项,清空zhuaxia下载历史记录..." 
+history_cleared                  = u" zhuaxia所有下载记录已清空" 
 history_exporting                = u" 忽略其它选项, 正在导出下载历史记录..." 
 history_exported                 = u" 下载历史记录导出到: %s" 
 
