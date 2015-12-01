@@ -31,7 +31,9 @@ help_info = msg.help_info
 
 def usage():
     """print usage information"""
-    print help_info % log.STYLE
+    import pydoc
+    pydoc.pager(help_info)
+    sys.exit(0)
 
 def version():
     """print version"""
