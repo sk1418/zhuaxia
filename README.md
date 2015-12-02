@@ -1,5 +1,5 @@
 
-**[English Version](README_EN.md)**
+**[>>>> English Version <<<<](README_EN.md)**
 
 
 ####Table of contents
@@ -44,7 +44,10 @@ zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾
 - [虾]配置项`china.proxy.http=ip:port` 来设置国内的代理服务进行解析和下载。详见："Usage -> 海外IP下载资源" 一节
 - 加入实验性`-p`选项，尝试解决频繁请求被服务器ban的问题
 - 中英文命令行界面. 配置项 `lang=en|cn` 默认中文(`cn`)
-- 下载歌曲的歌词，保存为同名`lrc`文件 (`-l`选项)
+- 下载歌曲的同时下载歌词，保存为同名`lrc`文件 (`-l`选项)
+- zhuaxia维护一个下载历史记录, 支持增量下载(`-i` 选项). 增量下载时, 曾下载过的歌曲将被忽略
+- 支持下载历史的导出(`-e`),清空(`-d`)
+- 所有下载完成时显示/保存本次下载详情
 
 
 
@@ -73,47 +76,76 @@ Archlinux 用户, zhuaxia可以从AUR中获取
 - 使用：
 
 
-		zhuaxia (抓虾) -- 抓取[虾米音乐]和[网易云音乐]的 mp3 音乐
+    zhuaxia (抓虾) -- 抓取[虾米音乐]和[网易云音乐]的 mp3 音乐
 
-		[CONFIG FILE:]   $HOME/.zhuaxia/zhuaxia.conf
+    [CONFIG FILE:] $HOME/.zhuaxia/zhuaxia.conf
+                   缺省配置文件会在第一次运行zhuaxia时自动生成
 
-		[OPTIONS] 
-			-H : 首选HQ质量(320kbps), 
-				> 虾米音乐 <
-					- 配置文件中需给出正确登录信箱和密码, 登录用户需拥有VIP身份
-					- 用户需在xiami vip设置页面设置默认高音质
-					- 此选项对不满足上两项情况无效，仍下载128kbps资源
-				> 网易音乐 <
-					-无需特殊要求,直接下载高音质资源
+    [OPTIONS]
+        -H : 首选HQ质量(320kbps),
+            > 虾米音乐 <
+                - 配置文件中需给出正确登录信箱和密码, 登录用户需拥有VIP身份
+                - 用户需在xiami vip设置页面设置默认高音质
+                - 此选项对不满足上两项情况无效，仍下载128kbps资源
+            > 网易音乐 <
+                -无需特殊要求,直接下载高音质资源
 
-			-p : (实验性选项)使用代理池下载
-				在下载/解析量大的情况下，目标服务器会对禁止频繁的请求，所以zhuaxia可以自动获取
-				代理来解析和下载资源。因为获取的代理速度/可靠性不一，下载可能会缓慢或不稳定。
 
-			-h ：显示帮助
-			-l ：下载lrc格式歌词
-			-f ：从文件下载
-			-v ：显示版本信息
+        -h : 显示帮助
 
-		[USAGE] 
+        -l : 下载歌曲的lrc格式歌词
 
-			zx [OPTION] <URL>
-				: 下载指定URL资源, 抓虾自动识别链接, 支持
-					- [虾] 歌曲，专辑，精选集，用户收藏,艺人TopN
-					- [易] 歌曲，专辑，歌单，艺人TopN
-				例子： 
-				  zx "http://www.xiami.com/space/lib-song/u/25531126"
-				  zx "http://music.163.com/song?id=27552647"
+        -f : 从文件下载
 
-			zx [OPTION] -f <file> 
-				: 多个URL在一个文件中，每个URL一行。 URLs可以是混合[虾]和[易]的不同类型音乐资源。例子：
-				  $ cat /tmp/foo.txt
-					http://music.163.com/artist?id=5345
-					http://www.xiami.com/song/1772130322
-					http://music.163.com/album?id=2635059
-					http://www.xiami.com/album/32449
+        -i : 增量下载. zhuaxia依靠历史记录来判定一首歌是否曾被下载
+             曾经被下载过的歌曲将被略过. 判断一首歌曲是否被下载过靠3个属性:
+             song_id(虾米或网易的歌曲id), source (虾米/网易), quality (H/L)
 
-				  $ zx -f /tmp/foo.txt
+        -e : 导出当前下载历史记录到文件
+             如果这个选项被使用, 其它选项将被忽略
+
+        -d : 清空当前下载历史记录
+             如果这个选项被使用, 其它选项将被忽略. 
+             -e 和-d 选项不能同时使用
+
+        -v : 显示版本信息
+
+        -p : (实验性选项)使用代理池下载
+            在下载/解析量大的情况下，目标服务器会对禁止频繁的请求，所以zhuaxia可以自动获取 代理来解析和下载资源。因为获取的代理速度/可靠性不一，下载可能会缓慢或不稳定。
+
+    [USAGE]
+
+        zx [OPTION] <URL>
+            : 下载指定URL资源, 抓虾自动识别链接, 支持
+                - [虾] 歌曲，专辑，精选集，用户收藏,艺人TopN
+                - [易] 歌曲，专辑，歌单，艺人TopN
+            例子：
+              zx "http://www.xiami.com/space/lib-song/u/25531126"
+              zx "http://music.163.com/song?id=27552647"
+
+        zx [OPTION] -f <file>
+            : 多个URL在一个文件中，每个URL一行。 URLs可以是混合[虾]和[易]的不同类型音乐资源。例子：
+
+              >$ cat /tmp/foo.txt
+                http://music.163.com/artist?id=5345
+                http://www.xiami.com/song/1772130322
+                http://music.163.com/album?id=2635059
+                http://www.xiami.com/album/32449
+              >$ zx -f /tmp/foo.txt
+
+        Other Examples:
+
+                下载歌曲和歌词:
+                    zx -l "http://music.163.com/song?id=27552647"
+
+                增量下载, 并下载歌词
+                    zx -li "http://music.163.com/song?id=27552647"
+
+                导出下载历史记录. 文件会被保存在配置文件设置的"download.dir"目录中
+                    zx -e
+
+                清空所有下载历史记录
+         
 
 ### Proxy setting
 

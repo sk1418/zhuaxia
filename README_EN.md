@@ -46,6 +46,9 @@ zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resource
 - `-p` option (experimental function)，using a proxypool to solve the problem of "ip was banned if requests to a server were too often.
 - Chinese (default) or English CLI, add `lang=en` in config file to change CLI into English. 
 - Download lyrics (`-l` option)
+- zhuaxia maintains a download history, supports incremental downloading. (`-i` option). When running with `-i`, mp3 in history will be skipped.
+- Export (`-e`), Clear (`-d`) download history function
+- provide download summary after all downloading finished, supports view/save summary.
 
 
 ## Installation
@@ -70,48 +73,81 @@ other users:
 
 - Usage:
 
-		zhuaxia -- download mp3 music from [xiami.com] and [music.163.com]
+    zhuaxia -- download mp3 music from [xiami.com] and [music.163.com]
 
-		[CONFIG FILE:]   $HOME/.zhuaxia/zhuaxia.conf
+    [CONFIG FILE:]  $HOME/.zhuaxia/zhuaxia.conf
+                    It will be automatically created when zhuaxia was started first time.
 
-		[OPTIONS]
-			-H : prefer High Quality(320kbps),
-				> xiami <
-					- xiami vip user email/password should be set in config
-					- user should set HQ on xiami vip setting page
-					- if any above requirements was not satisfied, 128kbps will be taken
-				> 163 <
-					- no special requirement
+    [OPTIONS]
+        -H : prefer High Quality(320kbps),
+            > xiami <
+                - xiami vip user email/password should be set in config
+                - user should set HQ on xiami vip setting page
+                - if any above requirements was not satisfied, 128kbps will be taken
+            > 163 <
+                - no special requirement
 
-			-p : auto choose proxy from proxy pool (experimental option)
-				when frequency of request to target host is high enough, host could ban the client
-				for some time. zhuaxia will auto take proxy from pool. However this may make
-				downloading slow or unstable.
+        -h : show this help
 
-			-h ：show help
-			-l ：download lyrics
-			-f ：download from url file
-			-v ：show version information
+        -l : download lyric too (lrc format)
 
-		[USAGE]
+        -f : download from url file (see example in [USAGE])
 
-			zx [OPTION] <URL>
-				: auto recognize and download the given url resource, supports:
-					- [xm] song, album, favorite, collection, artist TopN
-					- [163]song, album, list, artist topN
-				example:
-					zx "http://www.xiami.com/space/lib-song/u/25531126"
-					zx "http://music.163.com/song?id = 27552647"
+        -i : incremental downloading
+             zhuaxia will check download history and skip the mp3 if it has been downloaded before.
+             To identify a downloaded mp3, the combination of these three attributes will be checked:
+             song_id(id in xiami/netease), source (xiami/netease), quality (H/L)
 
-			zx [OPTION] -f <file>
-				: download from url file. one url per line. The urls could be 163 and xm mixed. Example:
-				  $ cat /tmp/foo.txt
-					http://music.163.com/artist?id=5345
-					http://www.xiami.com/song/1772130322
-					http://music.163.com/album?id=2635059
-					http://www.xiami.com/album/32449
+        -e : export history data to file, if this option was given, other options will be ignored.
 
-				  $ zx -f /tmp/foo.txt
+        -d : clear all history data, if this option was given, other options will be ignored.
+             -e and -d cannot be used together.
+
+        -v : show version information
+
+        -p : auto choose proxy from proxy pool (experimental option)
+             when frequency of request to target host is high enough, host could ban the client
+             for some time. zhuaxia will auto take proxy from pool. However this may make
+             downloading slow or unstable.
+
+    [USAGE]
+
+        zx [OPTION] <URL>
+
+             auto recognize and download the given url resource, supports:
+                - [xm] song, album, favorite, collection, artist TopN
+                - [163]song, album, list, artist topN
+
+        Example:
+                zx "http://www.xiami.com/space/lib-song/u/25531126"
+                zx "http://music.163.com/song?id=27552647"
+
+        zx [OPTION] -f <file>
+
+            download from url file. one url per line. The urls could be 163 and xm mixed. Example:
+
+        Example:
+              $ cat /tmp/foo.txt
+                http://music.163.com/artist?id=5345
+                http://www.xiami.com/song/1772130322
+                http://music.163.com/album?id=2635059
+                http://www.xiami.com/album/32449
+
+              $ zx -f /tmp/foo.txt
+
+        Other Examples:
+
+                download lyrics with songs: 
+                    zx -l "http://music.163.com/song?id=27552647"
+
+                incremental download songs with lyrics: 
+                    zx -li "http://music.163.com/song?id=27552647"
+
+                export zhuaxia download history. File will be save under "download.dir" in config file:
+                    zx -e
+
+                clear(delete) all zhuaxia download history:
+                    zx -d
 
 
 ### Proxy setting

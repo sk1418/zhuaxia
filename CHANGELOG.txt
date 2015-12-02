@@ -1,3 +1,10 @@
+2015-12-02  Version 3.0.0
+=========================
+- [feature] [#20] incremental downloading support (-i option)
+- [feature] downloading history (export, clear)
+- [feature] download summary after downloading (view/save as file)
+- [enhancement] better help info output
+
 2015-11-25  Version 2.8.1
 =========================
 - [#24] fix the refactory problem (old method name)
