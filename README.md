@@ -145,6 +145,7 @@ Archlinux 用户, zhuaxia可以从AUR中获取
 						zx -e
 
 					清空所有下载历史记录
+						zx -d
          
 
 ### Proxy setting
