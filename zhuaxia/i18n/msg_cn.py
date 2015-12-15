@@ -143,4 +143,9 @@ help_info                        = u"""
 
                 清空所有下载历史记录
                     zx -d
+
+    [AUTHOR]
+        
+        Kai Yuan <kent.yuan(at)gmail.com>
+        please report bugs or feature requests at https://github.com/sk1418/zhuaxia/issues
         """
