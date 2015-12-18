@@ -74,6 +74,11 @@ class NeteaseSong(Song):
         # album id, name
         self.album_name = util.decode_html(js['album']['name'])
         self.album_id = js['album']['id']
+        #track no
+        if js['position']:
+            self.track_no = js['position']
+        elif js['no']:
+            self.track_no = js['no']
 
         # download link
         dfsId = ''

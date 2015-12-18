@@ -81,6 +81,7 @@ class Song(object):
 
         #used only for album/collection etc. create a dir to group all songs
         self.group_dir = None
+        self.track_no = 1
 
         self.filename = ''
         

@@ -148,10 +148,10 @@ class HistDao(object):
 
     def update_history(self, hist, song):
         sql = """update History set 
-            times=times+1, dl_time=?, location, api_url
+            times=times+1, dl_time=?, location=?, api_url=?
             where id=?"""
         cur = self.conn.cursor()
-        cur.execute(sql, (datetime.datetime.today(), song.abs_pat, song.dl_link, hist.id ))
+        cur.execute(sql, (datetime.datetime.today(), song.abs_path, song.dl_link, hist.id ))
         cur.close()
 
     def delete_all(self):

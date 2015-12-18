@@ -68,6 +68,7 @@ def write_mp3_meta(song):
     id3.add(TIT2(encoding=3, text=song.song_name))
     id3.add(TALB(encoding=3, text=song.album_name))
     id3.add(TPE1(encoding=3, text=song.artist_name))
+    id3.add(TRCK(encoding=3, text=str(song.track_no)))
     id3.save(song.abs_path)
 
 def print_progress():
