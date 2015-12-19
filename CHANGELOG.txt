@@ -1,3 +1,8 @@
+2015-12-19  Version 3.0.1
+=========================
+- [feature][#25] set track no in 163 mp3
+- [bugfix] update history fix
+
 2015-12-02  Version 3.0.0
 =========================
 - [feature] [#20] incremental downloading support (-i option)
