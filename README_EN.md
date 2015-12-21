@@ -1,5 +1,3 @@
-
-
 [中文介绍](README.md)
 
 
@@ -11,6 +9,7 @@
 - [Installation](#installation)
 - [Usage](#usage)
 	- [download resource outside China](#proxy-setting)
+        - [How to get China Proxy](#how-to-get-china-proxy)
 - [Screenshots](#screenshots)
 - [Change logs](#changelog)
 
@@ -164,9 +163,18 @@ For example:
 
 The `ip:port` is http proxy in China, so that we can send request with Chinese IP. If your machine has already an IP in China. You don't need this option. You can remove or comment this property out.
 
-**Tip**: finding a China proxy: Go to http://proxy-list.org/ then search country "China"
+**Tip**: finding a China proxy: 
 
 **Considering the users' existing config, the option `xiami.proxy.http` is still usable too. The proxy will be applied for both xiami and 163 song downloading. However changing the option name in config is recommended. Old and new options cannot be used together.**
+
+#### How to get China Proxy
+
+Go to http://proxy-list.org/ then search country "China"
+
+Or:
+
+Using this script: 
+[cnProxy.py](https://github.com/sk1418/myScripts/blob/master/python/cnProxy.py) to get top N (default 5) fast China Proxies.
 
 ## Screenshots
 
@@ -182,3 +190,6 @@ The `ip:port` is http proxy in China, so that we can send request with Chinese I
 ## Changelog
 
 [Click to check Change logs](CHANGELOG.txt)
+
+
+
