@@ -29,7 +29,7 @@ else:
 total=0
 #the number of finished jobs
 done=0
-#progress dictionary, for progress display
+#progress dictionary, for progress display. {filename:Download_Progress obj}
 progress = {}
 #finsished job to be shown in progress
 done2show=[]
@@ -37,6 +37,27 @@ done2show=[]
 #success/failed song lists (song objects)
 success_list=[]
 failed_list=[]
+
+class Download_Progress(object):
+    """
+    a download progress object 
+    """
+    def __init__(self, filename):
+        self.filename = filename
+        self.total_length = 0
+        self.finished_length =0
+        self.start = datetime.datetime.now()
+
+
+    def percent(self):
+        """calculate downloaded percentage"""
+        return float(self.finished_length) / float(self.total_length) if self.total_length else 0.0
+
+    def rate(self):
+        """ calculate downloading rate """
+        elapsed = datetime.datetime.now() - self.start
+        return float(self.total_length-self.finished_length)/float(elapsed.total_seconds())/1024
+
 
 
 class Downloader(Thread):
@@ -87,19 +108,25 @@ def print_progress():
     sys.stdout.write(log.hl(u' %s'%header,'warning'))
     sys.stdout.write(line)
 
-    fmt_progress = '%s [%s] %.1f%%\n'
+    fmt_progress = '%s [%s] %.1f%% (%dkib/s)\n'
 
 
     all_p = [] #all progress bars, filled by following for loop
     sum_percent = 0 # total percent for running job
+    sum_rate = 0 # total rate for running job
     total_percent = 0
 
-    for filename, percent in progress.items():
+    for filename, prog_obj in progress.items():
+        percent = prog_obj.percent()
+        rate = prog_obj.rate()
+        #sum for the total progress
         sum_percent += percent
+        sum_rate += rate
+
         bar = util.ljust('=' * int(percent * bar_count), bar_count)
         per100 = percent * 100 
         single_p =  fmt_progress % \
-                (util.rjust(filename,(width - bar_count -10)), bar, per100) # the -10 is for the xx.x% and [ and ]
+                (util.rjust(filename,(width - bar_count -22)), bar, per100,rate) # the -20 is for the xx.x% and [ and ] xx.xkb/s (spaces)
         all_p.append(log.hl(single_p,'green'))
     
     #calculate total progress percent
@@ -109,7 +136,7 @@ def print_progress():
     g_text = msg.fmt_dl_progress % (done, total)
     g_bar = util.ljust('#' * int(total_percent* bar_count), bar_count)
     g_progress =  fmt_progress % \
-                (util.rjust(g_text,(width - bar_count -10)), g_bar, 100*total_percent) # the -10 is for the xx.x% and [ and ]
+                (util.rjust(g_text,(width - bar_count -22)), g_bar, 100*total_percent,sum_rate) # the -20 is for the xx.x% and [ and ] xx.xkb/s (spaces)
 
     #output all total progress bars
     sys.stdout.write(log.hl(u'%s'%g_progress, 'red'))
@@ -140,6 +167,21 @@ def print_progress():
     sys.stdout.write(line)
     sys.stdout.flush()
 
+
+def fill_download_progress(filename, total_length, finished_length):
+    """ fill the global dict progress {} with download progress """
+    global progress
+
+    if filename in progress:
+        prog_obj = progress[filename]
+        prog_obj.total_length = total_length
+        prog_obj.finished_length = finished_length
+    else:
+        prog_obj = Download_Progress(filename)
+        progress[filename] = prog_obj
+
+
+
 def download_url_urllib(url,filepath,show_progress=False, proxy=None):
     """ 
     this function does the samething as the download_url(). The different is
@@ -166,6 +208,7 @@ def download_url_urllib(url,filepath,show_progress=False, proxy=None):
         r = urllib2.urlopen(url, timeout=30)
         if r.getcode() == 200:
             total_length = int(r.info().getheader('Content-Length').strip())
+            
             done_length = 0
             chunk_size=1024
             with open(filepath,'wb') as f:
@@ -176,8 +219,7 @@ def download_url_urllib(url,filepath,show_progress=False, proxy=None):
                         break
                     f.write(chunk)
                     if show_progress:
-                        percent = float(done_length) / float(total_length)
-                        progress[fname] = percent
+                        fill_download_progress(fname, total_length, done_length)
             return 0
         else:
             LOG.debug("[DL_URL] HTTP Status %d . Song: %s " % (r.status_code,fname))
@@ -210,8 +252,7 @@ def download_url(url,filepath,show_progress=False, proxy=None):
                     done_length += len(chunk)
                     f.write(chunk)
                     if show_progress:
-                        percent = float(done_length) / float(total_length)
-                        progress[fname] = percent
+                        fill_download_progress(fname, total_length, done_length)
             return 0
         else:
             LOG.debug("[DL_URL] HTTP Status %d . Song: %s " % (r.status_code,fname))
@@ -242,7 +283,7 @@ def download_single_song(song):
 
         #if file not in progress, add
         if song.filename not in progress:
-            progress[song.filename] = 0.0
+            fill_download_progress(song.filename, 0.0, 0.0)
 
         #do the actual downloading
         dl_result = download_url_urllib(song.dl_link, mp3_file, show_progress=True, proxy= get_proxy(song))
@@ -266,7 +307,6 @@ def download_single_song(song):
     if dl_result == 0:
         #set the success flag
         song.success = True 
-
         fill_done2show(song)
         #remove from progress
         del progress[song.filename]
@@ -302,7 +342,7 @@ def start_download(songs, skipped_hists):
 
     call the finish_hook function, pass skipped_hist
     """
-    global total, progress
+    global total
     total = len(songs)
     LOG.debug('init thread pool (%d) for downloading'% config.THREAD_POOL_SIZE)
     pool = ThreadPool(config.THREAD_POOL_SIZE)

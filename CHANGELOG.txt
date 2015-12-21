@@ -1,3 +1,7 @@
+2015-12-22  Version 3.0.2
+=========================
+- [enhancement] add download rate in output 
+
 2015-12-19  Version 3.0.1
 =========================
 - [feature][#25] set track no in 163 mp3
