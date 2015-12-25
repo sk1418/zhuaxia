@@ -6,7 +6,7 @@ setup(
     version = zxver.version,
     install_requires=[ 'requests','mutagen','beautifulsoup4' ],
     packages = find_packages(),
-    package_data={'zhuaxia':['conf/*.conf']},
+    package_data={'zhuaxia':['conf/default.*']},
     #data_files=[('conf',glob.glob('conf/*.*'))],
     include_package_data= True,
     zip_safe=False,
