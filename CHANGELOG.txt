@@ -1,3 +1,7 @@
+2016-01-21  Version 3.0.3
+=========================
+- [bugfix] [#26] change the 163's mp3 dl link
+
 2015-12-22  Version 3.0.2
 =========================
 - [enhancement] add download rate in output 
