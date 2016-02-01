@@ -122,6 +122,7 @@ class NeteaseAlbum(object):
         #album logo
         self.logo = js['picUrl']
         # artist_name
+        self.artist_name = js['artists'][0]['name']
         #handle songs
         for jsong in js['songs']:
             song = NeteaseSong(self.handler, song_json=jsong)
