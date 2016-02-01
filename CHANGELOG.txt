@@ -1,3 +1,7 @@
+2016-02-01  Version 3.0.4
+=========================
+- [#29] check the key (position) in json dict before using it. 163 changed json structure.
+
 2016-01-21  Version 3.0.3
 =========================
 - [bugfix] [#26] change the 163's mp3 dl link

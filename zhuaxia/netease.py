@@ -75,9 +75,9 @@ class NeteaseSong(Song):
         self.album_name = util.decode_html(js['album']['name'])
         self.album_id = js['album']['id']
         #track no
-        if js['position']:
+        if 'position' in js and js['position']:
             self.track_no = js['position']
-        elif js['no']:
+        elif 'no' in js and js['no']:
             self.track_no = js['no']
 
         # download link
@@ -122,7 +122,6 @@ class NeteaseAlbum(object):
         #album logo
         self.logo = js['picUrl']
         # artist_name
-        self.artist_name = js['artists'][0]['name']
         #handle songs
         for jsong in js['songs']:
             song = NeteaseSong(self.handler, song_json=jsong)
