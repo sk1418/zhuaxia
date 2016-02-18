@@ -395,7 +395,7 @@ def finish_summary(skipped_hist):
     while True:
         sys.stdout.write(msg.summary_prompt)
         choice = raw_input().lower()
-        if choice == 'q':
+        if choice == 'q' or choice == '':
             break
         elif choice == 'v':
             pydoc.pager(u"\n".join(text))
