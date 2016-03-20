@@ -193,7 +193,7 @@ def download_url_urllib(url,filepath,show_progress=False, proxy=None):
     """
 
     if ( not filepath ) or (not url):
-        LOG.err( 'Url or filepath is not valid, resouce cannot be downloaded.')
+        LOG.error( 'Url or filepath is not valid, resouce cannot be downloaded.')
         return 1
 
     fname = path.basename(filepath)
@@ -201,11 +201,16 @@ def download_url_urllib(url,filepath,show_progress=False, proxy=None):
     try:
         proxyServer = urllib2.ProxyHandler(proxy) if proxy else None
         opener = urllib2.build_opener()
-        if proxyServer:
-            opener = urllib2.build_opener(proxyServer)
+        # for downloading, ignore the proxy, it seems that if 
+        # we got the real link, both 163 and xiami don't need a CN proxy to
+        # download the songs
+
+        # if proxyServer:
+            # opener = urllib2.build_opener(proxyServer)
             
         urllib2.install_opener(opener)
         r = urllib2.urlopen(url, timeout=30)
+
         if r.getcode() == 200:
             total_length = int(r.info().getheader('Content-Length').strip())
             
@@ -224,6 +229,7 @@ def download_url_urllib(url,filepath,show_progress=False, proxy=None):
         else:
             LOG.debug("[DL_URL] HTTP Status %d . Song: %s " % (r.status_code,fname))
             return 1
+
     except Exception, err:
         LOG.debug("[DL_URL] downloading song %s timeout!" % fname)
         LOG.debug(traceback.format_exc())
@@ -236,7 +242,7 @@ def download_url(url,filepath,show_progress=False, proxy=None):
     http.get timeout: 30s
     """
     if ( not filepath ) or (not url):
-        LOG.err( 'Url or filepath is not valid, resouce cannot be downloaded.')
+        LOG.error( 'Url or filepath is not valid, resouce cannot be downloaded.')
         return 1
 
     fname = path.basename(filepath)
@@ -269,14 +275,14 @@ def download_single_song(song):
     """
     global done, progress
 
-
     if ( not song.filename ) or (not song.dl_link):
-        LOG.err( 'Song [id:%s] cannot be downloaded' % song.song_id)
+        LOG.error( 'Song [id:%s] cannot be downloaded' % song.song_id)
         return
     mp3_file = song.abs_path
 
     retry = 5
     dl_result = -1 # download return code
+    LOG.debug("[DL_Song] downloading: %s " % song.dl_link)
     while retry > 0 :
         retry -= 1
         LOG.debug("[DL_Song] start downloading: %s retry: %d" % (mp3_file, 5-retry))
