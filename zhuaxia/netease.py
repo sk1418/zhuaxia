@@ -72,6 +72,7 @@ class NeteaseSong(Song):
         self.song_id = js['id']
         #name
         self.song_name = util.decode_html(js['name'])
+        LOG.debug("parsing song %s ...."%self.song_name)
 
         # artist_name
         self.artist_name = js['artists'][0]['name']
