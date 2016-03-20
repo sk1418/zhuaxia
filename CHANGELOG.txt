@@ -1,3 +1,7 @@
+2016-02-01  Version 3.1.0
+=========================
+- [#32] apply 163 new api
+
 2016-02-01  Version 3.0.4
 =========================
 - [#29] check the key (position) in json dict before using it. 163 changed json structure.

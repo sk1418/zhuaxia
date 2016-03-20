@@ -21,6 +21,7 @@ class Handler(object):
     def __init__(self, proxies = None):
         self.proxies = proxies
         self.need_proxy_pool = self.proxies != None
+        self.HEADERS = {}
 
 class History(object):
     """

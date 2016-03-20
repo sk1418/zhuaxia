@@ -4,7 +4,7 @@ import zhuaxia.zxver as zxver
 setup(
     name = 'zhuaxia',
     version = zxver.version,
-    install_requires=[ 'requests','mutagen','beautifulsoup4' ],
+    install_requires=['pycrypto', 'requests','mutagen','beautifulsoup4' ],
     packages = find_packages(),
     package_data={'zhuaxia':['conf/default.*']},
     #data_files=[('conf',glob.glob('conf/*.*'))],

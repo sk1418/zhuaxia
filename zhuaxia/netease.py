@@ -3,7 +3,9 @@ import time
 import re
 import requests
 import log, config, util
+import json
 import md5
+import os
 from os import path
 import downloader
 from obj import Song, Handler
@@ -17,20 +19,23 @@ LOG = log.get_logger("zxLogger")
 
 #163 music api url
 url_163="http://music.163.com"
-url_mp3="http://m1.music.126.net/%s/%s.mp3"
+#url_mp3="http://m1.music.126.net/%s/%s.mp3" #not valid any longer
 url_album="http://music.163.com/api/album/%s/"
 url_song="http://music.163.com/api/song/detail/?id=%s&ids=[%s]"
 url_playlist="http://music.163.com/api/playlist/detail?id=%s"
 url_artist_top_song = "http://music.163.com/api/artist/%s"
 url_lyric = "http://music.163.com/api/song/lyric?id=%s&lv=1"
+url_mp3_post = 'http://music.163.com/weapi/song/enhance/player/url?csrf_token='
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
 
-#headers
-HEADERS = {'User-Agent':AGENT}
-HEADERS['Referer'] = url_163
-HEADERS['Cookie'] = 'appver=1.7.3'
+#this block is kind of magical secret.....No idea why the keys, modulus have those values ( for building the post request parameters. The encryption logic was take from https://github.com/Catofes/musicbox/blob/new_api/NEMbox/api.py)
+modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7'
+nonce = '0CoJUm6Qyw8W8jud'
+pubKey = '010001'
+
+
 
 class NeteaseSong(Song):
     """
@@ -67,7 +72,7 @@ class NeteaseSong(Song):
         self.song_id = js['id']
         #name
         self.song_name = util.decode_html(js['name'])
-        
+        LOG.debug("parsing song %s ...."%self.song_name)
 
         # artist_name
         self.artist_name = js['artists'][0]['name']
@@ -82,15 +87,23 @@ class NeteaseSong(Song):
 
         # download link
         dfsId = ''
+        bitrate = 0
         if self.handler.is_hq and js['hMusic']:
             dfsId = js['hMusic']['dfsId']
+            quality = 'HD'
+            bitrate = js['hMusic']['bitrate']
         elif js['mMusic']:
             dfsId = js['mMusic']['dfsId']
+            quality = 'MD'
+            bitrate = js['mMusic']['bitrate']
         elif js['lMusic']:
             LOG.warning(msg.head_163 + msg.fmt_quality_fallback %self.song_name)
             dfsId = js['lMusic']['dfsId']
+            quality = 'LD'
+            bitrate = js['lMusic']['bitrate']
         if dfsId:
-            self.dl_link = url_mp3 % (self.handler.encrypt_dfsId(dfsId), dfsId)
+            # self.dl_link = url_mp3 % (self.handler.encrypt_dfsId(dfsId), dfsId)
+            self.dl_link = self.handler.get_mp3_dl_link(self.song_id, bitrate)
         else:
             LOG.warning(msg.head_163 + msg.fmt_err_song_parse %self.song_name)
 
@@ -199,10 +212,15 @@ class Netease(Handler):
         Handler.__init__(self,option.proxies)
         self.is_hq = option.is_hq
         self.dl_lyric = option.dl_lyric
+        #headers
+        self.HEADERS = {'User-Agent':AGENT}
+        self.HEADERS['Referer'] = url_163
+        self.HEADERS['Cookie'] = 'appver=1.7.3'
 
     def read_link(self, link):
         
         retVal = None
+        requests_proxy = {}
         if config.CHINA_PROXY_HTTP:
             requests_proxy = { 'http':config.CHINA_PROXY_HTTP}
         if self.need_proxy_pool:
@@ -210,7 +228,7 @@ class Netease(Handler):
 
             while True:
                 try:
-                    retVal =  requests.get(link, headers=HEADERS, proxies=requests_proxy)
+                    retVal =  requests.get(link, headers=self.HEADERS, proxies=requests_proxy)
                     break 
                 except requests.exceptions.ConnectionError:
                     LOG.debug('invalid proxy detected, removing from pool')
@@ -222,7 +240,7 @@ class Netease(Handler):
                         raise
                         break
         else:
-            retVal =  requests.get(link, headers=HEADERS)
+            retVal =  requests.get(link, headers=self.HEADERS, proxies=requests_proxy)
         return retVal
 
     def encrypt_dfsId(self,dfsId):
@@ -237,3 +255,36 @@ class Netease(Handler):
         result = result.replace('/', '_')
         result = result.replace('+', '-')
         return result
+
+    def createSecretKey(self, size):
+        return (''.join(map(lambda xx: (hex(ord(xx))[2:]), os.urandom(size))))[0:16]
+
+    def encrypt_post_param(self,req_dict):
+        text = json.dumps(req_dict)
+        secKey = self.createSecretKey(16)
+        encText = util.aes_encrypt(util.aes_encrypt(text, nonce), secKey)
+        encSecKey = util.rsa_encrypt(secKey, pubKey, modulus)
+        result = {
+            'params': encText,
+            'encSecKey': encSecKey
+        }
+        return result
+
+    def get_mp3_dl_link(self, song_id,  bitrate):
+        req = {
+                "ids": [song_id],
+                "br": bitrate,
+                "csrf_token": ""
+            }
+        page = requests.post(url_mp3_post, data=self.encrypt_post_param(req), headers=self.HEADERS, timeout=30)
+        result = page.json()["data"][0]["url"]
+
+        #the redirect.....
+        if result:
+
+            r = self.read_link(result)
+            if r.history:
+                return  r.history[0].headers['Location']
+        
+        return result
+

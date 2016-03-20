@@ -28,6 +28,7 @@ zhuaxia(抓虾) (MIT Licensed) is a little tool to batch download music resource
 - requests module
 - mutagen module
 - beautifulsoup4 module
+- pycrypto module
 
 ## Features
 

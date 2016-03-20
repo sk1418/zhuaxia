@@ -28,6 +28,7 @@ zhuaxia 是一个基于命令行的虾米音乐 ( www.xiami.com 以下简称[虾
 - requests module
 - mutagen module
 - beautifulsoup4 module
+- pycrypto module
 
 ##Features
 - 自动识别解析URL. 目前支持：

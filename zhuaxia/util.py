@@ -10,6 +10,9 @@ import HTMLParser
 
 #used by get_terminal_size
 import fcntl, termios, struct
+#used by Netease post request parameter encoding
+from Crypto.Cipher import AES
+import base64
 
 def get_terminal_size(fd=1):
     """
@@ -60,3 +63,17 @@ def rjust(s,n,fillchar=' '):
     no_ascii_list = re.findall(r'[^\x00-\x7F]+', s)
     ln = len(''.join(no_ascii_list))
     return s.rjust(n-ln, fillchar)
+
+def rsa_encrypt(text, pubKey, modulus):
+    text = text[::-1]
+    rs = int(text.encode('hex'), 16) ** int(pubKey, 16) % int(modulus, 16)
+    return format(rs, 'x').zfill(256)
+
+def aes_encrypt(text, secKey):
+    pad = 16 - len(text) % 16
+    text = text + pad * chr(pad)
+    encryptor = AES.new(secKey, 2, '0102030405060708')
+    ciphertext = encryptor.encrypt(text)
+    ciphertext = base64.b64encode(ciphertext)
+    return ciphertext
+
