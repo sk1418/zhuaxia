@@ -75,9 +75,9 @@ class Downloader(Thread):
 def get_proxy(song):
     proxy = None
     if song.handler.need_proxy_pool:
-        proxy = {'http':song.handler.proxies.get_proxy()}
-    elif config.CHINA_PROXY_HTTP:
-        proxy={'http': config.CHINA_PROXY_HTTP}
+        proxy = {'http':song.handler.proxy_pool.get_proxy()}
+    elif song.handler.proxy:
+        proxy={'http': song.handler.proxy}
     return proxy
 
 def write_mp3_meta(song):
@@ -201,12 +201,8 @@ def download_url_urllib(url,filepath,show_progress=False, proxy=None):
     try:
         proxyServer = urllib2.ProxyHandler(proxy) if proxy else None
         opener = urllib2.build_opener()
-        # for downloading, ignore the proxy, it seems that if 
-        # we got the real link, both 163 and xiami don't need a CN proxy to
-        # download the songs
-
-        # if proxyServer:
-            # opener = urllib2.build_opener(proxyServer)
+        if proxyServer:
+            opener = urllib2.build_opener(proxyServer)
             
         urllib2.install_opener(opener)
         r = urllib2.urlopen(url, timeout=30)
@@ -435,7 +431,7 @@ def download_lyrics(songs):
                 if song.song_type == 1: #xiami
                     if song.handler.need_proxy_pool:
                         if song.lyric_link:
-                            download_url(song.lyric_link, song.lyric_abs_path, show_progress=True, proxy={'http':song.handler.proxies.get_proxy()})
+                            download_url(song.lyric_link, song.lyric_abs_path, show_progress=True, proxy=get_proxy(song))
                     else:
                         if song.lyric_link:
                             download_url(song.lyric_link, song.lyric_abs_path, show_progress=True)
