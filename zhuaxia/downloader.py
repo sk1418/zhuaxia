@@ -272,7 +272,9 @@ def download_single_song(song):
     global done, progress
 
     if ( not song.filename ) or (not song.dl_link):
-        LOG.error( 'Song [id:%s] cannot be downloaded' % song.song_id)
+        LOG.error( 'Song [id:%s] cannot be downloaded. Filename or dl_link is missing.' % song.song_id)
+        fill_failed_list(song)
+        done+=1
         return
     mp3_file = song.abs_path
 
