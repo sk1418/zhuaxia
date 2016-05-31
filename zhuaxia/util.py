@@ -14,6 +14,10 @@ import fcntl, termios, struct
 from Crypto.Cipher import AES
 import base64
 
+def format_json(json_str):
+    parsed = json.loads(json_str)
+    return json.dumps(parsed, indent=4, sort_keys=True)
+
 def get_terminal_size(fd=1):
     """
       Returns height and width of current terminal. First tries to get

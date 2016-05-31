@@ -18,9 +18,9 @@ class Handler(object):
     """
     handler class encapsulate xiami or netease object
     """
-    def __init__(self, proxies = None):
-        self.proxies = proxies
-        self.need_proxy_pool = self.proxies != None
+    def __init__(self, proxy_pool = None):
+        self.proxy_pool = proxy_pool
+        self.need_proxy_pool = self.proxy_pool != None
         self.HEADERS = {}
 
 class History(object):

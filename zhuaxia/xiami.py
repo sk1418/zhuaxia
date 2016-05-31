@@ -320,7 +320,8 @@ class Xiami(Handler):
         self.session = None
         self.is_hq = option.is_hq
         self.dl_lyric = option.dl_lyric
-        Handler.__init__(self,option.proxies)
+        self.proxy = option.proxy
+        Handler.__init__(self,option.proxy_pool)
 
         #if either email or password is empty skip login
         if not email or not password or not self.is_hq:
@@ -369,11 +370,11 @@ class Xiami(Handler):
 
 
         requests_proxy = None
-        if config.CHINA_PROXY_HTTP:
-            requests_proxy = { 'http':config.CHINA_PROXY_HTTP}
+        if self.proxy:
+            requests_proxy = { 'http':self.proxy}
 
         if self.need_proxy_pool:
-            requests_proxy = {'http':self.proxies.get_proxy()}
+            requests_proxy = {'http':self.proxy_pool.get_proxy()}
 
         retVal = None
         if self.need_proxy_pool:
