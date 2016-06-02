@@ -18,10 +18,10 @@ class Option(object):
         self.proxy           = config.CHINA_PROXY_HTTP
 
     def debug_me(self):
-        LOG.debug( "hq:"+str(self.is_hq))
-        LOG.debug( "inFile:"+self.inFile)
-        LOG.debug( "inUrl:"+self.inUrl)
-        LOG.debug( "proxy:"+ self.proxy)
-        LOG.debug( "needProxyPool:"+ str(self.need_proxy_pool))
-        LOG.debug( "dl_lyric:"+str(self.dl_lyric))
-        LOG.debug( "incremental_dl:"+str(self.incremental_dl))
+        LOG.debug( "hq: "+str(self.is_hq))
+        LOG.debug( "inFile: "+self.inFile)
+        LOG.debug( "inUrl: "+self.inUrl)
+        LOG.debug( "proxy: "+ str(self.proxy))
+        LOG.debug( "needProxyPool: "+ str(self.need_proxy_pool))
+        LOG.debug( "dl_lyric: "+str(self.dl_lyric))
+        LOG.debug( "incremental_dl: "+str(self.incremental_dl))
