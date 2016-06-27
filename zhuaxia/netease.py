@@ -287,13 +287,5 @@ class Netease(Handler):
         
         page = requests.post(url_mp3_post, data=self.encrypt_post_param(req), headers=self.HEADERS, timeout=30, proxies={'http':self.proxy})
         result = page.json()["data"][0]["url"]
-
-        #the redirect.....
-        if result:
-
-            r = self.read_link(result)
-            if r.history:
-                return  r.history[0].headers['Location']
-        
         return result
 
