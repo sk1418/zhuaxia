@@ -57,7 +57,14 @@ class NeteaseSong(Song):
             self.song_id = re.search(r'(?<=/song\?id=)\d+', url).group(0)
 
             LOG.debug(msg.head_163 + msg.fmt_init_song % self.song_id)
-            j = self.handler.read_link(url_song % (self.song_id,self.song_id)).json()['songs'][0]
+            response = self.handler.read_link(url_song % (self.song_id,self.song_id))
+
+            #print json for debug
+            #LOG.debug(util.format_json(response.text))
+
+            j = response.json()['songs'][0]
+
+
             self.init_by_json(j)
             LOG.debug(msg.head_163 + msg.fmt_init_song_ok % self.song_id)
             #set filename, abs_path etc.
@@ -209,9 +216,10 @@ class Netease(Handler):
     option is the user given options and other data @see __init__
     """
     def __init__(self, option):
-        Handler.__init__(self,option.proxies)
+        Handler.__init__(self,option.proxy_pool)
         self.is_hq = option.is_hq
         self.dl_lyric = option.dl_lyric
+        self.proxy = option.proxy
         #headers
         self.HEADERS = {'User-Agent':AGENT}
         self.HEADERS['Referer'] = url_163
@@ -221,10 +229,10 @@ class Netease(Handler):
         
         retVal = None
         requests_proxy = {}
-        if config.CHINA_PROXY_HTTP:
-            requests_proxy = { 'http':config.CHINA_PROXY_HTTP}
+        if self.proxy:
+            requests_proxy = { 'http':self.proxy}
         if self.need_proxy_pool:
-            requests_proxy = {'http':self.proxies.get_proxy()}
+            requests_proxy = {'http':self.proxy_pool.get_proxy()}
 
             while True:
                 try:
@@ -276,7 +284,8 @@ class Netease(Handler):
                 "br": bitrate,
                 "csrf_token": ""
             }
-        page = requests.post(url_mp3_post, data=self.encrypt_post_param(req), headers=self.HEADERS, timeout=30)
+        
+        page = requests.post(url_mp3_post, data=self.encrypt_post_param(req), headers=self.HEADERS, timeout=30, proxies={'http':self.proxy})
         result = page.json()["data"][0]["url"]
 
         #the redirect.....
