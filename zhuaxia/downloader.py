@@ -271,6 +271,9 @@ def download_single_song(song):
     """
     global done, progress
 
+    #download retry count
+    retry = 5
+
     if ( not song.filename ) or (not song.dl_link):
         LOG.error( 'Song [id:%s] cannot be downloaded. Filename or dl_link is missing.' % song.song_id)
         fill_failed_list(song)
@@ -278,7 +281,6 @@ def download_single_song(song):
         return
     mp3_file = song.abs_path
 
-    retry = 5
     dl_result = -1 # download return code
     LOG.debug("[DL_Song] downloading: %s " % song.dl_link)
     while retry > 0 :
