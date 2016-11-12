@@ -134,6 +134,7 @@ class Album(object):
         #handle songs
         for jsong in j:
             song = XiamiSong(self.handler, song_json=jsong)
+            song.song_name = jsong['name']  # name or songName
             song.group_dir = self.artist_name + u'_' + self.album_name
             song.group_dir = song.group_dir.replace('/','_')
             song.post_set()
