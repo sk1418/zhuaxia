@@ -1,0 +1,4 @@
+beautifulsoup4==4.5.1
+mutagen==1.35.1
+pycrypto==2.6.1
+requests==2.11.1
