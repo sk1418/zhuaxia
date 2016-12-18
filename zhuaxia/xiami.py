@@ -97,6 +97,9 @@ class XiamiSong(Song):
             title = song_json['title']
         elif song_json['name']:
             title = song_json['name']
+        elif song_json['songName']:
+            title = song_json['songName']
+
         self.song_name = util.decode_html(title)
         location = song_json['location']
         #decode download link
