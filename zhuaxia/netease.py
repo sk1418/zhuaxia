@@ -147,6 +147,7 @@ class NeteaseAlbum(object):
         for jsong in js['songs']:
             song = NeteaseSong(self.handler, song_json=jsong)
             song.group_dir = self.artist_name + u'_' + self.album_name
+            song.group_dir = song.group_dir.replace('/', '_')
             song.post_set()
             self.songs.append(song)
 

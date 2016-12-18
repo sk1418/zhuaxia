@@ -125,24 +125,29 @@ class Album(object):
         self.init_album()
 
     def init_album(self):
-        j = self.handler.read_link(url_album % self.album_id).json()['data']['trackList']
-        j_first_song = j[0]
-        #name
-        self.album_name = util.decode_html(j_first_song['album_name'])
-        #album logo
-        self.logo = j_first_song['album_pic']
-        # artist_name
-        self.artist_name = j_first_song['artist']
+        resp_json = self.handler.read_link(url_album % self.album_id).json()
+        j = resp_json['data']['trackList']
 
         #description
         html = self.handler.read_link(self.url).text
         soup = BeautifulSoup(html,'html.parser')
         self.album_desc = soup.find('span', property="v:summary").text
+        # name
+        self.album_name = soup.find('meta', property="og:title")['content']
+        # album logo
+        self.logo = soup.find('meta', property="og:image")['content']
+        # artist_name
+        self.artist_name = soup.find('meta', property="og:music:artist")['content']
+        if j is None :
+            LOG.error(resp_json['message'])
+            return
 
         #handle songs
         for jsong in j:
             song = XiamiSong(self.handler, song_json=jsong)
+            song.song_name = jsong['name']  # name or songName
             song.group_dir = self.artist_name + u'_' + self.album_name
+            song.group_dir = song.group_dir.replace('/','_')
             song.post_set()
             self.songs.append(song)
 

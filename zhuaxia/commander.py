@@ -193,7 +193,7 @@ def from_url_xm(xm_obj, url, verbose=True):
 
         fav = xm.Favorite(xm_obj, url, verbose)
         total_songs.extend(fav.songs)
-        msgs = [fmt_parsing % (xiami_url_abbr(url), msgTxt.Favorite ,'')]
+        msgs = [fmt_parsing % (xiami_url_abbr(url), msgTxt.favorite ,'')]
         if verbose:
             for s in fav.songs:
                 msgs.append(fmt_single_song %s.song_name)
