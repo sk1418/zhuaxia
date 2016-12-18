@@ -92,7 +92,12 @@ class XiamiSong(Song):
 
         self.song_id = song_json['song_id']
         self.album_id = song_json['album_id']
-        self.song_name = util.decode_html(song_json['title'])
+        title = song_json['artist'] + '_' + self.song_id
+        if song_json['title']:
+            title = song_json['title']
+        elif song_json['name']:
+            title = song_json['name']
+        self.song_name = util.decode_html(title)
         location = song_json['location']
         #decode download link
         self.dl_link = self.handler.decode_xiami_link(location)
