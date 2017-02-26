@@ -1,3 +1,7 @@
+2017-02-26  Version 3.2.0
+=========================
+- [#49] xiami now encrypts the object id in url, add logic to get the real id, also try to get the hq link directly from json
+
 2016-12-18  Version 3.1.3
 =========================
 - [#47] xiami song title handling
