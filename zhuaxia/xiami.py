@@ -56,7 +56,7 @@ class XiamiSong(Song):
         # self.group_dir = None
         if url:
             self.url = url
-            self.song_id = re.search(r'(?<=/song/)\d+', url).group(0)
+            self.song_id = xiami_obj.get_real_id(url, r'(?<=/song/)[^?]+')
             LOG.debug(msg.head_xm + msg.fmt_init_song % self.song_id)
 
             #get the song json data
@@ -78,17 +78,13 @@ class XiamiSong(Song):
         elif song_json:
             self.init_by_json(song_json)
         
-        #if is_hq, get the hq location to overwrite the dl_link
-        if self.handler.is_hq:
-            try:
-                self.dl_link = self.handler.get_hq_link(self.song_id)
-            except:
-                #if user was not VIP, don't change the dl_link
-                pass
 
 
     def init_by_json(self, song_json ):
-        """ the group dir and abs_path should be set by the caller"""
+        """ 
+        This method will handle HQ option too
+        the group dir and abs_path should be set by the caller
+        """
 
         self.song_id = song_json['song_id']
         self.album_id = song_json['album_id']
@@ -111,13 +107,21 @@ class XiamiSong(Song):
         # album id, name
         self.album_name = util.decode_html(song_json['album_name'])
 
+        #if is_hq, get the hq location to overwrite the dl_link
+        if self.handler.is_hq:
+            try:
+                hq_link = self.handler.get_hq_link(song_json)
+                self.dl_link = hq_link if hq_link else self.dl_link
+            except:
+                #if user was not VIP, don't change the dl_link
+                pass
 
 class Album(object):
     """The xiami album object"""
     def __init__(self, xm_obj, url):
         self.handler = xm_obj
         self.url = url 
-        self.album_id = re.search(r'(?<=/album/)\d+', self.url).group(0)
+        self.album_id = xiami_obj.get_real_id(url, r'(?<=/album/)[^?]+')
         LOG.debug(msg.head_xm + msg.fmt_init_album % self.album_id)
         self.year = None
         self.track=None
@@ -234,7 +238,7 @@ class Collection(object):
         self.url = url
         self.handler = xm_obj
         #user id in url
-        self.collection_id = re.search(r'(?<=/collect/)\d+', self.url).group(0)
+        self.collection_id = xiami_obj.get_real_id(url, r'(?<=/collect/)[^?]+')
         self.songs = []
         self.init_collection()
 
@@ -274,14 +278,14 @@ class TopSong(object):
         self.handler = xm_obj
         #artist id
         id_regexs=(
-                r'(?<=/artist/top/id/)\d+',
-                r'(?<=/artist/top-)\d+',
-                r'(?<=/artist/)\d+'
+                r'(?<=/artist/top/id/)[^?]+',
+                r'(?<=/artist/top-)[^?]+',
+                r'(?<=/artist/)[^?]+'
                 )
         for id_regex in id_regexs:
             matched = re.search(id_regex, self.url)
             if matched:
-                self.artist_id = matched.group(0)
+                self.artist_id = xiami_obj.get_real_id(url, id_regex)
                 break
 
         self.artist_name = ""
@@ -344,12 +348,12 @@ class Xiami(Handler):
         #do login
         if self.skip_login:
             LOG.warning(msg.head_xm + msg.dl_128kbps_xm)
-            is_hq = False
+            # is_hq = False
         else:
             if self.login():
                 LOG.info( msg.head_xm + msg.fmt_login_ok_xm % (self.user_name.decode('utf-8'),self.uid) )
-            else:
-                self.is_hq = False
+            # else:
+                # self.is_hq = False
 
     def login(self):
         LOG.info( msg.head_xm + msg.login_xm)
@@ -374,7 +378,7 @@ class Xiami(Handler):
             return True
         except:
             LOG.warning(msg.head_xm + msg.login_err_xm)
-            self.is_hq = False
+            # self.is_hq = False
             return False
 
     def read_link(self, link):
@@ -416,9 +420,16 @@ class Xiami(Handler):
         return retVal
 
 
-    def get_hq_link(self, song_id):
-        mess = self.read_link(url_hq%song_id).json()['location']
-        return self.decode_xiami_link(mess)
+    def get_hq_link(self, song_json):
+        """ return hq file path or None
+        """
+        LOG.debug(msg.head_xm + " Try to get xiami HQ link...")
+        all_audios = song_json['allAudios']
+        for audio in all_audios:
+            if audio['format'] == 'mp3' and audio['audioQualityEnum'] == 'HIGH':
+                LOG.debug( msg.head_xm + "found HQ link:" + audio['filepath'])
+                return audio['filepath']
+        return None
 
     def decode_xiami_link(self,mess):
         """decode xm song link"""
@@ -439,3 +450,20 @@ class Xiami(Handler):
             durl += l[i%rows][i/rows]
 
         return urllib.unquote(durl).replace('^', '0')
+
+    def get_real_id(self,url, regex):
+        """
+        try to get the real object(album, song etc.) id
+        url : the url to the object
+        regex: the regex to fetch the possible object id
+        """
+        possible_id = re.search(regex , url).group(0)
+        if re.match('^\d+$', possible_id):
+            return possible_id
+
+        html = self.read_link(url).text
+        soup = BeautifulSoup(html,'html.parser')
+        real_url = soup.find('meta', {'name':"mobile-agent"})['content']
+        real_id = re.search(r'\d+$', real_url).group(0)
+        return real_id
+
