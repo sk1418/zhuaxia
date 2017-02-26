@@ -427,8 +427,8 @@ class Xiami(Handler):
         all_audios = song_json['allAudios']
         for audio in all_audios:
             if audio['format'] == 'mp3' and audio['audioQualityEnum'] == 'HIGH':
-                LOG.debug( msg.head_xm + "found HQ link:" + audio['filepath'])
-                return audio['filepath']
+                LOG.debug(msg.head_xm + "found HQ link:" + audio['filePath'])
+                return audio['filePath']
         return None
 
     def decode_xiami_link(self,mess):
