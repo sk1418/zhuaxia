@@ -161,15 +161,16 @@ def from_url_xm(xm_obj, url, verbose=True):
     msg = u''
     if '/collect/' in url:
         collect = xm.Collection(xm_obj, url)
-        total_songs.extend(collect.songs)
-        msgs = [ fmt_parsing % (xiami_url_abbr(url), msgTxt.collection ,collect.collection_name)]
-        if verbose:
-            for s in collect.songs:
-                msgs.append( fmt_single_song % s.song_name)
-            msg = u'\n    |-> '.join(msgs)
-        else:
-            msgs.append(fmt_has_song_nm % len(collect.songs))
-            msg= u' => '.join(msgs)
+        if collect.songs:
+            total_songs.extend(collect.songs)
+            msgs = [ fmt_parsing % (xiami_url_abbr(url), msgTxt.collection ,collect.collection_name)]
+            if verbose:
+                for s in collect.songs:
+                    msgs.append( fmt_single_song % s.song_name)
+                msg = u'\n    |-> '.join(msgs)
+            else:
+                msgs.append(fmt_has_song_nm % len(collect.songs))
+                msg= u' => '.join(msgs)
 
     elif '/song/' in url:
         song = xm.XiamiSong(xm_obj, url=url)

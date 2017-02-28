@@ -121,7 +121,7 @@ class Album(object):
     def __init__(self, xm_obj, url):
         self.handler = xm_obj
         self.url = url 
-        self.album_id = xiami_obj.get_real_id(url, r'(?<=/album/)[^?]+')
+        self.album_id = xm_obj.get_real_id(url, r'(?<=/album/)[^?]+')
         LOG.debug(msg.head_xm + msg.fmt_init_album % self.album_id)
         self.year = None
         self.track=None
@@ -238,13 +238,16 @@ class Collection(object):
         self.url = url
         self.handler = xm_obj
         #user id in url
-        self.collection_id = xiami_obj.get_real_id(url, r'(?<=/collect/)[^?]+')
+        self.collection_id = xm_obj.get_real_id(url, r'(?<=/collect/)[^?]+')
         self.songs = []
         self.init_collection()
 
     def init_collection(self):
         LOG.debug(msg.head_xm + msg.fmt_init_collect % self.collection_id)
         j = self.handler.read_link(url_collection % (self.collection_id) ).json()['data']['trackList']
+        if not j:
+            LOG.warning(msg.head_xm + " cannot load data for url: %s "% self.url)
+            return
         j_first_song = j[0]
         #read collection name
         self.collection_name = self.get_collection_name()
@@ -285,7 +288,7 @@ class TopSong(object):
         for id_regex in id_regexs:
             matched = re.search(id_regex, self.url)
             if matched:
-                self.artist_id = xiami_obj.get_real_id(url, id_regex)
+                self.artist_id = xm_obj.get_real_id(url, id_regex)
                 break
 
         self.artist_name = ""
