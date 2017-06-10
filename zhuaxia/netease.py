@@ -97,15 +97,18 @@ class NeteaseSong(Song):
         bitrate = 0
         if self.handler.is_hq and js['hMusic']:
             dfsId = js['hMusic']['dfsId']
+            dfsId = js['hMusic']['id'] if not dfsId else dfsId
             quality = 'HD'
             bitrate = js['hMusic']['bitrate']
         elif js['mMusic']:
             dfsId = js['mMusic']['dfsId']
+            dfsId = js['mMusic']['id'] if not dfsId else dfsId
             quality = 'MD'
             bitrate = js['mMusic']['bitrate']
         elif js['lMusic']:
             LOG.warning(msg.head_163 + msg.fmt_quality_fallback %self.song_name)
             dfsId = js['lMusic']['dfsId']
+            dfsId = js['lMusic']['id'] if not dfsId else dfsId
             quality = 'LD'
             bitrate = js['lMusic']['bitrate']
         if dfsId:
