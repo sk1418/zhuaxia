@@ -1,3 +1,7 @@
+2017-02-26  Version 3.2.1
+=========================
+- [#53] fix reading dfsId of 163 song due to the json modification by netease
+
 2017-02-26  Version 3.2.0
 =========================
 - [#49] xiami now encrypts the object id in url, add logic to get the real id, also try to get the hq link directly from json
