@@ -1,3 +1,7 @@
+2017-07-04  Version 3.2.2
+=========================
+- [#54] fix song doesn't have an album name
+
 2017-02-26  Version 3.2.1
 =========================
 - [#53] fix reading dfsId of 163 song due to the json modification by netease
