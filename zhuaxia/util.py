@@ -53,7 +53,10 @@ def create_dir(dir_name):
             os.makedirs(dir_name)
 
 def decode_html(s):
-    return HTMLParser.HTMLParser().unescape(s)
+    try:
+        return HTMLParser.HTMLParser().unescape(s)
+    except Exception:
+        return "Unknown"
 
 def ljust(s,n,fillchar=' '):
     """ if string has unicode chars, the built-in l/rjust cannot 
