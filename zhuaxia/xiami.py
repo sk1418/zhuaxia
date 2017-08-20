@@ -89,12 +89,12 @@ class XiamiSong(Song):
         self.song_id = song_json['song_id']
         self.album_id = song_json['album_id']
         title = song_json['artist'] + '_' + self.song_id
-        if song_json['title']:
-            title = song_json['title']
+        if song_json['songName']:
+            title = song_json['songName']
         elif song_json['name']:
             title = song_json['name']
-        elif song_json['songName']:
-            title = song_json['songName']
+        elif song_json['title']:
+            title = song_json['title']
 
         self.song_name = util.decode_html(title)
         location = song_json['location']
