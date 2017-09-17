@@ -1,3 +1,7 @@
+2017-08-20 Version 3.2.3
+=========================
+- [#55] fix xiami song title parsing
+
 2017-07-04  Version 3.2.2
 =========================
 - [#54] fix song doesn't have an album name
