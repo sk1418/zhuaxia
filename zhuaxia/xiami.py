@@ -63,7 +63,7 @@ class XiamiSong(Song):
             try:
                 jsong = self.handler.read_link(url_song % self.song_id).json()['data']['trackList'][0]
             except Exception, err:
-                LOG.error(msg.head_xm + msg.fmt_err_song_parse %url)
+                LOG.error(msg.head_xm + msg.fmt_err_song_parse %url) 
                 LOG.debug(self.handler.read_link(url_song % self.song_id).text)
                 raise
                 
@@ -203,7 +203,7 @@ class Favorite(object):
             if not total:
                 total = soup.find('span', class_='counts').string
 
-            links = [link.get('href') for link in soup.find_all(href=re.compile(r'xiami.com/song/\d+')) if link]
+            links = [link.get('href') for link in soup.find_all(href=re.compile(r'xiami.com/song/[^?]+')) if link]
             if links:
                 for link in links:
                     LOG.debug(msg.head_xm + msg.fmt_parse_song_url % link)
