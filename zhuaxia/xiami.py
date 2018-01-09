@@ -36,6 +36,7 @@ url_album = xm_type_dict['album'].join(url_parts)
 url_artist_top_song= xm_type_dict['artist'].join(url_parts)
 url_collection= xm_type_dict['collection'].join(url_parts)
 url_fav = "http://www.xiami.com/space/lib-song/u/%s/page/%s"
+req_para = "?_ksTS=%s"
 
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
@@ -386,7 +387,8 @@ class Xiami(Handler):
 
     def read_link(self, link):
         headers = {'User-Agent':AGENT}
-        #headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
+        # headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
+        headers['Referer'] = link.split(url_parts[1])[0]
 
 
         requests_proxy = None
