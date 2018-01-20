@@ -388,7 +388,8 @@ class Xiami(Handler):
         headers = {'User-Agent':AGENT}
         # headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
         # the Referer needs to be the link with id and download type 
-        headers['Referer'] = link.split(url_parts[1])[0]
+        referer_prefix = 'http://www.xiami.com/play?ids='
+        headers['Referer'] = link.split(url_parts[1])[0].replace(url_xiami, referer_prefix)
 
 
         requests_proxy = None
