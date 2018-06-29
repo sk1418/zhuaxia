@@ -1,3 +1,11 @@
+2018-06-29  Version 3.2.6
+=========================
+- [#60] xiami cutoff the http: from dl-link, fixed
+
+2018-01-20  Version 3.2.5
+=========================
+- change xiami Referer Header, xm changed it again...
+
 2018-01-09  Version 3.2.4
 =========================
 - [#59] add xiami Referer Header 

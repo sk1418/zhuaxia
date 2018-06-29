@@ -455,7 +455,11 @@ class Xiami(Handler):
         for i in xrange(len_url):
             durl += l[i%rows][i/rows]
 
-        return urllib.unquote(durl).replace('^', '0')
+        durl = urllib.unquote(durl).replace('^', '0')
+
+        #if it is not started by 'http:', add the protocol
+        durl = ("" if durl.startswith('http:') else 'http:') + durl
+        return durl
 
     def get_real_id(self,url, regex):
         """
