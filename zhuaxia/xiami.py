@@ -40,7 +40,6 @@ url_fav = "http://www.xiami.com/space/lib-song/u/%s/page/%s"
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
 
-
 class XiamiSong(Song):
     """
     xiami Song class, if song_json was given, 
@@ -128,23 +127,31 @@ class Album(object):
         self.songs = [] # list of Song
         self.init_album()
 
+
     def init_album(self):
         resp_json = self.handler.read_link(url_album % self.album_id).json()
         j = resp_json['data']['trackList']
 
+        if not j :
+            LOG.error(resp_json['message'])
+            return
         #description
         html = self.handler.read_link(self.url).text
         soup = BeautifulSoup(html,'html.parser')
-        self.album_desc = soup.find('span', property="v:summary").text
-        # name
-        self.album_name = soup.find('meta', property="og:title")['content']
-        # album logo
-        self.logo = soup.find('meta', property="og:image")['content']
-        # artist_name
-        self.artist_name = soup.find('meta', property="og:music:artist")['content']
-        if j is None :
-            LOG.error(resp_json['message'])
-            return
+        if  soup.find('meta', property="og:title"):
+            self.album_desc = soup.find('span', property="v:summary").text
+            # name
+            self.album_name = soup.find('meta', property="og:title")['content']
+            # album logo
+            self.logo = soup.find('meta', property="og:image")['content']
+            # artist_name
+            self.artist_name = soup.find('meta', property="og:music:artist")['content']
+        else:
+            aSong = j[0]
+            self.album_name = aSong['album_name']
+            self.logo = aSong['album_pic']
+            self.artist_name = aSong['artistVOs'][0]['artistName']
+            self.album_desc = None
 
         #handle songs
         for jsong in j:
@@ -162,7 +169,9 @@ class Album(object):
 
         #download album logo images
         LOG.debug(msg.head_xm + msg.fmt_dl_album_cover % self.album_name)
-        downloader.download_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
+        if self.logo:
+            self.logo = self.handler.add_http_prefix(self.logo)
+            downloader.download_url(self.logo, path.join(d,'cover.' +self.logo.split('.')[-1]))
 
         LOG.debug(msg.head_xm + msg.fmt_save_album_desc % self.album_name)
         if self.album_desc:
@@ -385,12 +394,20 @@ class Xiami(Handler):
             return False
 
     def read_link(self, link):
+        link = self.add_http_prefix(link)
         headers = {'User-Agent':AGENT}
         # headers['Referer'] = 'http://img.xiami.com/static/swf/seiya/player.swf?v=%s'%str(time.time()).replace('.','')
         # the Referer needs to be the link with id and download type 
         referer_prefix = 'http://www.xiami.com/play?ids='
         headers['Referer'] = link.split(url_parts[1])[0].replace(url_xiami, referer_prefix)
-
+        headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        headers['Accept-Language'] = 'en-US,en;q=0.5'
+        headers['Accept-Encoding'] = 'gzip, deflate, br'
+        headers['Host'] = 'www.xiami.com'
+        headers['DNT'] = '1'
+        headers['Connection'] = 'keep-alive'
+        headers['Upgrade-Insecure-Requests'] = '1'
+        headers['User-Agent']= 'Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0'
 
         requests_proxy = None
         if self.proxy:
@@ -434,8 +451,11 @@ class Xiami(Handler):
         for audio in all_audios:
             if audio['format'] == 'mp3' and audio['audioQualityEnum'] == 'HIGH':
                 LOG.debug(msg.head_xm + "found HQ link:" + audio['filePath'])
-                return audio['filePath']
+                return self.add_http_prefix(audio['filePath'])
         return None
+
+    def add_http_prefix(self, link):
+        return ("" if link.startswith('http') else 'http:') + link
 
     def decode_xiami_link(self,mess):
         """decode xm song link"""
@@ -466,14 +486,18 @@ class Xiami(Handler):
         try to get the real object(album, song etc.) id
         url : the url to the object
         regex: the regex to fetch the possible object id
+
+        update: it seems that json can be loaded with the string id 
+        now, so comment out the old logic
         """
         possible_id = re.search(regex , url).group(0)
-        if re.match('^\d+$', possible_id):
-            return possible_id
+        return possible_id
+        # if re.match('^\d+$', possible_id):
+            # return possible_id
 
-        html = self.read_link(url).text
-        soup = BeautifulSoup(html,'html.parser')
-        real_url = soup.find('meta', {'name':"mobile-agent"})['content']
-        real_id = re.search(r'\d+$', real_url).group(0)
-        return real_id
+        # html = self.read_link(url).text
+        # soup = BeautifulSoup(html,'html.parser')
+        # real_url = soup.find('meta', {'name':"mobile-agent"})['content']
+        # real_id = re.search(r'\d+$', real_url).group(0)
+        # return real_id
 
