@@ -7,6 +7,7 @@ import json
 import md5
 import os
 from os import path
+import random
 import downloader
 from obj import Song, Handler
 
@@ -30,6 +31,9 @@ url_mp3_post = 'http://music.163.com/weapi/song/enhance/player/url?csrf_token='
 #agent string for http request header
 AGENT= 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'
 
+#cookie string
+COOKIE= 'JSESSIONID-WYYY=%s; _iuqxldmzr_=32; _ntes_nnid=%s,%s; _ntes_nuid=%s; appver=1.7.3'
+
 #this block is kind of magical secret.....No idea why the keys, modulus have those values ( for building the post request parameters. The encryption logic was take from https://github.com/Catofes/musicbox/blob/new_api/NEMbox/api.py)
 modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7'
 nonce = '0CoJUm6Qyw8W8jud'
@@ -39,8 +43,8 @@ pubKey = '010001'
 
 class NeteaseSong(Song):
     """
-    163 Song class, if song_json was given, 
-    Song.post_set() needs to be called for post-setting 
+    163 Song class, if song_json was given,
+    Song.post_set() needs to be called for post-setting
     abs_path, filename, etc.
     url example: http://music.163.com/song?id=209235
     """
@@ -129,7 +133,7 @@ class NeteaseAlbum(object):
         """url example: http://music.163.com/album?id=2646379"""
 
         self.handler=m163
-        self.url = url 
+        self.url = url
         self.album_id = re.search(r'(?<=/album\?id=)\d+', self.url).group(0)
         LOG.debug(msg.head_163 + msg.fmt_init_album % self.album_id)
         self.year = None
@@ -227,10 +231,13 @@ class Netease(Handler):
         #headers
         self.HEADERS = {'User-Agent':AGENT}
         self.HEADERS['Referer'] = url_163
-        self.HEADERS['Cookie'] = 'appver=1.7.3'
+        timestamp = str(int(time.time() * 1000))
+        jsessionid = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKMNOPQRSTUVWXYZ\\/+') for i in xrange(176)) + ':' + timestamp
+        nuid = ''.join(random.choice('0123456789abcdefghijklmnopqrstuvwxyz') for i in xrange(32))
+        self.HEADERS['Cookie'] = COOKIE % (jsessionid, nuid, timestamp, nuid)
 
     def read_link(self, link):
-        
+
         retVal = None
         requests_proxy = {}
         if self.proxy:
@@ -241,7 +248,7 @@ class Netease(Handler):
             while True:
                 try:
                     retVal =  requests.get(link, headers=self.HEADERS, proxies=requests_proxy)
-                    break 
+                    break
                 except requests.exceptions.ConnectionError:
                     LOG.debug('invalid proxy detected, removing from pool')
                     self.proxies.del_proxy(requests_proxy['http'])
@@ -288,7 +295,7 @@ class Netease(Handler):
                 "br": bitrate,
                 "csrf_token": ""
             }
-        
+
         page = requests.post(url_mp3_post, data=self.encrypt_post_param(req), headers=self.HEADERS, timeout=30, proxies={'http':self.proxy})
         result = page.json()["data"][0]["url"]
         return result
